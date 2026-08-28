@@ -151,6 +151,9 @@ if ! grep -q __MINGW32__ "$SAFEINT"; then
     sed -i 's|#ifndef C_ASSERT|#ifdef __MINGW32__\n#undef C_ASSERT\n#define C_ASSERT(e) static_assert((e), "C_ASSERT")\n#endif\n#ifndef C_ASSERT|' "$SAFEINT"
 fi
 
+# MSVC-style link input; mingw needs the lowercase library name.
+sed -i 's|Winhttp\.lib|winhttp|' "$SRC/cpprestsdk-$VER/Release/src/CMakeLists.txt"
+
 export WINLIBS_FIND_ROOT="$BOOST;$OPENSSL;$ZLIB"
 B="$BLD/cpprestsdk"
 rm -rf "$B" "$PREFIX"
