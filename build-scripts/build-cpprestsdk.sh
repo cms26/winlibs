@@ -151,8 +151,10 @@ if ! grep -q __MINGW32__ "$SAFEINT"; then
     sed -i 's|#ifndef C_ASSERT|#ifdef __MINGW32__\n#undef C_ASSERT\n#define C_ASSERT(e) static_assert((e), "C_ASSERT")\n#endif\n#ifndef C_ASSERT|' "$SAFEINT"
 fi
 
-# MSVC-style link input; mingw needs the lowercase library name.
+# MSVC-style link input; mingw needs the lowercase library name, and the
+# asio-based listener/websocket code needs winsock.
 sed -i 's|Winhttp\.lib|winhttp|' "$SRC/cpprestsdk-$VER/Release/src/CMakeLists.txt"
+sed -i 's|^    winhttp$|    winhttp\n    ws2_32\n    mswsock|' "$SRC/cpprestsdk-$VER/Release/src/CMakeLists.txt"
 
 export WINLIBS_FIND_ROOT="$BOOST;$OPENSSL;$ZLIB"
 B="$BLD/cpprestsdk"
@@ -160,7 +162,7 @@ rm -rf "$B" "$PREFIX"
 cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
     -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DBUILD_TESTS=OFF -DBUILD_SAMPLES=OFF -DWERROR=OFF \
-    -DCMAKE_CXX_FLAGS="-D_TURN_OFF_PLATFORM_STRING" \
+    -DCMAKE_CXX_FLAGS="-D_TURN_OFF_PLATFORM_STRING -DCPPREST_FORCE_PPLX=1" \
     -DCPPREST_EXCLUDE_BROTLI=ON \
     -DCPPREST_FILEIO_IMPL=posix \
     -DCPPREST_HTTP_LISTENER_IMPL=asio \
