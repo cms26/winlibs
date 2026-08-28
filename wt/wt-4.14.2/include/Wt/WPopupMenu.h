@@ -1,0 +1,352 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bv, Herent, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WPOPUP_MENU_H_
+#define WPOPUP_MENU_H_
+
+#include <Wt/WMenu.h>
+#include <Wt/WJavaScript.h>
+
+namespace Wt {
+
+/*! \class WPopupMenu Wt/WPopupMenu.h Wt/WPopupMenu.h
+ *  \brief A menu presented in a popup window.
+ *
+ * The menu implements a typical context menu, with support for
+ * submenu's. It is a specialized WMenu from which it inherits most of
+ * the API.
+ *
+ * When initially created, the menu is invisible, until popup() or
+ * exec() is called. Then, the menu will remain visible until an item
+ * is selected, or the user cancels the menu (by hitting Escape or
+ * clicking elsewhere).
+ *
+ * The implementation assumes availability of JavaScript to position
+ * the menu at the current mouse position and provide feed-back of the
+ * currently selected item.
+ *
+ * As with WDialog, there are two ways of using the menu. The simplest
+ * way is to use one of the synchronous exec() methods, which starts a
+ * reentrant event loop and waits until the user cancelled the popup
+ * menu (by hitting Escape or clicking elsewhere), or selected an
+ * item.
+ *
+ * Alternatively, you can use one of the popup() methods to show the
+ * menu and listen to the \link WPopupMenu::triggered
+ * triggered\endlink signal where you read the result(), or associate the
+ * menu with a button using WPushButton::setMenu().
+ *
+ * You have several options to react to the selection of an item:
+ * - Either you use the WMenuItem itself to identify the action,
+ *   perhaps by specialization or simply by binding custom data using
+ *   WMenuItem::setData().
+ * - You can bind a separate method to each item's WMenuItem::triggered
+ *   signal.
+ *
+ * Usage example:
+ * \if cpp
+ * \code
+ * // Create a menu with some items
+ * WPopupMenu popup;
+ * popup.addItem("icons/item1.gif", "Item 1");
+ * popup.addItem("Item 2")->setCheckable(true);
+ * popup.addItem("Item 3");
+ * popup.addSeparator();
+ * popup.addItem("Item 4");
+ * popup.addSeparator();
+ * popup.addItem("Item 5");
+ * popup.addItem("Item 6");
+ * popup.addSeparator();
+ *
+ * auto subMenu = std::make_unique<Wt::WPopupMenu>();
+ * subMenu->addItem("Sub Item 1");
+ * subMenu->addItem("Sub Item 2");
+ * popup.addMenu("Item 7", std::move(subMenu));
+ *
+ * WMenuItem *item = popup.exec(event);
+ *
+ * if (item) {
+ *   // ... do associated action.
+ * }
+ * \endcode
+ * \elseif java
+ * \code
+ * // Create a menu with some items
+ * WPopupMenu popup = new WPopupMenu();
+ * popup.addItem("icons/item1.gif", "Item 1");
+ * popup.addItem("Item 2").setCheckable(true);
+ * popup.addItem("Item 3");
+ * popup.addSeparator();
+ * popup.addItem("Item 4");
+ * popup.addSeparator();
+ * popup.addItem("Item 5");
+ * popup.addItem("Item 6");
+ * popup.addSeparator();
+ *
+ * WPopupMenu subMenu = new WPopupMenu();
+ * subMenu.addItem("Sub Item 1");
+ * subMenu.addItem("Sub Item 2");
+ * popup.addMenu("Item 7", subMenu);
+ *
+ * WMenuItem item = popup.exec(event);
+ *
+ * if (item != null) {
+ *  // ... do associated action.
+ * }
+ * \endcode
+ * \endif
+ *
+ * A snapshot of the WPopupMenu:
+ * \image html WPopupMenu-default-1.png "WPopupMenu example (default)"
+ * \image html WPopupMenu-polished-1.png "WPopupMenu example (polished)"
+ *
+ * \sa WMenuItem
+ */
+class WT_API WPopupMenu : public WMenu
+{
+public:
+
+  /*! \brief Enumeration of auto-hide options.
+   *
+   * This enumeration is used to configure how auto-hide affects other
+   * submenus of the same menu.
+   *
+   * \sa setAutoHideBehaviour(), setAutoHide()
+   */
+  enum class AutoHideBehaviour {
+    /*! \brief When the mouse leaves the menu, hides the top-most
+     * submenu with auto-hide enabled.
+     */
+    HideAllEnabled = 0,
+
+    /*! \brief As long as a submenu with auto-hide disabled is visible,
+     * keeps all of its parent menus visible as well.
+     */
+    HideAfterLastDisabled = 1,
+
+    /*! \brief Prevents hiding (due to auto-hide) to propagate to the
+     * parent menu. This means that only the submenu left by the mouse
+     * (and its submenus) could be hidden.
+     */
+    KeepParents = 2
+  };
+
+  /*! \brief Creates a new popup menu.
+   *
+   * The menu is hidden, by default, and must be shown using popup()
+   * or exec().
+   */
+  WPopupMenu(WStackedWidget *contentsStack = nullptr);
+
+  virtual ~WPopupMenu();
+
+  /*! \brief Shows the the popup at a position.
+   *
+   * Displays the popup at a point with document coordinates
+   * \p point. The positions intelligent, and will chose one of
+   * the four menu corners to correspond to this point so that the
+   * popup menu is completely visible within the window.
+   *
+   * \sa exec()
+   */
+  void popup(const WPoint& point);
+
+  /*! \brief Shows the the popup at the location of a mouse event.
+   *
+   * This is a convenience method for popup(const WPoint&) that uses the
+   * event's document coordinates.
+   *
+   * \sa popup(const WPoint& p), WMouseEvent::document()
+   */
+  void popup(const WMouseEvent& event);
+
+  // Sets the button that triggers the popup
+  void setButton(WInteractWidget *button);
+
+  /*! \brief Shows the popup besides a widget.
+   *
+   * \sa positionAt(), popup(const WPointF&)
+   */
+  void popup(WWidget *location,
+             Orientation orientation = Orientation::Vertical);
+
+  /*! \brief Executes the the popup at a position.
+   *
+   * Displays the popup at a point with document coordinates \p p,
+   * using popup(), and the waits until a menu item is selected, or
+   * the menu is cancelled.
+   *
+   * Returns the selected menu (or sub-menu) item, or \c 0 if the user
+   * cancelled the menu.
+   *
+   * \sa popup()
+   */
+  WMenuItem *exec(const WPoint& point);
+
+  /*! \brief Executes the the popup at the location of a mouse event.
+   *
+   * This is a convenience method for exec(const WPoint& p) that uses the
+   * event's document coordinates.
+   *
+   * \sa exec(const WPoint&)
+   */
+  WMenuItem *exec(const WMouseEvent& event);
+
+  /*! \brief Executes the popup besides a widget.
+   *
+   * \sa positionAt(), popup(const WPointF&)
+   */
+  WMenuItem *exec(WWidget *location,
+                  Orientation orientation = Orientation::Vertical);
+
+  /*! \brief Returns the last triggered menu item.
+   *
+   * The result is \c nullptr when the user cancelled the popup menu.
+   */
+  WMenuItem *result() const { return result_; }
+
+  virtual void setHidden(bool hidden,
+                         const WAnimation& animation = WAnimation()) override;
+
+  virtual void setMaximumSize(const WLength& width, const WLength& height) override;
+  virtual void setMinimumSize(const WLength& width, const WLength& height) override;
+
+  /*! \brief %Signal emitted when the popup is hidden.
+   *
+   * Unlike the itemSelected() signal, aboutToHide() is only emitted
+   * by the toplevel popup menu (and not by submenus), and is also
+   * emitted when no item was selected.
+   *
+   * You can use result() to get the selected item, which may be \c nullptr.
+   *
+   * \sa triggered(), itemSelected()
+   */
+  Signal<>& aboutToHide() { return aboutToHide_; }
+
+  /*! \brief %Signal emitted when an item is selected.
+   *
+   * Unlike the itemSelected() signal, triggered() is only emitted
+   * by the toplevel popup menu (and not by submenus).
+   *
+   * \sa aboutToHide(), itemSelected()
+   */
+  Signal<WMenuItem *>& triggered() { return triggered_; }
+
+  /*! \brief Configure auto-hide when the mouse leaves the menu.
+   *
+   * If \p enabled, The popup menu will be hidden when the mouse
+   * leaves the menu, its submenus or its parent menu, for longer than
+   * \p autoHideDelay (milliseconds).
+   *
+   * It is possible to configure how this affects its submenus and
+   * parents menus using setAutoHideBehaviour().
+   *
+   * If the top-level menu is automatically hidden, its result() will be
+   * a \p nullptr, as if the user cancelled.
+   *
+   * By default, this option is disabled.
+   */
+  void setAutoHide(bool enabled, int autoHideDelay = 0);
+
+  /*! \brief Configures auto-hide behaviour.
+   *
+   * Defines how auto-hide behaves in this popup menu.
+   *
+   * This setting can only be set on the top-level popup menu. Setting
+   * it on a submenu has no effect.
+   *
+   * By default, the behaviour is
+   * AutoHideBehaviour::HideAllEnabled.
+   *
+   * \sa setAutoHide()
+   */
+  void setAutoHideBehaviour(AutoHideBehaviour behaviour);
+
+  /*! \brief Returns the auto-hide behaviour.
+   *
+   * \sa setAutoHideBehaviour()
+   */
+  AutoHideBehaviour autoHideBehaviour() { return autoHideBehaviour_; }
+
+  /*! \brief Set whether this popup menu should hide when an item is selected.
+   *
+   * Defaults to true.
+   *
+   * \sa hideOnSelect()
+   */
+  void setHideOnSelect(bool enabled = true);
+
+  /*! \brief Returns whether this popup menu should hide when an item is selected.
+   *
+   * \sa setHideOnSelect()
+   */
+  bool hideOnSelect() const { return hideOnSelect_; }
+
+  /*! \brief Sets in which direction this popup menu can adjust its coordinates on popup.
+   *
+   * This sets in which orientations the popup menu can adjust its
+   * position in order to be fully visible in the window, potentially
+   * hiding the widget (or point) from which it popped up.
+   * \sa WWidget::positionAt() for more informations.
+   *
+   * If it can adjust in both orientations, WWidget::anchorAt() is used
+   * instead of WWidget::positionAt().
+   *
+   * By default, it can adjust in both orientations.
+   */
+  void setAdjust(WFlags<Orientation> adjustOrientations);
+
+  /*! \brief Returns in which orientations this popup widget can adjust its coordinates on popup.
+   *
+   * \sa setAdjust()
+   */
+  WFlags<Orientation> adjust() const { return adjustFlags_; }
+
+protected:
+  virtual void renderSelected(WMenuItem *item, bool selected) override;
+  virtual void setCurrent(int index) override;
+  virtual void getSDomChanges(std::vector<DomElement *>& result, WApplication *app) override;
+  virtual void render(WFlags<RenderFlag> flags) override;
+  virtual std::string renderRemoveJs(bool recursive) override;
+
+private:
+  static const int BIT_WILL_POPUP = 0;
+  static const int BIT_OPEN_CHANGED = 1;
+  static const int BIT_AUTO_HIDE_CHANGED = 2;
+  static const int BIT_AUTO_HIDE_BEHAVIOR_CHANGED = 3;
+
+  std::bitset<4> flags_;
+
+  WPopupMenu *topLevel_;
+  WMenuItem *result_;
+  WWidget *location_;
+  WInteractWidget *button_;
+
+  Signal<> aboutToHide_;
+  Signal<WMenuItem *> triggered_;
+  JSignal<> cancel_;
+
+  bool recursiveEventLoop_;
+  bool hideOnSelect_;
+  bool open_;
+  WFlags<Orientation> adjustFlags_;
+  int autoHideDelay_;
+  int renderedAutoHideDelay_;
+  AutoHideBehaviour autoHideBehaviour_;
+
+  void exec();
+  void cancel();
+  void done(WMenuItem *result);
+  void popupImpl();
+  void prepareRender(WApplication *app);
+  void adjustPadding();
+  void popupAtButton();
+  void connectSignals(WPopupMenu * const topLevel);
+};
+
+}
+
+#endif // WPOPUP_MENU_H_

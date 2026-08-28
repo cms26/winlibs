@@ -1,0 +1,1310 @@
+/*
+ * Validators
+ */
+.Wt-invalid {
+    background-color: #f79a9a;
+}
+
+.Wt-valid {
+    background-color: #9af79a
+}
+
+/*
+ * Wt-disabled
+ */
+span.Wt-disabled, fieldset.Wt-disabled legend {
+    color: gray;
+}
+
+/*
+ * Effects
+ */
+.Wt-animated {
+    -webkit-backface-visibility: hidden; /* avoids flicker on Chrome */
+}
+
+/*
+ * Outset using a dropshadow
+ */
+.Wt-outset {
+    border: 1px solid white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    *border-inline-end-width: 2px;
+    *border-bottom-width: 2px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+}
+
+/*
+ * WStackedWidget
+ */
+.Wt-stack.Wt-animated {
+    overflow: hidden;
+    position: relative;
+}
+
+/*
+ * WFormWidget
+ */
+.Wt-edit-emptyText {
+    color: gray;
+}
+
+/*
+ * Silk screen
+ */
+.Wt-dialogcover {
+    background: #CCCCCC;
+    background: rgb(204, 204, 204);
+    height: 100%; width: 100%;
+    top: 0px; left: 0px;
+    position: fixed;
+}
+
+.Wt-dialogcover.in {
+    filter: alpha(opacity=50);
+    opacity: 0.5;
+}
+
+/*
+ * WBadge
+ */
+ .Wt-badge {
+    display: inline-block;
+    position: relative;
+    min-width: 5px;
+    padding: 3px 7px;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1;
+    color: #cccccc;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background-color: #000000;
+    border-radius: 10px;
+    border: 1px inset #999;
+}
+
+.Wt-badge:empty {
+    display: none;
+}
+
+.Wt-btn .Wt-badge,
+.item .Wt-badge,
+.itemselected .Wt-badge {
+  margin-inline-start: 2px;
+}
+
+/*
+ * WCalendar
+ */
+.Wt-cal {
+    padding: 0px;
+}
+
+.Wt-cal table {
+    border-left: 1px solid #727D9C;
+    font: normal 13px/22px "Trebuchet MS", Verdana, Arial, Helvetica,
+      sans-serif;
+    color: #515B66;
+    text-align: center;
+    background-color: #fff;
+    border-collapse: separate;
+}
+
+.Wt-cal table td {
+    text-align: center;
+}
+
+.Wt-cal table.d1 {
+    width: 155px;
+}
+
+.Wt-cal table.d1 td {
+    width: 20px;
+}
+
+.Wt-cal table.d3 {
+    width: 220px;
+}
+
+.Wt-cal table.d3 td {
+    width: 30px;
+}
+
+.Wt-cal table.dlong {
+    width: 490px;
+}
+
+.Wt-cal table.dlong td {
+    width: 70px;
+}
+
+.Wt-cal th.caption {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #6880A0 url(title-gradient.png) repeat-x scroll 0 -20px;
+    color: #fff;
+    font: bold 13px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+.Wt-cal-navbutton {
+    cursor: pointer;
+    font: bold 20px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    vertical-align: middle;
+    display: block;
+}
+
+.Wt-cal caption select {
+    cursor: pointer;
+    font: 12px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    margin: 2px 0px;
+    vertical-align: middle;
+}
+
+.Wt-cal-year {
+    vertical-align: middle;
+}
+
+.Wt-cal-year span {
+    padding: 1px 2px;
+}
+
+.Wt-cal-year span:hover {
+    color: #6880A0;
+    background-color: #F0F0F0;
+}
+
+.Wt-cal th {
+    font: bold 12px/22px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    color: #515B66;
+    background: #D9E2E1;
+    border-right: 1px solid #6880A0;
+    border-bottom: 1px solid #6880A0;
+    border-top: 1px solid #6880A0;
+    cursor: default;
+}
+
+.Wt-cal td {
+    border-right: 1px solid #6880A0;
+    border-bottom: 1px solid #6880A0;
+    text-align: center;
+    cursor: default;
+}
+
+.Wt-cal-oom {
+    color: #CCCCCC;
+}
+
+.Wt-cal-oor {
+    color: #CCCCCC;
+}
+
+.Wt-cal-sel {
+    background-color:#FFF19F;
+}
+
+.Wt-cal-now {
+    color: #F6F4DA;
+    font-weight: bold;
+    background: #AAAAAA;
+}
+
+/*
+ * WDateEdit
+ */
+.Wt-dateedit {
+    background-image: url('../../date.gif');
+    background-repeat: no-repeat;
+    background-position: right top;
+    padding-right: 40px;
+}
+
+/*
+ * WTimeEdit
+ */
+.Wt-timeedit {
+    background-image: url('../../icon_clock.gif');
+    background-repeat: no-repeat;
+    background-position: right top;
+    padding-right: 40px;
+}
+
+/*
+ * WDatePicker
+ */
+.Wt-datepicker {
+    background-color: white;
+}
+
+/*
+ * Wt-dateedit
+ */
+.Wt-dateedit::-ms-clear {
+    display:none
+}
+
+/*
+ * Wt-timeedit
+ */
+.Wt-timeedit::-ms-clear {
+    display: none
+}
+
+/*
+ * WDialog
+ */
+.Wt-dialog {
+    background-color: white;
+    padding: 1px;
+}
+
+.Wt-dialog .titlebar {
+    color: #FFFFFF;
+    background: #6880A0 url(title-gradient.png) repeat-x scroll 0 -20px;
+    font: bold 12px Verdana;
+    padding: 3px 6px;
+}
+
+.Wt-dialog .movable .titlebar {
+    cursor: move;
+}
+
+.Wt-dialog .closeicon {
+    background: transparent url(closeicons-dialog.png) no-repeat scroll right top;
+    width: 13px;
+    height: 13px;
+    background-position: right 0px;
+    cursor: default;
+    vertical-align: center;
+    position: absolute;
+    inset-inline-end: 5px;
+    top: 5px;
+}
+
+.Wt-dialog .closeicon:hover {
+    background-position: right -13px;
+}
+
+/*
+ * Fix dialog content being cut off see #14332
+ */
+.Wt-dialog .Wt-fill-width .body {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.Wt-dialog .body, .Wt-dialog .footer {
+    padding: 4px 6px;
+}
+
+.Wt-dialog .footer {
+    text-align: end;
+}
+
+.Wt-dialog .footer button {
+    padding: 1px 4px 1px;
+    margin: 2px;
+}
+
+.Wt-dialog .titlebar h4 {
+    margin: 0px 2px;
+    font-size: 110%;
+}
+
+/*
+ * WMenuItem
+ */
+.closeicon {
+  background: transparent url(closeicons-mi.png) no-repeat scroll right top;
+  height: 8px;
+  width: 9px;
+  margin-top: 2px;
+  margin-bottom: 0px;
+  margin-inline: 2px 5px;
+  padding: 0px;
+  font-size: 0px;
+  cursor: default;
+  float: inline-end;
+}
+
+.closeicon:hover {
+  background-position: right -8px;
+}
+
+/*
+ * WMessageBox
+ */
+.Wt-dialog .Wt-msgbox-icon {
+    display: block;
+    float: inline-start;
+    margin: 0px 15px -15px;
+    width: 25px;
+    height: 35px;
+}
+
+.Wt-dialog .Wt-msgbox-body {
+    padding: 10px;
+}
+
+.Wt-dialog .Wt-msgbox-text {
+    overflow: auto;
+}
+
+/*
+ * WGridLayout
+ */
+
+.Wt-hrh2, .Wt-vsh2 {
+    cursor: row-resize;
+}
+
+.Wt-vrh2, .Wt-hsh2 {
+    cursor: col-resize;
+}
+
+.Wt-hrh2 {
+    background: url(splitter-v.png) no-repeat 50% 50% #EEE;
+}
+
+.Wt-vrh2 {
+    background: url(splitter-h.png) no-repeat 50% 50% #EEE;
+}
+
+.Wt-hsh2, .Wt-vsh2 {
+    background-color: #8ea2bd;
+}
+
+.Wt-vrh2:hover, .Wt-hrh2:hover {
+    background-color: #8ea2bd;
+}
+
+/*
+ * WItemDelegate, when editable
+ */
+.Wt-delegate-edit {
+  line-height: 0px;
+}
+
+/*
+ * WPanel
+ */
+
+.Wt-panel .titlebar {
+    color: #FFFFFF;
+    background: #6880A0 url(title-gradient.png) repeat-x scroll 0 -20px;
+    font: bold 12px Verdana;
+    padding: 3px 6px;
+    cursor: default;
+}
+
+.Wt-panel .body {
+    clear: inline-start;
+    padding: 4px 6px;
+}
+
+.Wt-collapse-button {
+    display: block;
+    flex: none;
+    align-self: center;
+    width: 16px;
+    height: 16px;
+    float: inline-start;
+    background-image: url(../../collapse.gif);
+    background-repeat: no-repeat;
+    background-position: right center;
+    transition: transform .3s ease-in-out;
+}
+
+.Wt-collapsed .Wt-collapse-button {
+    transform: rotate(-90deg);
+}
+
+/*
+ * Icons, check-boxes in WMenuItem
+ */
+.Wt-icon {
+    display: inline-block;
+    margin-inline-end: 8px;
+    background-repeat: no-repeat;
+    background-position: center left;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    vertical-align: text-top;
+}
+
+.Wt-chkbox {
+    margin-inline-start: 2px;
+    margin-inline-end: 10px;
+    display: inline-block;
+    width: 12px;
+}
+
+/*
+ * WPopupMenu
+ */
+.Wt-popupmenu {
+    position: absolute;
+    display: none;
+    background: #FAFAFA;
+    font: normal 13px/22px "Trebuchet MS", Verdana, Arial, Helvetica,
+      sans-serif;
+    color: #515B66;
+    z-index: 200;
+    cursor: default;
+    white-space: nowrap;
+    list-style: none;
+    padding: 0px;
+    margin: 0;
+}
+
+.Wt-popupmenu li a {
+    display: block;
+    padding: 2px 10px;
+}
+
+.Wt-popupmenu .Wt-padded {
+    margin-inline-end: 3px;
+    margin-inline-start: 24px;
+    padding-inline-end: 24px;
+}
+
+.Wt-popupmenu .active {
+    background: #6880A0;
+    color: white;
+}
+
+.Wt-popupmenu .Wt-disabled, .Wt-popupmenu .Wt-disable.active {
+    background: transparent;
+    color: #888;
+}
+
+.Wt-popupmenu .submenu {
+    background-image: url(../../right-arrow.gif);
+    background-repeat: no-repeat;
+    background-position: right center;
+}
+
+.Wt-popupmenu .Wt-separator {
+    border-top: 1px solid #CCCCCC;
+    border-bottom: 1px solid #DDDDDD;
+    margin: 0px 3px;
+    line-height: 0px;
+    padding: 0;
+}
+
+.Wt-popupmenu .Wt-sectheader, .Wt-popupmenu .Wt-sectheader.active {
+    background: transparent;
+    color: #888;
+}
+
+/*
+ * WProgressBar
+ */
+.Wt-progressbar
+{
+   font: normal 1em "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+   background: gray;
+   border: 1px solid #555;
+   position: relative;
+   overflow: hidden;
+   color: white;
+   font-weight: bold;
+   width: 200px;
+   height: 1em;
+   line-height: 1em;
+ }
+
+.Wt-progressbar .Wt-pgb-bar
+{
+   position: absolute;
+   inset-inline-start: 0px;
+   top: 0px;
+   height: 100%;
+   background: #6880A0 url(title-gradient.png) repeat-x scroll 0 -20px;
+}
+
+.Wt-progressbar .Wt-pgb-label
+{
+   font-size: 0.8em;
+   position: absolute;
+   inset-inline-start: 0px;
+   width: 100%;
+   text-align: center;
+}
+
+/*
+ * WPushButton
+ */
+.Wt-btn:hover {
+    border-color:#9CF #69E #69E #7AF;
+}
+
+.Wt-btn {
+    background: transparent url(gradient.png) repeat-x scroll 0 0;
+    border: 1px outset #CCC;
+    cursor: pointer;
+    font-size: small;
+    margin: 0px 2px;
+    padding: 2px 5px;
+    text-decoration: none;
+}
+
+.Wt-btn img {
+    vertical-align: middle;
+}
+
+.Wt-btn.with-label img {
+    padding-inline-end: 10px;
+}
+
+.Wt-btn:active {
+    border: 1px inset #CCC;
+}
+
+.Wt-btn[disabled] {
+    border: 1px outset #CCC;
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
+.Wt-btn-default {
+    font-weight: bold;
+    border: 1px outset #37E;
+}
+
+/*
+ * WResizable
+ */
+.Wt-resizable {
+    background-image: url(../../resizable.png);
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: right bottom;
+}
+
+/*
+ * WSlider
+ */
+.Wt-slider-h .Wt-slider-bg {
+    background: url(sliderbg-h.png) repeat-x scroll left center;
+    margin: 0px 5px;
+}
+
+.Wt-slider-v .Wt-slider-bg {
+    background: url(sliderbg-v.png) repeat-y scroll center top;
+    margin: 5px 0px;
+}
+
+.Wt-slider-h .Wt-w {
+    position: absolute;
+    left: 0px;
+    width: 5px;
+    top: 0px;
+    bottom: 0px;
+    background: url(sliderbg-hw.png) no-repeat scroll left center;
+}
+
+.Wt-slider-h .Wt-e {
+    position: absolute;
+    right: 0px;
+    width: 5px;
+    top: 0px;
+    bottom: 0px;
+    background: url(sliderbg-he.png) no-repeat scroll left center;
+}
+
+.Wt-slider-v .Wt-w {
+    position: absolute;
+    left: 0px;
+    height: 5px;
+    top: 0px;
+    right: 0px;
+    background: url(sliderbg-vw.png) no-repeat scroll center top;
+}
+
+.Wt-slider-v .Wt-e {
+    position: absolute;
+    left: 0px;
+    height: 5px;
+    right: 0px;
+    bottom: 0px;
+    background: url(sliderbg-ve.png) no-repeat scroll center top;
+}
+
+.Wt-slider-h .handle {
+    cursor: pointer;
+    background: url(slider-thumb.png) no-repeat scroll center;
+}
+
+.Wt-slider-v .handle {
+    cursor: pointer;
+    background: url(slider-thumb.png) no-repeat scroll center;
+}
+
+/*
+ * WSlider - disabled
+ */
+.Wt-slider-h.Wt-disabled .Wt-slider-bg {
+    background: url(sliderbg-h-disabled.png) repeat-x scroll left center;
+    margin: 0px 5px;
+}
+
+.Wt-slider-v.Wt-disabled .Wt-slider-bg {
+    background: url(sliderbg-v-disabled.png) repeat-y scroll center top;
+    margin: 5px 0px;
+}
+
+.Wt-slider-h.Wt-disabled .Wt-w {
+    position: absolute;
+    left: 0px;
+    width: 5px;
+    top: 0px;
+    bottom: 0px;
+    background: url(sliderbg-hw-disabled.png) no-repeat scroll left center;
+}
+
+.Wt-slider-h.Wt-disabled .Wt-e {
+    position: absolute;
+    right: 0px;
+    width: 5px;
+    top: 0px;
+    bottom: 0px;
+    background: url(sliderbg-he-disabled.png) no-repeat scroll left center;
+}
+
+.Wt-slider-v.Wt-disabled .Wt-w {
+    position: absolute;
+    left: 0px;
+    height: 5px;
+    top: 0px;
+    right: 0px;
+    background: url(sliderbg-vw-disabled.png) no-repeat scroll center top;
+}
+
+.Wt-slider-v.Wt-disabled .Wt-e {
+    position: absolute;
+    left: 0px;
+    height: 5px;
+    right: 0px;
+    bottom: 0px;
+    background: url(sliderbg-ve-disabled.png) no-repeat scroll center top;
+}
+
+.Wt-slider-h.Wt-disabled .handle {
+    cursor: auto;
+    background: url(slider-thumb-disabled.png) no-repeat scroll center;
+}
+
+.Wt-slider-v.Wt-disabled .handle {
+    cursor: auto;
+    background: url(slider-thumb-disabled.png) no-repeat scroll center;
+}
+
+/*
+ * WSuggestionPopup
+ */
+.Wt-suggest {
+    background: #FAFAFA;
+    font: normal 13px/22px "Trebuchet MS", Verdana, Arial, Helvetica,
+      sans-serif;
+    color: #515B66;
+    cursor: default;
+    overflow-y: auto;
+    list-style: none;
+    margin: 0;
+    padding: 1px;
+}
+
+.Wt-suggest li {
+    padding: 0px 3px;
+}
+
+.Wt-suggest .active {
+    background: #6880A0;
+    color: white;
+}
+
+.Wt-suggest-dropdown {
+    background-image: url('suggest-dropdown.png');
+    background-repeat: no-repeat;
+    background-position: right center;
+}
+
+/*
+ * WSpinBox -- todo: polish this
+ */
+.Wt-spinbox {
+    background-image: url('../default/spin-buttons.png');
+    background-repeat: no-repeat;
+    background-position: right center;
+    padding-inline-end: 16px;
+}
+
+.Wt-spinbox:dir(rtl) {
+    background-position: left center;
+}
+
+.Wt-spinbox.up {
+    background-image: url('../default/spin-buttons-up.png');
+}
+
+.Wt-spinbox.dn {
+    background-image: url('../default/spin-buttons-dn.png');
+}
+
+.Wt-spinbox::-ms-clear {
+    display: none
+}
+
+/*
+ * WTabWidget
+ */
+.Wt-tabs {
+    border-bottom: 1px solid gray;
+    padding: 3px 3px 0px;
+    font: bold 12px Verdana;
+    list-style-type: none;
+    margin: 0px;
+}
+
+.Wt-tabs li {
+    cursor: pointer;
+    display: block;
+    white-space: nowrap;
+    float: inline-start;
+    padding: 2px 6px 3px;
+    margin: 0px 3px 0px;
+    border: 1px solid gray;
+    border-bottom: none;
+    background: #6880A0 url(title-gradient.png) repeat-x scroll 0 -20px;
+    color: #FFFFFF;
+    height: 16px;
+}
+
+.Wt-tabs li a, .Wt-tabs li button {
+    text-decoration: none;
+    color: inherit;
+}
+
+.Wt-tabs li button a {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+}
+
+.Wt-tabs li:hover, .Wt-tabs .itemselected {
+    background: white;
+    color: black;
+    border-bottom: 1px solid white;
+    margin-bottom: -1px;
+}
+
+.Wt-tabs li.active a, .Wt-tabs li.active button {
+    background: white;
+    color: black;
+}
+
+.Wt-tabs .closeicon {
+    background: transparent url(closeicons-tab.png) no-repeat scroll right top;
+    height: 16px;
+    float: inline-end;
+    background-position: right 3px;
+    border-width: 3px 0px 0px 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-inline: 7px 6px;
+    cursor: default;
+    margin-inline-start: 3px;
+    vertical-align: top;
+}
+
+.Wt-tabs .closeicon:hover {
+    background-position: right -10px;
+}
+
+.Wt-tabs:after { content: ""; display: block; height: 0; clear: both; }
+.Wt-tabs { clear-after: both; }
+
+/*
+ * XHTML Tooltips
+ */
+.Wt-tooltip {
+    display: inline-block;
+    background-color: #ffffcc;
+    border: 1px solid black;
+    padding: 1px 2px;
+    font-family: sans-serif;
+    font-size: smaller;
+    z-index: 1000;
+    overflow-y: auto;
+    width: fit-content;
+    height: fit-content;
+}
+
+/*
+ * WTree(node)
+ */
+.Wt-tree {
+    font-family: verdana,helvetica,tahoma,sans-serif;
+    font-size: 9pt;
+    cursor: default;
+    white-space: nowrap;
+}
+
+.Wt-tree ul {
+    margin: 0;
+    padding-inline-start: 20px;
+    list-style: none;
+}
+
+/* nodes */
+
+.Wt-tree div.Wt-root {
+    display: none;
+}
+
+.Wt-tree ul.Wt-root {
+    padding-inline-start: 0px;
+}
+
+.Wt-tree .Wt-ctrl {
+    float: inline-start;
+    display: block;
+    width: 19px;
+    height: 17px;
+}
+
+.Wt-tree .Wt-ctrl.Wt-expand {
+  background: url(nav-minus.gif) no-repeat 0 center;
+}
+
+.Wt-tree .Wt-ctrl.Wt-expand.Wt-collapsed {
+  background: url(nav-plus.gif) no-repeat 0 center;
+}
+
+.Wt-tree .Wt-ctrl img {
+  width: 19px;
+  height: 17px;
+}
+
+body.Wt-rtl .Wt-tree .Wt-ctrl.Wt-expand {
+  background: url(nav-minus-rtl.gif) no-repeat 0 center;
+}
+
+body.Wt-rtl .Wt-tree .Wt-ctrl.Wt-expand.Wt-collapsed {
+  background: url(nav-plus-rtl.gif) no-repeat 0 center;
+}
+
+.Wt-treetable {
+    background: white;
+    border: 1px solid #dcdfe8;
+}
+
+.Wt-treetable .Wt-header {
+    background: #6880A0 url(title-gradient.png) repeat-x scroll 0 -20px;
+    font-family: verdana,helvetica,tahoma,sans-serif;
+    font-size: 9pt;
+    cursor: default;
+    color: white;
+    cursor: default;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 3px;
+    padding-inline-end: 0px;
+}
+
+.Wt-sbspacer {
+    float: inline-end;
+    width: 16px;
+    height: 1px;
+    border: 0px;
+    display: none;
+}
+
+.Wt-tree .cols-row {
+    float: inline-end;
+}
+
+/* selection */
+.Wt-tree .Wt-selected {
+    background-color: #999999;
+    color: white;
+}
+
+/* label */
+.Wt-tree .Wt-label {
+    padding: 0px 2px;
+    line-height: 150%;
+}
+
+/*
+ * WAbstractItemView (WTableView and WTreeView)
+ */
+.Wt-itemview .Wt-headerdiv {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+    overflow: hidden;
+    width: 100%;
+}
+
+.Wt-itemview .Wt-tv-rh {
+    float: inline-end;
+    width: 3px;
+    cursor: col-resize;
+}
+
+.Wt-itemview .Wt-disabled .Wt-tv-rh {
+    cursor: default;
+}
+
+.Wt-itemview .Wt-tv-no-rh {
+    width: 0px;
+    margin-inline-start: 4px;
+    cursor: default;
+}
+
+/* sort handles */
+.Wt-itemview .Wt-tv-sh {
+    float: inline-end;
+    width: 16px;
+    height: 16px;
+    padding-bottom: 6px;
+    cursor: pointer;
+}
+
+.Wt-itemview .Wt-disabled .Wt-tv-sh {
+    background: url(sort-arrow-disabled.gif) no-repeat 0 6px;
+    cursor: default;
+}
+
+.Wt-itemview {
+    font-family: verdana,helvetica,tahoma,sans-serif;
+    font-size: 9pt;
+    cursor: default;
+    white-space: nowrap;
+    background: white;
+    border: 1px solid #dcdfe8;
+}
+
+.Wt-itemview .Wt-spacer {
+    background: url(../../loading.png);
+}
+
+.Wt-itemview .Wt-headerdiv,
+.Wt-itemview .Wt-headerdiv .Wt-tv-rowc,
+.Wt-itemview th {
+    background: #6880A0 url(title-gradient.png) repeat-x scroll 0 -20px;
+    color: white;
+}
+
+.Wt-itemview th, .Wt-itemview th .Wt-tv-br {
+    overflow: hidden;
+}
+
+.Wt-itemview .Wt-header .Wt-label {
+    font-weight: bold;
+    text-overflow: ellipsis;
+    overflow: hidden; /* needed for IE only */
+    white-space: nowrap;
+    height: 100%;
+}
+
+.Wt-itemview .Wt-header .Wt-disabled .Wt-label {
+    color: gray;
+}
+
+.Wt-itemview .Wt-header .Wt-wwrap .Wt-label {
+    overflow: visible;
+    white-space: normal;
+}
+
+.Wt-itemview .Wt-tv-rh:hover {
+    background-color: #DDDDDD;
+}
+
+.Wt-itemview .Wt-disabled .Wt-tv-rh:hover {
+    background-color: transparent;
+}
+
+.Wt-itemview .Wt-tv-sh-none {
+    background: url(sort-arrow-none.gif) no-repeat 0 6px;
+}
+
+.Wt-itemview .Wt-tv-sh-up {
+    background: url(sort-arrow-up.gif) no-repeat 0 6px;
+}
+
+.Wt-itemview .Wt-tv-sh-down {
+    background: url(sort-arrow-down.gif) no-repeat 0 6px;
+}
+
+/* selection */
+.Wt-itemview .Wt-selected {
+    background-color: #999999;
+    color: white;
+}
+
+/* item drag & drop */
+.Wt-itemview .Wt-drop-site {
+    background-color: #EEEEEE;
+    outline: 1px dotted black;
+}
+
+.Wt-drop-site-top {
+    box-shadow: 0 2px 0 #000 inset;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width:100%;
+    height:100%;
+    pointer-events: none;
+}
+.Wt-drop-site-bottom {
+    box-shadow: 0 -2px 0 #000 inset;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width:100%;
+    height:100%;
+    pointer-events: none;
+}
+
+/*
+ * WTableView
+ */
+
+.Wt-tableview .Wt-tv-contents .Wt-tv-c,
+.Wt-plaintable .Wt-tv-c {
+    padding: 0px 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.Wt-tableview .Wt-tv-contents img.icon,
+.Wt-tableview .Wt-plaintable img.icon,
+.Wt-tableview .Wt-tv-contents input.icon,
+.Wt-tableview .Wt-plaintable input.icon {
+    margin-top: 0px;
+    margin-bottom: 2px;
+    margin-inline: 0px 3px;
+    vertical-align: middle;
+}
+
+.Wt-tableview .Wt-spacer {
+    position: relative;
+    overflow: hidden;
+}
+
+/* header */
+
+.Wt-tableview {
+    white-space: nowrap
+}
+
+.Wt-tableview th {
+    padding: 0px;
+}
+
+.Wt-tableview .Wt-header .Wt-label {
+  padding-inline: 3px 0px;
+}
+
+.Wt-tableview .Wt-header .Wt-tv-no-rh ~ * > * > .Wt-label {
+  padding-inline-end: 3px;
+}
+
+.Wt-tableview .Wt-header div[style*="text-align:center;"] .Wt-tv-sh ~ .Wt-label {
+  padding-inline: 19px 0px;
+}
+
+.Wt-tableview .Wt-header .Wt-tv-no-rh ~ div[style*="text-align:center;"] > * > .Wt-tv-sh ~ .Wt-label {
+  padding-inline-start: 16px;
+}
+
+.Wt-tableview table {
+    background-position: left bottom;
+}
+
+/* borders */
+.Wt-tableview .Wt-tv-br {
+    border-inline-end: 1px solid #dcdfe8;
+}
+
+.Wt-tableview .Wt-tv-contents .Wt-tv-c,
+.Wt-tableview .Wt-plaintable tbody .Wt-tv-c {
+    border-inline-end: 0px;
+    margin-inline-end: 1px;
+}
+
+/*
+ * WTreeView
+ */
+
+/* Layout styling */
+.Wt-treeview ul {
+    margin: 0px;
+    padding-inline-start: 20px;
+    list-style: none;
+}
+
+.Wt-treeview ul.Wt-tv-root {
+    padding-inline-start: 0px;
+}
+
+.Wt-treeview .Wt-tv-row {
+    float: inline-end;
+    overflow: hidden;
+}
+
+.Wt-treeview .Wt-tv-row .Wt-tv-c {
+    display: block;
+    float: inline-start;
+    padding: 0px 3px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.Wt-treeview img.icon, .Wt-treeview input.icon {
+    vertical-align: middle;
+}
+
+.Wt-treeview img.icon,
+.Wt-treeview input.icon {
+    margin-top: 0px;
+    margin-bottom: 2px;
+    margin-inline: 0px 3px;
+}
+
+.Wt-treeview .Wt-header .Wt-tv-c {
+    padding: 0px;
+    margin-inline-start: 7px;
+}
+
+.Wt-treeview .Wt-scroll {
+    overflow: auto;
+    height: 22px;
+}
+
+.Wt-treeview .Wt-scroll div {
+    height: 1px;
+}
+
+/* header */
+.Wt-treeview .Wt-headerdiv .background {
+    background-color: #FFFFFF;
+}
+
+/* nodes */
+.Wt-treeview .Wt-ctrl {
+    width: 19px;
+    height: 18px;
+    float: inline-start;
+}
+
+.Wt-treeview .Wt-ctrl.expand {
+    background-image: url(nav-plus.png);
+    background-repeat: no-repeat;
+    background-position: 0 center;
+}
+
+body.Wt-rtl .Wt-treeview .Wt-ctrl.expand {
+    background-image: url(nav-plus-rtl.png);
+}
+
+.Wt-treeview .Wt-ctrl.collapse {
+    background-image: url(nav-minus.png);
+    background-repeat: no-repeat;
+    background-position: 0 center;
+}
+
+body.Wt-rtl .Wt-treeview .Wt-ctrl.collapse {
+    background-image: url(nav-minus-rtl.png);
+}
+
+/* borders */
+.Wt-treeview .Wt-tv-br {
+    border-inline-end: 1px solid #dcdfe8;
+}
+
+.Wt-treeview li .Wt-tv-row .Wt-tv-c {
+    border-inline-end: 0px;
+    margin-inline-end: 1px;
+}
+
+/*
+ * WTreeView and WTableView default paging bar
+ */
+.Wt-pagingbar {
+    text-align: center;
+    height: 35px;
+    line-height: 35px;
+}
+
+.Wt-pagingbar span {
+    margin: 0px 4px;
+}
+
+.Wt-pagingbar button {
+    margin: 0px 4px;
+    padding: 0px 3px;
+    vertical-align: middle;
+    line-height: 20px;
+}
+
+/*
+ * For Ext::TableView
+ */
+
+table.x-grid3-row-table {
+    table-layout: fixed;
+}
+
+.Wt-filedropzone {
+    width: 200px;
+    height: 200px;
+    border: thick dashed grey;
+    background-color: lightgrey;
+}
+
+.Wt-filedropzone.Wt-dropzone-hover {
+    border-color: green;
+}
+
+.Wt-filedropzone.Wt-dropzone-hover * {
+    pointer-events: none;
+}
+
+.Wt-fileupload-hidden {
+    display: none !important;
+}
+
+.Wt-filedropzone.Wt-dropzone-dragstyle {
+    position: relative;
+    z-index: 20001;
+}
+
+.Wt-filedropzone.Wt-dropzone-indication {
+    border-color: green;
+}
+
+.Wt-dropcover {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: -100;
+}
+.Wt-dropcover.Wt-dropzone-dragstyle {
+    z-index: 20000;
+}

@@ -1,0 +1,17 @@
+.Wt-treetable {
+  overflow: auto;
+
+  .Wt-header {
+    font-weight: bold;
+    line-height: 28px;
+    border-bottom: 1px solid transparent;
+  }
+}
+
+.Wt-sbspacer {
+  display: none;
+  float: inline-end;
+  width: 16px;
+  height: 1px;
+  border: 0;
+}

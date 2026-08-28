@@ -1,0 +1,33 @@
+.dropdown-menu {
+  .disabled {
+    a, a:hover {
+      color: $gray-500;
+      text-decoration: none;
+      cursor: default;
+      background-color: transparent;
+    }
+  }
+
+  .Wt-chkbox {
+    margin-inline: 1px 6px;
+  }
+
+  label.checkbox-inline {
+    padding-inline-start: 0;
+  }
+
+  .Wt-padded {
+    padding-inline-start: 39px;
+  }
+
+  li label {
+    display: inline;
+  }
+}
+
+/*
+ * Dropdown item cursor fix
+ */
+.dropdown-item {
+  cursor: pointer;
+}
