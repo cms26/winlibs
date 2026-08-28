@@ -52,6 +52,19 @@ if ! grep -q __MINGW32__ "$COMPAT"; then
     sed -i 's|#include <sal.h>|#include <sal.h>\n#ifdef __MINGW32__\n#include <assert.h>\n#ifndef _ASSERTE\n#define _ASSERTE(x) assert(x)\n#endif\n#ifndef _ReturnAddress\n#define _ReturnAddress() __builtin_return_address(0)\n#endif\n#ifndef __assume\n#define __assume(x) do { if (!(x)) __builtin_unreachable(); } while (false)\n#endif\n#endif|' "$COMPAT"
 # The Windows code paths need C++14 (std::enable_if_t etc.).
 sed -i 's|-std=c++11|-std=c++14|g' "$SRC/cpprestsdk-$VER/Release/CMakeLists.txt"
+# cpprest's U() macro breaks Boost headers that use U as a template parameter
+# with a function-style initializer (boost/move). Build the library itself
+# with _TURN_OFF_PLATFORM_STRING and use _XPLATSTR internally instead.
+grep -rl 'U("' "$SRC/cpprestsdk-$VER/Release/src" | while read -r f; do
+    sed -i 's/\bU(")/_XPLATSTR(")/g; s/\bU("/_XPLATSTR("/g' "$f"
+done
+grep -rl "U('" "$SRC/cpprestsdk-$VER/Release/src" | while read -r f; do
+    sed -i "s/\bU('/_XPLATSTR('/g" "$f"
+done
+# Unqualified pplx type in the MSVC-oriented Concurrency shim.
+sed -i 's|std::shared_ptr<scheduler_interface>|std::shared_ptr<pplx::scheduler_interface>|g' \
+    "$SRC/cpprestsdk-$VER/Release/src/pplx/pplxwin.cpp"
+
 # mingw ships Windows headers with lowercase names (case matters when
 # cross-compiling from a case-sensitive filesystem).
 grep -rl -e '<Wincrypt.h>' -e '<Strsafe.h>' -e '<VersionHelpers.h>' \
@@ -72,6 +85,7 @@ rm -rf "$B" "$PREFIX"
 cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
     -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DBUILD_TESTS=OFF -DBUILD_SAMPLES=OFF -DWERROR=OFF \
+    -DCMAKE_CXX_FLAGS="-D_TURN_OFF_PLATFORM_STRING" \
     -DCPPREST_EXCLUDE_BROTLI=ON \
     -DBoost_ROOT="$BOOST" -DBoost_USE_STATIC_LIBS=ON \
     -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
