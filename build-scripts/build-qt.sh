@@ -42,11 +42,18 @@ QT_TOOLCHAIN="$PREFIX/lib/cmake/Qt6/qt.toolchain.cmake"
 for m in $MODULES; do
     B="$BLD/qt-cross-$m"
     rm -rf "$B"
+    EXTRA=""
+    if [ "$m" = qtdeclarative ]; then
+        # svgtoqml would require host qtsvg+svgtoqml; skip the QML
+        # VectorImage support instead.
+        EXTRA="-DQT_FEATURE_quick_vectorimage=OFF"
+    fi
     cmake -G Ninja -S "$SRC/$m-$VER" -B "$B" \
         -DCMAKE_TOOLCHAIN_FILE="$QT_TOOLCHAIN" \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-        -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF
+        -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF \
+        $EXTRA
     cmake --build "$B" -j"$JOBS"
     cmake --install "$B"
 done
