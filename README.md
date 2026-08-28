@@ -61,21 +61,27 @@ library.
 ## Rebuilding
 
 Every library was produced by a script in [`build-scripts/`](build-scripts/),
-cross-compiled on Linux with the Ubuntu mingw-w64 package. To rebuild
-everything from scratch on a Debian/Ubuntu host:
+cross-compiled on Linux with the Ubuntu mingw-w64 package.
+
+**One-step rebuild with Docker** (see the [`Dockerfile`](Dockerfile) header
+for output-extraction commands; takes several hours, ~40 GB scratch):
 
 ```sh
-apt-get install mingw-w64 cmake ninja-build make autoconf automake libtool \
-                python3-mako pkg-config curl git unzip
-./build-scripts/build-zlib.sh          # support deps first
-./build-scripts/build-openssl.sh
-./build-scripts/build-eigen.sh         # then anything else, order-free ...
-./build-scripts/build-boost.sh
-./build-scripts/build-qt-host.sh       # Qt host tools, required before:
-./build-scripts/build-qt.sh
-./build-scripts/build-qwt.sh           # after Qt
-./build-scripts/build-marble.sh        # after Qt
+docker build -t winlibs .
 ```
+
+**Directly on a Debian/Ubuntu host:**
+
+```sh
+apt-get install build-essential perl python3-mako mingw-w64 mingw-w64-tools \
+                cmake ninja-build make autoconf automake libtool pkg-config \
+                libgl-dev libglu1-mesa-dev libxkbcommon-dev curl git unzip xz-utils
+./build-scripts/build-all.sh           # everything, in dependency order
+```
+
+Individual `build-<lib>.sh` scripts can be run on their own; the only
+ordering constraints are zlib/openssl before their consumers, boost before
+wt/cpprestsdk, and qt-host → qt → qwt/marble.
 
 Scripts download their own sources (GitHub/GitLab mirrors) and install into
 the repo folders. `WINLIBS_WORK` controls the scratch/build directory
