@@ -50,15 +50,16 @@ if ! grep -q __MINGW32__ "$COMPAT"; then
     # noexcept/constexpr are always available with GCC; _ASSERTE is MSVC crtdbg.
     sed -i 's|#if _MSC_VER >= 1900|#if defined(__MINGW32__) \|\| _MSC_VER >= 1900|' "$COMPAT"
     sed -i 's|#include <sal.h>|#include <sal.h>\n#ifdef __MINGW32__\n#include <assert.h>\n#include <intrin.h>\n#ifndef _ASSERTE\n#define _ASSERTE(x) assert(x)\n#endif\n#ifndef _ReturnAddress\n#define _ReturnAddress() __builtin_return_address(0)\n#endif\n#ifndef __assume\n#define __assume(x) do { if (!(x)) __builtin_unreachable(); } while (false)\n#endif\n#endif|' "$COMPAT"
+fi
 # The Windows code paths need C++14 (std::enable_if_t etc.).
 sed -i 's|-std=c++11|-std=c++14|g' "$SRC/cpprestsdk-$VER/Release/CMakeLists.txt"
 # cpprest's U() macro breaks Boost headers that use U as a template parameter
 # with a function-style initializer (boost/move). Build the library itself
 # with _TURN_OFF_PLATFORM_STRING and use _XPLATSTR internally instead.
-grep -rl 'U("' "$SRC/cpprestsdk-$VER/Release/src" | while read -r f; do
+ { grep -rl 'U("' "$SRC/cpprestsdk-$VER/Release/src" || true; } | while read -r f; do
     sed -i 's/\bU(")/_XPLATSTR(")/g; s/\bU("/_XPLATSTR("/g' "$f"
 done
-grep -rl "U('" "$SRC/cpprestsdk-$VER/Release/src" | while read -r f; do
+{ grep -rl "U('" "$SRC/cpprestsdk-$VER/Release/src" || true; } | while read -r f; do
     sed -i "s/\bU('/_XPLATSTR('/g" "$f"
 done
 # Unqualified pplx type in the MSVC-oriented Concurrency shim.
@@ -138,11 +139,10 @@ fi
 
 # mingw ships Windows headers with lowercase names (case matters when
 # cross-compiling from a case-sensitive filesystem).
-grep -rl -e '<Wincrypt.h>' -e '<Strsafe.h>' -e '<VersionHelpers.h>' \
-    "$SRC/cpprestsdk-$VER/Release" | while read -r f; do
+{ grep -rl -e '<Wincrypt.h>' -e '<Strsafe.h>' -e '<VersionHelpers.h>' \
+    "$SRC/cpprestsdk-$VER/Release" || true; } | while read -r f; do
     sed -i 's|<Wincrypt.h>|<wincrypt.h>|; s|<Strsafe.h>|<strsafe.h>|; s|<VersionHelpers.h>|<versionhelpers.h>|' "$f"
 done
-fi
 SAFEINT="$SRC/cpprestsdk-$VER/Release/include/cpprest/details/SafeInt3.hpp"
 if ! grep -q __MINGW32__ "$SAFEINT"; then
     # mingw's winnt.h C_ASSERT expands to an extern declaration, which is
