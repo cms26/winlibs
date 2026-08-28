@@ -1,0 +1,12 @@
+prefix=/home/user/winlibs/gpb/protobuf-36.0
+exec_prefix=${prefix}
+libdir=/home/user/winlibs/gpb/protobuf-36.0/lib
+includedir=/home/user/winlibs/gpb/protobuf-36.0/include
+
+Name: absl_variant
+Description: Abseil variant library
+URL: https://abseil.io/
+Version: 20250512
+Requires: absl_config = 20250512, absl_utility = 20250512
+Libs: -L${libdir}  
+Cflags: -I${includedir} -DNOMINMAX

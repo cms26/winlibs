@@ -1,0 +1,12 @@
+prefix=/home/user/winlibs/gpb/protobuf-36.0
+exec_prefix=${prefix}
+libdir=/home/user/winlibs/gpb/protobuf-36.0/lib
+includedir=/home/user/winlibs/gpb/protobuf-36.0/include
+
+Name: absl_function_ref
+Description: Abseil function_ref library
+URL: https://abseil.io/
+Version: 20250512
+Requires: absl_core_headers = 20250512, absl_any_invocable = 20250512, absl_meta = 20250512
+Libs: -L${libdir}  
+Cflags: -I${includedir} -DNOMINMAX

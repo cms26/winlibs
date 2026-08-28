@@ -1,0 +1,12 @@
+prefix=/home/user/winlibs/gpb/protobuf-36.0
+exec_prefix=${prefix}
+libdir=/home/user/winlibs/gpb/protobuf-36.0/lib
+includedir=/home/user/winlibs/gpb/protobuf-36.0/include
+
+Name: absl_log
+Description: Abseil log library
+URL: https://abseil.io/
+Version: 20250512
+Requires: absl_log_internal_log_impl = 20250512, absl_vlog_is_on = 20250512
+Libs: -L${libdir}  
+Cflags: -I${includedir} -DNOMINMAX

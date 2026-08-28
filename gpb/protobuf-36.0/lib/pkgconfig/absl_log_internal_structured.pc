@@ -1,0 +1,12 @@
+prefix=/home/user/winlibs/gpb/protobuf-36.0
+exec_prefix=${prefix}
+libdir=/home/user/winlibs/gpb/protobuf-36.0/lib
+includedir=/home/user/winlibs/gpb/protobuf-36.0/include
+
+Name: absl_log_internal_structured
+Description: Abseil log_internal_structured library
+URL: https://abseil.io/
+Version: 20250512
+Requires: absl_any_invocable = 20250512, absl_config = 20250512, absl_core_headers = 20250512, absl_log_internal_message = 20250512, absl_log_internal_structured_proto = 20250512, absl_strings = 20250512
+Libs: -L${libdir}  
+Cflags: -I${includedir} -DNOMINMAX

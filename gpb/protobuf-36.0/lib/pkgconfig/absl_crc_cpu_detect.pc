@@ -1,0 +1,12 @@
+prefix=/home/user/winlibs/gpb/protobuf-36.0
+exec_prefix=${prefix}
+libdir=/home/user/winlibs/gpb/protobuf-36.0/lib
+includedir=/home/user/winlibs/gpb/protobuf-36.0/include
+
+Name: absl_crc_cpu_detect
+Description: Abseil crc_cpu_detect library
+URL: https://abseil.io/
+Version: 20250512
+Requires: absl_base = 20250512, absl_config = 20250512, absl_optional = 20250512
+Libs: -L${libdir}  -labsl_crc_cpu_detect 
+Cflags: -I${includedir} -DNOMINMAX

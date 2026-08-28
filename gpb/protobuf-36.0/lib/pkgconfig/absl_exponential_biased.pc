@@ -1,0 +1,12 @@
+prefix=/home/user/winlibs/gpb/protobuf-36.0
+exec_prefix=${prefix}
+libdir=/home/user/winlibs/gpb/protobuf-36.0/lib
+includedir=/home/user/winlibs/gpb/protobuf-36.0/include
+
+Name: absl_exponential_biased
+Description: Abseil exponential_biased library
+URL: https://abseil.io/
+Version: 20250512
+Requires: absl_config = 20250512, absl_core_headers = 20250512
+Libs: -L${libdir}  -labsl_exponential_biased 
+Cflags: -I${includedir} -DNOMINMAX
