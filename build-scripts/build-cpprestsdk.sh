@@ -22,6 +22,20 @@ cat > "$SRC/cpprestsdk-$VER/Release/include/SDKDDKVer.h" <<'EOF'
 #endif
 EOF
 
+# mingw-w64 fixes: cpprest's _WIN32 branches assume MSVC.
+COMPAT="$SRC/cpprestsdk-$VER/Release/include/cpprest/details/cpprest_compat.h"
+if ! grep -q __MINGW32__ "$COMPAT"; then
+    # noexcept/constexpr are always available with GCC; _ASSERTE is MSVC crtdbg.
+    sed -i 's|#if _MSC_VER >= 1900|#if defined(__MINGW32__) \|\| _MSC_VER >= 1900|' "$COMPAT"
+    sed -i 's|#include <sal.h>|#include <sal.h>\n#ifdef __MINGW32__\n#include <assert.h>\n#ifndef _ASSERTE\n#define _ASSERTE(x) assert(x)\n#endif\n#endif|' "$COMPAT"
+fi
+SAFEINT="$SRC/cpprestsdk-$VER/Release/include/cpprest/details/SafeInt3.hpp"
+if ! grep -q __MINGW32__ "$SAFEINT"; then
+    # mingw's winnt.h C_ASSERT expands to an extern declaration, which is
+    # invalid at class scope; use static_assert instead.
+    sed -i 's|#ifndef C_ASSERT|#ifdef __MINGW32__\n#undef C_ASSERT\n#define C_ASSERT(e) static_assert((e), "C_ASSERT")\n#endif\n#ifndef C_ASSERT|' "$SAFEINT"
+fi
+
 export WINLIBS_FIND_ROOT="$BOOST;$OPENSSL;$ZLIB"
 B="$BLD/cpprestsdk"
 rm -rf "$B" "$PREFIX"
@@ -29,9 +43,6 @@ cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
     -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DBUILD_TESTS=OFF -DBUILD_SAMPLES=OFF -DWERROR=OFF \
     -DCPPREST_EXCLUDE_BROTLI=ON \
-    -DCPPREST_PPLX_IMPL=linux \
-    -DCPPREST_HTTP_CLIENT_IMPL=asio -DCPPREST_HTTP_LISTENER_IMPL=asio \
-    -DCPPREST_FILEIO_IMPL=posix -DCPPREST_WEBSOCKETS_IMPL=wspp \
     -DBoost_ROOT="$BOOST" -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
 cmake --build "$B" -j"$JOBS"
 cmake --install "$B"
