@@ -26,7 +26,7 @@ for cfg in double single; do
             -DCMAKE_INSTALL_PREFIX="$PREFIX" \
             -DBUILD_SHARED_LIBS=$SHARED \
             -DBUILD_TESTS=OFF \
-            -DWITH_OUR_MALLOC=ON \
+            -DCMAKE_C_FLAGS="-DWITH_OUR_MALLOC" \
             -DENABLE_SSE2=ON -DENABLE_AVX=ON -DENABLE_AVX2=ON \
             -DENABLE_THREADS=ON -DWITH_COMBINED_THREADS=ON \
             $EXTRA
