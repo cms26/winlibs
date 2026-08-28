@@ -46,6 +46,41 @@ static int getrusage(int who, struct rusage *ru)
 SHIM
     sed -i 's|#include "liquid.h"|#include "liquid.h"\n#include "timer_win32_compat.h"|' src/core/src/timer.c
 fi
+# msvcrt-based mingw lacks TIME_UTC/timespec_get and strsep; logging.c needs both.
+if ! grep -q logging_win32_compat src/core/src/logging.c; then
+    cat > src/core/src/logging_win32_compat.h <<'SHIM'
+#ifndef LIQUID_LOGGING_WIN32_COMPAT_H
+#define LIQUID_LOGGING_WIN32_COMPAT_H
+#ifdef _WIN32
+#include <time.h>
+#include <string.h>
+#ifndef TIME_UTC
+#define TIME_UTC 1
+static int timespec_get(struct timespec *ts, int base)
+{
+    clock_gettime(CLOCK_REALTIME, ts);
+    return base;
+}
+#endif
+static char *strsep(char **stringp, const char *delim)
+{
+    char *start = *stringp, *p;
+    if (start == NULL)
+        return NULL;
+    p = strpbrk(start, delim);
+    if (p == NULL) {
+        *stringp = NULL;
+    } else {
+        *p = '\0';
+        *stringp = p + 1;
+    }
+    return start;
+}
+#endif
+#endif
+SHIM
+    sed -i 's|#include "liquid.internal.h"|#include "liquid.internal.h"\n#include "logging_win32_compat.h"|' src/core/src/logging.c
+fi
 rm -f configure
 ./bootstrap.sh
 rm -rf "$PREFIX"
