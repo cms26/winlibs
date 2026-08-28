@@ -13,6 +13,15 @@ if [ ! -d "$SRC/cpprestsdk-$VER" ]; then
         https://github.com/microsoft/cpprestsdk.git "$SRC/cpprestsdk-$VER"
 fi
 
+# SDKDDKVer.h is an MSVC Windows-SDK header that mingw-w64 does not ship;
+# provide a stub (mingw's headers default _WIN32_WINNT themselves).
+cat > "$SRC/cpprestsdk-$VER/Release/include/SDKDDKVer.h" <<'EOF'
+#pragma once
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0A00
+#endif
+EOF
+
 export WINLIBS_FIND_ROOT="$BOOST;$OPENSSL;$ZLIB"
 B="$BLD/cpprestsdk"
 rm -rf "$B" "$PREFIX"

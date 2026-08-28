@@ -27,6 +27,7 @@ cmake -G Ninja -S "$SRC/qtbase-$VER" -B "$B" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF \
+    -DQT_FEATURE_dbus=OFF \
     -DINPUT_openssl=linked \
     -DOPENSSL_ROOT_DIR="$OPENSSL" \
     -DQT_FEATURE_sql_odbc=ON -DQT_FEATURE_sql_sqlite=ON
