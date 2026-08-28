@@ -27,5 +27,17 @@ cmake_mingw -S "$SRC/wt-$VER" -B "$B" \
     -DENABLE_SQLITE=ON -DENABLE_SSL=ON -DENABLE_LIBWTTEST=OFF
 cmake --build "$B" -j"$JOBS"
 cmake --install "$B"
+
+# Wt's Windows default CONFIGDIR is the absolute path c:/witty; installing
+# from Linux renders that as a literal "c:" directory under the prefix,
+# which is an invalid filename on Windows and breaks git checkout there.
+# Keep the sample config under etc/wt instead (at run time Wt still looks
+# in c:/witty by default, or wherever --config points).
+if [ -d "$PREFIX/c:" ]; then
+    mkdir -p "$PREFIX/etc/wt"
+    mv "$PREFIX/c:/witty/"* "$PREFIX/etc/wt/"
+    rm -rf "$PREFIX/c:"
+fi
+
 strip_prefix "$PREFIX"
 echo "wt $VER installed to $PREFIX"
