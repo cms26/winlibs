@@ -31,7 +31,7 @@ cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
     -DCPPREST_EXCLUDE_BROTLI=ON \
     -DCPPREST_PPLX_IMPL=linux \
     -DCPPREST_HTTP_CLIENT_IMPL=asio -DCPPREST_HTTP_LISTENER_IMPL=asio \
-    -DCPPREST_FILEIO_IMPL=posix -DCPPREST_WEBSOCKETS_IMPL=asio \
+    -DCPPREST_FILEIO_IMPL=posix -DCPPREST_WEBSOCKETS_IMPL=wspp \
     -DBoost_ROOT="$BOOST" -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
 cmake --build "$B" -j"$JOBS"
 cmake --install "$B"

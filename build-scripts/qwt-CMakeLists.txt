@@ -26,11 +26,12 @@ set(QWT_QT_LIBS
 
 # Shared library (consumers define QWT_DLL)
 add_library(qwt SHARED ${QWT_SOURCES} ${QWT_HEADERS})
-target_compile_definitions(qwt PRIVATE QWT_MAKEDLL)
+target_compile_definitions(qwt PRIVATE QWT_MAKEDLL QWT_MOC_INCLUDE=1)
 target_link_libraries(qwt PUBLIC ${QWT_QT_LIBS})
 
 # Static library
 add_library(qwt-static STATIC ${QWT_SOURCES} ${QWT_HEADERS})
+target_compile_definitions(qwt-static PRIVATE QWT_MOC_INCLUDE=1)
 target_link_libraries(qwt-static PUBLIC ${QWT_QT_LIBS})
 
 include(GNUInstallDirs)
