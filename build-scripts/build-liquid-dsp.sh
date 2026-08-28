@@ -92,5 +92,17 @@ CC="$CC_MINGW" CXX="$CXX_MINGW" ./configure \
     --enable-simdoverride
 make -s -j"$JOBS"
 make -s install
+
+# liquid's makefile names the Windows DLL like an ELF .so; fix that up and
+# generate a proper import library.
+if [ -f "$PREFIX/lib/libliquid.so.$VER" ]; then
+    mkdir -p "$PREFIX/bin"
+    mv "$PREFIX/lib/libliquid.so.$VER" "$PREFIX/bin/libliquid.dll"
+    rm -f "$PREFIX/lib/libliquid.so" "$PREFIX/lib/libliquid.so".[0-9]*
+    (cd "$PREFIX/bin" \
+        && gendef libliquid.dll >/dev/null \
+        && ${TRIPLET}-dlltool -d libliquid.def -l "$PREFIX/lib/libliquid.dll.a" -D libliquid.dll \
+        && rm -f libliquid.def)
+fi
 strip_prefix "$PREFIX"
 echo "liquid-dsp $VER installed to $PREFIX"
