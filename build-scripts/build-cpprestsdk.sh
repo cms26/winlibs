@@ -94,6 +94,46 @@ open(path, "w").write(s.replace(old, new, 1))
 PYEOF
 fi
 
+# The MSVC-CRT-specific fileio_win32.cpp does not build with GCC; use the
+# posix implementation with pread/pwrite shims for mingw.
+FIO="$SRC/cpprestsdk-$VER/Release/src/streams/fileio_posix.cpp"
+if ! grep -q __MINGW32__ "$FIO"; then
+    python3 - "$FIO" <<'PYEOF'
+import sys
+p = sys.argv[1]; s = open(p).read()
+shim = """#ifdef __MINGW32__
+#include <windows.h>
+#include <io.h>
+static ssize_t cpprest_pread(int fd, void* buf, size_t n, long long off)
+{
+    OVERLAPPED o; memset(&o, 0, sizeof(o));
+    o.Offset = (DWORD)off; o.OffsetHigh = (DWORD)((unsigned long long)off >> 32);
+    DWORD got = 0;
+    HANDLE h = (HANDLE)_get_osfhandle(fd);
+    if (!ReadFile(h, buf, (DWORD)n, &got, &o))
+        return GetLastError() == ERROR_HANDLE_EOF ? 0 : -1;
+    return (ssize_t)got;
+}
+static ssize_t cpprest_pwrite(int fd, const void* buf, size_t n, long long off)
+{
+    OVERLAPPED o; memset(&o, 0, sizeof(o));
+    o.Offset = (DWORD)off; o.OffsetHigh = (DWORD)((unsigned long long)off >> 32);
+    DWORD put = 0;
+    HANDLE h = (HANDLE)_get_osfhandle(fd);
+    if (!WriteFile(h, buf, (DWORD)n, &put, &o)) return -1;
+    return (ssize_t)put;
+}
+#define pread cpprest_pread
+#define pwrite cpprest_pwrite
+#endif
+"""
+marker = '#include "stdafx.h"'
+assert marker in s
+s = s.replace(marker, marker + "\n" + shim, 1)
+open(p, "w").write(s)
+PYEOF
+fi
+
 # mingw ships Windows headers with lowercase names (case matters when
 # cross-compiling from a case-sensitive filesystem).
 grep -rl -e '<Wincrypt.h>' -e '<Strsafe.h>' -e '<VersionHelpers.h>' \
@@ -116,6 +156,7 @@ cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
     -DBUILD_TESTS=OFF -DBUILD_SAMPLES=OFF -DWERROR=OFF \
     -DCMAKE_CXX_FLAGS="-D_TURN_OFF_PLATFORM_STRING" \
     -DCPPREST_EXCLUDE_BROTLI=ON \
+    -DCPPREST_FILEIO_IMPL=posix \
     -DBoost_ROOT="$BOOST" -DBoost_USE_STATIC_LIBS=ON \
     -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
 cmake --build "$B" -j"$JOBS"
