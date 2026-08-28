@@ -30,6 +30,12 @@ if ! grep -q __MINGW32__ "$COMPAT"; then
     sed -i 's|#include <sal.h>|#include <sal.h>\n#ifdef __MINGW32__\n#include <assert.h>\n#ifndef _ASSERTE\n#define _ASSERTE(x) assert(x)\n#endif\n#ifndef _ReturnAddress\n#define _ReturnAddress() __builtin_return_address(0)\n#endif\n#ifndef __assume\n#define __assume(x) do { if (!(x)) __builtin_unreachable(); } while (false)\n#endif\n#endif|' "$COMPAT"
 # The Windows code paths need C++14 (std::enable_if_t etc.).
 sed -i 's|-std=c++11|-std=c++14|g' "$SRC/cpprestsdk-$VER/Release/CMakeLists.txt"
+# mingw ships Windows headers with lowercase names (case matters when
+# cross-compiling from a case-sensitive filesystem).
+grep -rl -e '<Wincrypt.h>' -e '<Strsafe.h>' -e '<VersionHelpers.h>' \
+    "$SRC/cpprestsdk-$VER/Release" | while read -r f; do
+    sed -i 's|<Wincrypt.h>|<wincrypt.h>|; s|<Strsafe.h>|<strsafe.h>|; s|<VersionHelpers.h>|<versionhelpers.h>|' "$f"
+done
 fi
 SAFEINT="$SRC/cpprestsdk-$VER/Release/include/cpprest/details/SafeInt3.hpp"
 if ! grep -q __MINGW32__ "$SAFEINT"; then
