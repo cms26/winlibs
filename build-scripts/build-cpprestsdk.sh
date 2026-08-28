@@ -4,9 +4,31 @@ source "$(dirname "$0")/env.sh"
 
 VER=2.10.19
 PREFIX="$REPO_ROOT/cpprestsdk/cpprestsdk-$VER"
-BOOST="$REPO_ROOT/boost/boost-1.92.0"
 OPENSSL="$REPO_ROOT/openssl/openssl-3.5.8"
 ZLIB="$REPO_ROOT/zlib/zlib-1.3.2"
+
+# cpprestsdk 2.10.x (archived upstream) requires the classic Boost.Asio API
+# (io_service etc.) that Boost removed in 1.87, so it gets a private static
+# Boost 1.86 that is linked into the cpprest DLL and not shipped separately.
+BOOST_VER=1.86.0
+BOOST="$WORK/boost-cpprest"
+if [ ! -f "$BOOST/lib/libboost_system-mt-x64.a" ]; then
+    if [ ! -d "$SRC/boost-$BOOST_VER" ]; then
+        curl -sSfL -o "$SRC/boost-$BOOST_VER.tar.xz" \
+            "https://github.com/boostorg/boost/releases/download/boost-$BOOST_VER/boost-$BOOST_VER-b2-nodocs.tar.xz"
+        tar -C "$SRC" -xf "$SRC/boost-$BOOST_VER.tar.xz"
+    fi
+    cd "$SRC/boost-$BOOST_VER"
+    [ -x b2 ] || ./bootstrap.sh
+    echo "using gcc : mingw : $CXX_MINGW : <archiver>${TRIPLET}-ar <ranlib>${TRIPLET}-ranlib <rc>${TRIPLET}-windres ;" > user-config.jam
+    ./b2 --user-config=user-config.jam \
+        toolset=gcc-mingw target-os=windows address-model=64 architecture=x86 \
+        variant=release link=static runtime-link=shared threading=multi \
+        --layout=tagged --prefix="$BOOST" \
+        --with-system --with-thread --with-chrono --with-atomic \
+        --with-date_time --with-regex --with-random --with-filesystem \
+        -j"$JOBS" install
+fi
 
 if [ ! -d "$SRC/cpprestsdk-$VER" ]; then
     git clone --recursive --depth 1 --branch "v$VER" \
