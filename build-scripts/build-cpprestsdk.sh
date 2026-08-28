@@ -73,7 +73,8 @@ cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
     -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DBUILD_TESTS=OFF -DBUILD_SAMPLES=OFF -DWERROR=OFF \
     -DCPPREST_EXCLUDE_BROTLI=ON \
-    -DBoost_ROOT="$BOOST" -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
+    -DBoost_ROOT="$BOOST" -DBoost_USE_STATIC_LIBS=ON \
+    -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
 cmake --build "$B" -j"$JOBS"
 cmake --install "$B"
 strip_prefix "$PREFIX"
