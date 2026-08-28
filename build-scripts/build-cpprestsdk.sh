@@ -62,6 +62,39 @@ done
 { grep -rl "U('" "$SRC/cpprestsdk-$VER/Release/src" || true; } | while read -r f; do
     sed -i "s/\bU('/_XPLATSTR('/g" "$f"
 done
+# GCC has no MSVC SEH (__try/__except); call InitializeCriticalSection directly.
+PPLXWIN_CPP="$SRC/cpprestsdk-$VER/Release/src/pplx/pplxwin.cpp"
+if ! grep -q __MINGW32__ "$PPLXWIN_CPP"; then
+    python3 - "$PPLXWIN_CPP" <<'PYEOF'
+import sys
+p = sys.argv[1]; s = open(p).read()
+old = """#ifndef __cplusplus_winrt
+    // InitializeCriticalSection can cause STATUS_NO_MEMORY see C28125
+    __try
+    {
+        ::InitializeCriticalSection(_cs);
+    }
+    __except (GetExceptionCode() == STATUS_NO_MEMORY ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+    {
+        throw ::std::bad_alloc();
+    }"""
+new = """#if defined(__MINGW32__)
+    ::InitializeCriticalSection(_cs);
+#elif !defined(__cplusplus_winrt)
+    // InitializeCriticalSection can cause STATUS_NO_MEMORY see C28125
+    __try
+    {
+        ::InitializeCriticalSection(_cs);
+    }
+    __except (GetExceptionCode() == STATUS_NO_MEMORY ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+    {
+        throw ::std::bad_alloc();
+    }"""
+assert old in s, "pplxwin SEH pattern not found"
+open(p, "w").write(s.replace(old, new, 1))
+PYEOF
+fi
+
 # Unqualified pplx type in the MSVC-oriented Concurrency shim.
 sed -i 's|std::shared_ptr<scheduler_interface>|std::shared_ptr<pplx::scheduler_interface>|g' \
     "$SRC/cpprestsdk-$VER/Release/src/pplx/pplxwin.cpp"
