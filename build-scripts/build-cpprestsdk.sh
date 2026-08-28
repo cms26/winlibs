@@ -188,6 +188,24 @@ fi
 # does not export; the portable branch works fine.
 sed -i 's|^#if defined(_WIN32)$|#if defined(_WIN32) \&\& !defined(__MINGW32__)|' \
     "$SRC/cpprestsdk-$VER/Release/src/json/json_parsing.cpp"
+# ... and the portable branch needs a wide-char print_llu for the
+# _UTF16_STRINGS (Windows) build.
+python3 - "$SRC/cpprestsdk-$VER/Release/src/json/json_parsing.cpp" <<'PYEOF'
+import sys
+p = sys.argv[1]; s = open(p).read()
+anchor = "static double __attribute__((__unused__)) anystod(const char* str) { return strtod(str, nullptr); }"
+shim = """#ifdef __MINGW32__
+static int __attribute__((__unused__)) print_llu(wchar_t* ptr, size_t n, unsigned long long val64)
+{
+    return _snwprintf(ptr, n, L"%I64u", val64);
+}
+#endif
+"""
+if "print_llu(wchar_t* ptr, size_t n, unsigned long long val64)" not in s.split("#else", 1)[-1]:
+    assert anchor in s
+    s = s.replace(anchor, shim + anchor, 1)
+    open(p, "w").write(s)
+PYEOF
 
 # MSVC-style link input; mingw needs the lowercase library name, and the
 # asio-based listener/websocket code needs winsock.
