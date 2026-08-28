@@ -1,0 +1,13 @@
+prefix=/home/user/winlibs/log4cplus/log4cplus-2.2.0.1
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+modules=
+
+Name: log4cplus
+Version: 2.2.0
+Description: Simple to use, thread-safe C++ logging API
+Requires:
+Libs: -L${libdir} -llog4cplus
+Libs.private: 
+Cflags: -I${includedir}

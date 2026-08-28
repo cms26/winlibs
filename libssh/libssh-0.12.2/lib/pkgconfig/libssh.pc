@@ -1,0 +1,11 @@
+prefix=/home/user/winlibs/libssh/libssh-0.12.2
+exec_prefix=${prefix}
+libdir=/home/user/winlibs/libssh/libssh-0.12.2/lib
+includedir=/home/user/winlibs/libssh/libssh-0.12.2/include
+
+Name: libssh
+Description: The SSH Library
+Version: 0.12.2
+Libs: -L${libdir} -lssh
+Cflags: -I${includedir}
+Requires.private: 

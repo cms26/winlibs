@@ -1,0 +1,9 @@
+module org.kde.marble
+linktarget marbledeclarative
+optional plugin marbledeclarative
+classname org_kde_marblePlugin
+typeinfo marbledeclarative.qmltypes
+import org.kde.marble.imageprovider
+prefer :/qt/qml/org/kde/marble/
+depends QtQuick
+

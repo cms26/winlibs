@@ -1,0 +1,8 @@
+module org.kde.marble.imageprovider
+linktarget marbleimageprovider
+optional plugin marbleimageprovider
+classname org_kde_marble_imageproviderPlugin
+typeinfo marbleimageprovider.qmltypes
+prefer :/qt/qml/org/kde/marble/imageprovider/
+depends QtQuick
+

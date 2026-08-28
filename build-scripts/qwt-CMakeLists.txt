@@ -1,0 +1,42 @@
+# CMake build for Qwt (upstream builds only with qmake, which cannot be used
+# for mingw-w64 cross builds; this file is copied into the qwt source tree by
+# build-qwt.sh). Builds the full Qwt library: plot + polar + widgets + svg +
+# opengl, as shared DLL and static library.
+cmake_minimum_required(VERSION 3.16)
+project(qwt VERSION 6.2.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+
+find_package(Qt6 REQUIRED COMPONENTS
+    Core Gui Widgets Concurrent PrintSupport Svg OpenGL OpenGLWidgets)
+
+file(GLOB QWT_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB QWT_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+
+# QwtPlotGLCanvas is based on the QGLWidget API that was removed in Qt 6
+# (QwtPlotOpenGLCanvas is its Qt 6 replacement).
+list(FILTER QWT_SOURCES EXCLUDE REGEX "qwt_plot_glcanvas")
+list(FILTER QWT_HEADERS EXCLUDE REGEX "qwt_plot_glcanvas")
+
+set(QWT_QT_LIBS
+    Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::PrintSupport
+    Qt6::Svg Qt6::OpenGL Qt6::OpenGLWidgets)
+
+# Shared library (consumers define QWT_DLL)
+add_library(qwt SHARED ${QWT_SOURCES} ${QWT_HEADERS})
+target_compile_definitions(qwt PRIVATE QWT_MAKEDLL QWT_MOC_INCLUDE=1)
+target_link_libraries(qwt PUBLIC ${QWT_QT_LIBS})
+
+# Static library
+add_library(qwt-static STATIC ${QWT_SOURCES} ${QWT_HEADERS})
+target_compile_definitions(qwt-static PRIVATE QWT_MOC_INCLUDE=1)
+target_link_libraries(qwt-static PUBLIC ${QWT_QT_LIBS})
+
+include(GNUInstallDirs)
+install(TARGETS qwt qwt-static
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
+install(FILES ${QWT_HEADERS} DESTINATION include/qwt)

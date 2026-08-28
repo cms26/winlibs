@@ -1,0 +1,10 @@
+QT.Marble.VERSION = 
+QT.Marble.MAJOR_VERSION = 
+QT.Marble.MINOR_VERSION = 
+QT.Marble.PATCH_VERSION = 
+QT.Marble.name = marblewidget-qt6
+QT.Marble.defines =
+QT.Marble.includes = /home/user/winlibs/marble/marble-26.08.0/include
+QT.Marble.private_includes =
+QT.Marble.libs = /home/user/winlibs/marble/marble-26.08.0/lib
+QT.Marble.depends = xml gui widgets network
