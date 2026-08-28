@@ -27,7 +27,7 @@ COMPAT="$SRC/cpprestsdk-$VER/Release/include/cpprest/details/cpprest_compat.h"
 if ! grep -q __MINGW32__ "$COMPAT"; then
     # noexcept/constexpr are always available with GCC; _ASSERTE is MSVC crtdbg.
     sed -i 's|#if _MSC_VER >= 1900|#if defined(__MINGW32__) \|\| _MSC_VER >= 1900|' "$COMPAT"
-    sed -i 's|#include <sal.h>|#include <sal.h>\n#ifdef __MINGW32__\n#include <assert.h>\n#ifndef _ASSERTE\n#define _ASSERTE(x) assert(x)\n#endif\n#endif|' "$COMPAT"
+    sed -i 's|#include <sal.h>|#include <sal.h>\n#ifdef __MINGW32__\n#include <assert.h>\n#ifndef _ASSERTE\n#define _ASSERTE(x) assert(x)\n#endif\n#ifndef _ReturnAddress\n#define _ReturnAddress() __builtin_return_address(0)\n#endif\n#endif|' "$COMPAT"
 fi
 SAFEINT="$SRC/cpprestsdk-$VER/Release/include/cpprest/details/SafeInt3.hpp"
 if ! grep -q __MINGW32__ "$SAFEINT"; then
