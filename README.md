@@ -15,20 +15,20 @@ library.
 | Folder | Library | Version | Notes |
 |---|---|---|---|
 | `boost/boost-1.92.0` | Boost | 1.92.0 | shared + static, tagged layout; no python/mpi |
-| `cpprestsdk/cpprestsdk-2.10.19` | C++ REST SDK | 2.10.19 | final upstream release (project archived) |
+| `cpprestsdk/cpprestsdk-2.10.19` | C++ REST SDK | 2.10.19 | final upstream release (project archived); winhttp client, asio listener, websocketpp websockets, Boost 1.86 statically linked in |
 | `eigen/eigen-3.4.1` | Eigen | 3.4.1 | header-only, 3.4 LTS branch |
 | `fftw/fftw-3.3.10` | FFTW | 3.3.10 | double + single precision, SSE2/AVX/AVX2, threads |
 | `flatbuffer/25.12.19` | FlatBuffers | 25.12.19 | includes Windows `flatc.exe` |
 | `gpb/protobuf-36.0` | Protocol Buffers | 36.0 | static libs + `protoc.exe`, bundled Abseil |
 | `libssh/libssh-0.12.2` | libssh | 0.12.2 | linked against repo OpenSSL + zlib |
-| `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp | 1.8.2 | |
+| `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp | 1.8.2 | small Win32 compat shims (getrusage/timespec_get/strsep) |
 | `log4cplus/log4cplus-2.2.0.1` | log4cplus | 2.2.0.1 | |
 | `marble/marble-26.08.0` | Marble | 26.08.0 (KDE Gear) | Qt6 build, library only |
 | `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only |
 | `openssl/openssl-3.5.8` | OpenSSL | 3.5.8 | 3.5 LTS line |
 | `portaudio/portaudio-19.7.0` | PortAudio | v19.7.0 | WMME/DirectSound/WASAPI/WDM-KS |
-| `qt/6.11.2` | Qt | 6.11.2 | qtbase, qtsvg, qtimageformats, qtserialport, qt5compat; OpenSSL linked |
-| `qwt/qwt-6.2.0` | Qwt | 6.2.0 | built against Qt 6.11.2 |
+| `qt/6.11.2` | Qt | 6.11.2 | qtbase, qtsvg, qtimageformats, qtserialport, qt5compat, qtshadertools, qtdeclarative (QtQuick/QML); OpenSSL linked |
+| `qwt/qwt-6.2.0` | Qwt | 6.2.0 | built against Qt 6.11.2; headers in `include/qwt`; newest release available from an accessible mirror (6.3.0 is SourceForge-only) |
 | `shapelib/1.6.3` | Shapelib | 1.6.3 | |
 | `soapysdr/soapysdr-0.8.1` | SoapySDR | 0.8.1 | no python bindings |
 | `vkfft/vkfft-1.3.4` | VkFFT | 1.3.4 | header-only |
@@ -51,7 +51,12 @@ library.
 - **Qt**: use `qt/6.11.2` as a normal Qt installation prefix
   (`find_package(Qt6 ...)` with `CMAKE_PREFIX_PATH`, or point Qt Creator at
   it). OpenSSL-backed TLS requires `libssl-3-x64.dll`/`libcrypto-3-x64.dll`
-  from `openssl/openssl-3.5.8/bin` at run time.
+  from `openssl/openssl-3.5.8/bin` at run time. The QML VectorImage element
+  (`quick_vectorimage`) is disabled in this build.
+- **cpprestsdk**: built with the portable pplx (`winpplx`) and
+  `_TURN_OFF_PLATFORM_STRING`; use `_XPLATSTR()`/`utility::string_t`
+  conventions as usual — the `U()` convenience macro still works in consumer
+  code that does not define `_TURN_OFF_PLATFORM_STRING`.
 
 ## Rebuilding
 
