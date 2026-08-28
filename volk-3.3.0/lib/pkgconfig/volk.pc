@@ -1,0 +1,13 @@
+prefix=/home/user/winlibs/volk-3.3.0
+exec_prefix=/home/user/winlibs/volk-3.3.0
+libdir=/home/user/winlibs/volk-3.3.0/lib
+includedir=/home/user/winlibs/volk-3.3.0/include
+LV_CXXFLAGS=
+
+
+Name: volk
+Description: VOLK: Vector Optimized Library of Kernels
+Requires:
+Version: 3.3
+Libs: -L${libdir} -lvolk
+Cflags: -I${includedir} ${LV_CXXFLAGS}

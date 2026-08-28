@@ -11,6 +11,7 @@ if [ ! -d "$SRC/fftw-$VER" ]; then
     curl -sSfL -o "$SRC/fftw-$VER.tar.gz" \
         "http://archive.ubuntu.com/ubuntu/pool/main/f/fftw3/fftw3_$VER.orig.tar.gz"
     tar -C "$SRC" -xf "$SRC/fftw-$VER.tar.gz"
+    mv "$SRC/fftw3-$VER" "$SRC/fftw-$VER"
 fi
 
 rm -rf "$PREFIX"
@@ -25,6 +26,7 @@ for cfg in double single; do
             -DCMAKE_INSTALL_PREFIX="$PREFIX" \
             -DBUILD_SHARED_LIBS=$SHARED \
             -DBUILD_TESTS=OFF \
+            -DWITH_OUR_MALLOC=ON \
             -DENABLE_SSE2=ON -DENABLE_AVX=ON -DENABLE_AVX2=ON \
             -DENABLE_THREADS=ON -DWITH_COMBINED_THREADS=ON \
             $EXTRA

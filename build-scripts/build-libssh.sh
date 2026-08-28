@@ -14,6 +14,7 @@ if [ ! -d "$SRC/libssh-$VER" ]; then
     tar -C "$SRC/libssh-$VER" --strip-components=1 -xf "$SRC/libssh-$VER.tar.gz"
 fi
 
+export WINLIBS_FIND_ROOT="$OPENSSL;$ZLIB"
 B="$BLD/libssh"
 rm -rf "$B" "$PREFIX"
 cmake_mingw -S "$SRC/libssh-$VER" -B "$B" \
