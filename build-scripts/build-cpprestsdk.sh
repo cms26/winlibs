@@ -49,7 +49,7 @@ COMPAT="$SRC/cpprestsdk-$VER/Release/include/cpprest/details/cpprest_compat.h"
 if ! grep -q __MINGW32__ "$COMPAT"; then
     # noexcept/constexpr are always available with GCC; _ASSERTE is MSVC crtdbg.
     sed -i 's|#if _MSC_VER >= 1900|#if defined(__MINGW32__) \|\| _MSC_VER >= 1900|' "$COMPAT"
-    sed -i 's|#include <sal.h>|#include <sal.h>\n#ifdef __MINGW32__\n#include <assert.h>\n#ifndef _ASSERTE\n#define _ASSERTE(x) assert(x)\n#endif\n#ifndef _ReturnAddress\n#define _ReturnAddress() __builtin_return_address(0)\n#endif\n#ifndef __assume\n#define __assume(x) do { if (!(x)) __builtin_unreachable(); } while (false)\n#endif\n#endif|' "$COMPAT"
+    sed -i 's|#include <sal.h>|#include <sal.h>\n#ifdef __MINGW32__\n#include <assert.h>\n#include <intrin.h>\n#ifndef _ASSERTE\n#define _ASSERTE(x) assert(x)\n#endif\n#ifndef _ReturnAddress\n#define _ReturnAddress() __builtin_return_address(0)\n#endif\n#ifndef __assume\n#define __assume(x) do { if (!(x)) __builtin_unreachable(); } while (false)\n#endif\n#endif|' "$COMPAT"
 # The Windows code paths need C++14 (std::enable_if_t etc.).
 sed -i 's|-std=c++11|-std=c++14|g' "$SRC/cpprestsdk-$VER/Release/CMakeLists.txt"
 # cpprest's U() macro breaks Boost headers that use U as a template parameter
@@ -64,6 +64,35 @@ done
 # Unqualified pplx type in the MSVC-oriented Concurrency shim.
 sed -i 's|std::shared_ptr<scheduler_interface>|std::shared_ptr<pplx::scheduler_interface>|g' \
     "$SRC/cpprestsdk-$VER/Release/src/pplx/pplxwin.cpp"
+# mingw winerror.h lacks the WININET_E_* HRESULT aliases.
+WINHTTP_CPP="$SRC/cpprestsdk-$VER/Release/src/http/client/http_client_winhttp.cpp"
+if ! grep -q 'define WININET_E_INCORRECT_HANDLE_STATE' "$WINHTTP_CPP"; then
+    sed -i '0,/#include "stdafx.h"/s//#include "stdafx.h"\n#ifndef WININET_E_INCORRECT_HANDLE_STATE\n#define WININET_E_INCORRECT_HANDLE_STATE ((HRESULT)0x80072EF3L)\n#endif/' "$WINHTTP_CPP"
+fi
+# asio's terminate_threads exists only in its win_thread backend; the
+# mingw-posix build uses asio's posix_thread, which has no such API.
+TP_CPP="$SRC/cpprestsdk-$VER/Release/src/pplx/threadpool.cpp"
+if ! grep -q __MINGW32__ "$TP_CPP"; then
+    python3 - "$TP_CPP" <<'PYEOF'
+import sys
+path = sys.argv[1]
+s = open(path).read()
+old = """        bool terminate_threads = boost::asio::detail::thread::terminate_threads();
+        boost::asio::detail::thread::set_terminate_threads(true);
+        get_shared().~threadpool_impl();
+        boost::asio::detail::thread::set_terminate_threads(terminate_threads);"""
+new = """#ifndef __MINGW32__
+        bool terminate_threads = boost::asio::detail::thread::terminate_threads();
+        boost::asio::detail::thread::set_terminate_threads(true);
+#endif
+        get_shared().~threadpool_impl();
+#ifndef __MINGW32__
+        boost::asio::detail::thread::set_terminate_threads(terminate_threads);
+#endif"""
+assert old in s, "threadpool.cpp pattern not found"
+open(path, "w").write(s.replace(old, new, 1))
+PYEOF
+fi
 
 # mingw ships Windows headers with lowercase names (case matters when
 # cross-compiling from a case-sensitive filesystem).
