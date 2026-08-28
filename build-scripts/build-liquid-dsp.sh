@@ -10,7 +10,11 @@ if [ ! -d "$SRC/liquid-dsp-$VER" ]; then
 fi
 
 cd "$SRC/liquid-dsp-$VER"
-[ -f configure ] || ./bootstrap.sh
+# mingw-w64 has no libc.a (the C runtime is msvcrt); relax the hard
+# AC_CHECK_LIB([c],...) error so the cross configure can proceed.
+sed -i 's|AC_CHECK_LIB(\[c\],\[main\],\[\],\[AC_MSG_ERROR(Could not use standard C library)\],   \[\])|AC_CHECK_LIB([c],[main],[],[AC_MSG_WARN(no separate libc; assuming msvcrt)],[])|' configure.ac
+rm -f configure
+./bootstrap.sh
 rm -rf "$PREFIX"
 make distclean >/dev/null 2>&1 || true
 CC="$CC_MINGW" CXX="$CXX_MINGW" ./configure \

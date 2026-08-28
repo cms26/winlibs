@@ -1,0 +1,9 @@
+libdir=/home/user/winlibs/flatbuffer/25.12.19/lib
+includedir=/home/user/winlibs/flatbuffer/25.12.19/include
+
+Name: FlatBuffers
+Description: Memory Efficient Serialization Library
+Version: 25.12.19
+
+Libs: -L${libdir} -lflatbuffers
+Cflags: -I${includedir}
