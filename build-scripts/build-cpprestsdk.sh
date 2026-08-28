@@ -103,6 +103,7 @@ if ! grep -q __MINGW32__ "$FIO"; then
 import sys
 p = sys.argv[1]; s = open(p).read()
 shim = """#ifdef __MINGW32__
+#include <boost/asio.hpp>
 #include <windows.h>
 #include <io.h>
 #include <fcntl.h>
