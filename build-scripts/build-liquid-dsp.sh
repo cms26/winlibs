@@ -17,6 +17,35 @@ sed -i 's|AC_CHECK_LIB(\[c\],\[main\],\[\],\[AC_MSG_ERROR(Could not use standard
 # timing, which liquid's timer.c does not use on Windows.
 sed -i 's|getopt.h sys/resource.h float.h|getopt.h float.h|' configure.ac
 sed -i '\|#include <sys/resource.h>|d' src/core/src/timer.c
+# getrusage() shim for Windows (GetProcessTimes-based), used by timer.c.
+if ! grep -q timer_win32_compat src/core/src/timer.c; then
+    cat > src/core/src/timer_win32_compat.h <<'SHIM'
+#ifndef LIQUID_TIMER_WIN32_COMPAT_H
+#define LIQUID_TIMER_WIN32_COMPAT_H
+#ifdef _WIN32
+#include <windows.h>
+#define RUSAGE_SELF 0
+struct rusage { struct timeval ru_utime; struct timeval ru_stime; };
+static int getrusage(int who, struct rusage *ru)
+{
+    FILETIME c, e, k, u;
+    ULARGE_INTEGER t;
+    (void)who;
+    if (!GetProcessTimes(GetCurrentProcess(), &c, &e, &k, &u))
+        return -1;
+    t.LowPart = u.dwLowDateTime; t.HighPart = u.dwHighDateTime;
+    ru->ru_utime.tv_sec  = (long)(t.QuadPart / 10000000ULL);
+    ru->ru_utime.tv_usec = (long)((t.QuadPart % 10000000ULL) / 10);
+    t.LowPart = k.dwLowDateTime; t.HighPart = k.dwHighDateTime;
+    ru->ru_stime.tv_sec  = (long)(t.QuadPart / 10000000ULL);
+    ru->ru_stime.tv_usec = (long)((t.QuadPart % 10000000ULL) / 10);
+    return 0;
+}
+#endif
+#endif
+SHIM
+    sed -i 's|#include "liquid.h"|#include "liquid.h"\n#include "timer_win32_compat.h"|' src/core/src/timer.c
+fi
 rm -f configure
 ./bootstrap.sh
 rm -rf "$PREFIX"
