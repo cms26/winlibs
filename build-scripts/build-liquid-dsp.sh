@@ -81,8 +81,10 @@ static char *strsep(char **stringp, const char *delim)
 SHIM
     sed -i 's|#include "liquid.internal.h"|#include "liquid.internal.h"\n#include "logging_win32_compat.h"|' src/core/src/logging.c
 fi
-rm -f configure
-./bootstrap.sh
+if [ ! -f configure ]; then
+    sh bootstrap.sh
+    [ -f configure ] || autoreconf -fvi
+fi
 rm -rf "$PREFIX"
 make distclean >/dev/null 2>&1 || true
 CC="$CC_MINGW" CXX="$CXX_MINGW" ./configure \
