@@ -15,6 +15,11 @@ find_package(Qt6 REQUIRED COMPONENTS
 file(GLOB QWT_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file(GLOB QWT_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 
+# QwtPlotGLCanvas is based on the QGLWidget API that was removed in Qt 6
+# (QwtPlotOpenGLCanvas is its Qt 6 replacement).
+list(FILTER QWT_SOURCES EXCLUDE REGEX "qwt_plot_glcanvas")
+list(FILTER QWT_HEADERS EXCLUDE REGEX "qwt_plot_glcanvas")
+
 set(QWT_QT_LIBS
     Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::PrintSupport
     Qt6::Svg Qt6::OpenGL Qt6::OpenGLWidgets)
