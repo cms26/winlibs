@@ -104,6 +104,8 @@ p = sys.argv[1]; s = open(p).read()
 shim = """#ifdef __MINGW32__
 #include <windows.h>
 #include <io.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 static ssize_t cpprest_pread(int fd, void* buf, size_t n, long long off)
 {
     OVERLAPPED o; memset(&o, 0, sizeof(o));
