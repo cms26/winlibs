@@ -184,6 +184,11 @@ if ! grep -q __MINGW32__ "$SAFEINT"; then
     sed -i 's|#ifndef C_ASSERT|#ifdef __MINGW32__\n#undef C_ASSERT\n#define C_ASSERT(e) static_assert((e), "C_ASSERT")\n#endif\n#ifndef C_ASSERT|' "$SAFEINT"
 fi
 
+# json_parsing's _WIN32 branch uses MSVC *_l CRT functions that msvcrt-mingw
+# does not export; the portable branch works fine.
+sed -i 's|^#if defined(_WIN32)$|#if defined(_WIN32) \&\& !defined(__MINGW32__)|' \
+    "$SRC/cpprestsdk-$VER/Release/src/json/json_parsing.cpp"
+
 # MSVC-style link input; mingw needs the lowercase library name, and the
 # asio-based listener/websocket code needs winsock.
 sed -i 's|Winhttp\.lib|winhttp|' "$SRC/cpprestsdk-$VER/Release/src/CMakeLists.txt"
