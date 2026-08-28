@@ -160,6 +160,7 @@ cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
     -DCMAKE_CXX_FLAGS="-D_TURN_OFF_PLATFORM_STRING" \
     -DCPPREST_EXCLUDE_BROTLI=ON \
     -DCPPREST_FILEIO_IMPL=posix \
+    -DCPPREST_HTTP_LISTENER_IMPL=asio \
     -DBoost_ROOT="$BOOST" -DBoost_USE_STATIC_LIBS=ON \
     -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
 cmake --build "$B" -j"$JOBS"
