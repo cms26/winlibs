@@ -10,12 +10,18 @@ if [ ! -d "$SRC/zlib-$VER" ]; then
     git clone --depth 1 --branch "v$VER" https://github.com/madler/zlib.git "$SRC/zlib-$VER"
 fi
 
-B="$BLD/zlib"
-rm -rf "$B" "$PREFIX"
-cmake_mingw -S "$SRC/zlib-$VER" -B "$B" \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-    -DZLIB_BUILD_TESTING=OFF -DZLIB_BUILD_MINIZIP=OFF
-cmake --build "$B" -j"$JOBS"
-cmake --install "$B"
+rm -rf "$PREFIX"
+for WINLIBS_CONFIG in Release Debug; do
+    export WINLIBS_CONFIG
+    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
+    B="$BLD/zlib-$WINLIBS_CONFIG"
+    rm -rf "$B"
+    cmake_mingw -S "$SRC/zlib-$VER" -B "$B" \
+        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DZLIB_BUILD_TESTING=OFF -DZLIB_BUILD_MINIZIP=OFF
+    cmake --build "$B" -j"$JOBS"
+    cmake --install "$B"
+done
+prune_debug_subtree "$PREFIX/debug"
 strip_prefix "$PREFIX"
 echo "zlib $VER installed to $PREFIX"

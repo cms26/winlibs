@@ -24,4 +24,14 @@ rm -rf "$PREFIX"
     --without-python --without-mpi --without-graph_parallel \
     -j"$JOBS" install
 strip_prefix "$PREFIX"
+
+# Debug variant: tagged layout adds the -d- tag (libboost_X-mt-d-x64) so the
+# debug libraries coexist with release in the same lib dir. -Og -g1 keeps
+# the static archives under GitHub's 100 MB per-file limit.
+./b2 --user-config=user-config.jam \
+    toolset=gcc-mingw target-os=windows address-model=64 architecture=x86 \
+    variant=debug cxxflags="-Og -g1" link=shared,static runtime-link=shared threading=multi \
+    --layout=tagged --prefix="$PREFIX" \
+    --without-python --without-mpi --without-graph_parallel \
+    -j"$JOBS" install
 echo "boost $VER installed to $PREFIX"

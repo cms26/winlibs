@@ -15,15 +15,21 @@ if [ ! -d "$SRC/libssh-$VER" ]; then
 fi
 
 export WINLIBS_FIND_ROOT="$OPENSSL;$ZLIB"
-B="$BLD/libssh"
-rm -rf "$B" "$PREFIX"
-cmake_mingw -S "$SRC/libssh-$VER" -B "$B" \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-    -DCMAKE_PREFIX_PATH="$OPENSSL;$ZLIB" \
-    -DOPENSSL_ROOT_DIR="$OPENSSL" \
-    -DZLIB_ROOT="$ZLIB" \
-    -DWITH_EXAMPLES=OFF -DUNIT_TESTING=OFF -DWITH_SERVER=ON
-cmake --build "$B" -j"$JOBS"
-cmake --install "$B"
+rm -rf "$PREFIX"
+for WINLIBS_CONFIG in Release Debug; do
+    export WINLIBS_CONFIG
+    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
+    B="$BLD/libssh-$WINLIBS_CONFIG"
+    rm -rf "$B"
+    cmake_mingw -S "$SRC/libssh-$VER" -B "$B" \
+        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DCMAKE_PREFIX_PATH="$OPENSSL;$ZLIB" \
+        -DOPENSSL_ROOT_DIR="$OPENSSL" \
+        -DZLIB_ROOT="$ZLIB" \
+        -DWITH_EXAMPLES=OFF -DUNIT_TESTING=OFF -DWITH_SERVER=ON
+    cmake --build "$B" -j"$JOBS"
+    cmake --install "$B"
+done
+prune_debug_subtree "$PREFIX/debug"
 strip_prefix "$PREFIX"
 echo "libssh $VER installed to $PREFIX"

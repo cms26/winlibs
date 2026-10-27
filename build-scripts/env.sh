@@ -32,17 +32,30 @@ fi
 
 STRIP=${TRIPLET}-strip
 
-# cmake configured for cross-compiling to Windows
+# cmake configured for cross-compiling to Windows.
+# WINLIBS_CONFIG selects the configuration (default Release); debug builds
+# install into the library's debug/ subtree, see build_both_configs below.
 cmake_mingw() {
     cmake -G Ninja \
         -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE" \
-        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_BUILD_TYPE="${WINLIBS_CONFIG:-Release}" \
         "$@"
 }
 
+# Trim a debug/ subtree down to binaries: headers/data are shared with the
+# release install, and the per-config cmake/pkgconfig files would carry wrong
+# include paths from inside debug/.
+prune_debug_subtree() {
+    rm -rf "$1/include" "$1/share" "$1/cmake" "$1/etc" \
+           "$1/lib/cmake" "$1/lib/pkgconfig"
+}
+
 # Strip all dlls/exes/static libs under a prefix to keep the repo small.
+# Debug subtrees keep their symbols.
 strip_prefix() {
     local prefix="$1"
-    find "$prefix" -name '*.dll' -o -name '*.exe' | xargs -r "$STRIP" --strip-unneeded || true
-    find "$prefix" -name '*.a' ! -name '*.dll.a' | xargs -r "$STRIP" --strip-debug || true
+    find "$prefix" -not -path '*/debug/*' \( -name '*.dll' -o -name '*.exe' \) \
+        | xargs -r "$STRIP" --strip-unneeded || true
+    find "$prefix" -not -path '*/debug/*' -name '*.a' ! -name '*.dll.a' \
+        | xargs -r "$STRIP" --strip-debug || true
 }

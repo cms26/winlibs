@@ -29,6 +29,26 @@ cmake_mingw -S "$SRC/protobuf-$VER" -B "$B" \
 cmake --build "$B" -j"$JOBS"
 cmake --install "$B"
 
+# Debug variant into c++/debug/lib. -Og -g1 keeps the static archives under
+# GitHub's 100 MB per-file limit while keeping assertions, backtraces and
+# line-level stepping. protoc is a build tool; no debug variant.
+WINLIBS_CONFIG=Debug; export WINLIBS_CONFIG
+BD="$BLD/protobuf-debug"
+rm -rf "$BD"
+cmake_mingw -S "$SRC/protobuf-$VER" -B "$BD" \
+    -DCMAKE_INSTALL_PREFIX="$PREFIX/c++/debug" \
+    -DCMAKE_C_FLAGS_DEBUG="-Og -g1" -DCMAKE_CXX_FLAGS_DEBUG="-Og -g1" \
+    -DCMAKE_PREFIX_PATH="$ZLIB" -DZLIB_ROOT="$ZLIB" \
+    -Dprotobuf_BUILD_TESTS=OFF \
+    -Dprotobuf_BUILD_SHARED_LIBS=OFF \
+    -Dprotobuf_BUILD_PROTOC_BINARIES=OFF \
+    -Dprotobuf_WITH_ZLIB=ON
+cmake --build "$BD" -j"$JOBS"
+cmake --install "$BD"
+prune_debug_subtree "$PREFIX/c++/debug"
+rm -rf "$PREFIX/c++/debug/bin"
+unset WINLIBS_CONFIG
+
 # Rearrange into the legacy layout: tools out of c++/, headers at c++/ root.
 mv "$PREFIX/c++/bin" "$PREFIX/bin"
 mv "$PREFIX/c++/include/"* "$PREFIX/c++/"

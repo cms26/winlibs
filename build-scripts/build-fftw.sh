@@ -15,15 +15,18 @@ if [ ! -d "$SRC/fftw-$VER" ]; then
 fi
 
 rm -rf "$PREFIX"
-for cfg in double single; do
+for WINLIBS_CONFIG in Release Debug; do
+  export WINLIBS_CONFIG
+  IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
+  for cfg in double single; do
     EXTRA=""
     if [ "$cfg" = single ]; then EXTRA="-DENABLE_FLOAT=ON -DENABLE_SSE=ON"; fi
     for linkage in shared static; do
-        B="$BLD/fftw-$cfg-$linkage"
+        B="$BLD/fftw-$cfg-$linkage-$WINLIBS_CONFIG"
         rm -rf "$B"
         SHARED=OFF; [ "$linkage" = shared ] && SHARED=ON
         cmake_mingw -S "$SRC/fftw-$VER" -B "$B" \
-            -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+            -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
             -DBUILD_SHARED_LIBS=$SHARED \
             -DBUILD_TESTS=OFF \
             -DCMAKE_C_FLAGS="-DWITH_OUR_MALLOC" \
@@ -33,6 +36,8 @@ for cfg in double single; do
         cmake --build "$B" -j"$JOBS"
         cmake --install "$B"
     done
+  done
 done
+prune_debug_subtree "$PREFIX/debug"
 strip_prefix "$PREFIX"
 echo "fftw $VER installed to $PREFIX"

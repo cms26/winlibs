@@ -17,8 +17,8 @@ LIBS=(
     liquid-dsp protobuf
     # boost, then its consumers
     boost wt cpprestsdk
-    # Qt host tools, Qt for Windows, then Qt consumers
-    qt-host qt qwt marble
+    # Qt host tools, Qt for Windows (release + debug), then Qt consumers
+    qt-host qt qt-debug qwt marble
     # mingw runtime DLLs
     runtime-dlls
 )

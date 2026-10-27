@@ -13,13 +13,18 @@ if [ ! -d "$SRC/qwt-$VER" ]; then
 fi
 cp "$SCRIPT_DIR/qwt-CMakeLists.txt" "$SRC/qwt-$VER/CMakeLists.txt"
 
-B="$BLD/qwt"
-rm -rf "$B" "$PREFIX"
-cmake -G Ninja -S "$SRC/qwt-$VER" -B "$B" \
-    -DCMAKE_TOOLCHAIN_FILE="$QT/lib/cmake/Qt6/qt.toolchain.cmake" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX"
-cmake --build "$B" -j"$JOBS"
-cmake --install "$B"
+rm -rf "$PREFIX"
+for CFG in Release Debug; do
+    IPREFIX="$PREFIX"; [ "$CFG" = Debug ] && IPREFIX="$PREFIX/debug"
+    B="$BLD/qwt-$CFG"
+    rm -rf "$B"
+    cmake -G Ninja -S "$SRC/qwt-$VER" -B "$B" \
+        -DCMAKE_TOOLCHAIN_FILE="$QT/lib/cmake/Qt6/qt.toolchain.cmake" \
+        -DCMAKE_BUILD_TYPE=$CFG \
+        -DCMAKE_INSTALL_PREFIX="$IPREFIX"
+    cmake --build "$B" -j"$JOBS"
+    cmake --install "$B"
+done
+prune_debug_subtree "$PREFIX/debug"
 strip_prefix "$PREFIX"
 echo "qwt $VER installed to $PREFIX"

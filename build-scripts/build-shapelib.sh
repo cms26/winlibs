@@ -9,12 +9,18 @@ if [ ! -d "$SRC/shapelib-$VER" ]; then
     git clone --depth 1 --branch "v$VER" https://github.com/OSGeo/shapelib.git "$SRC/shapelib-$VER"
 fi
 
-B="$BLD/shapelib"
-rm -rf "$B" "$PREFIX"
-cmake_mingw -S "$SRC/shapelib-$VER" -B "$B" \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-    -DBUILD_SHAPELIB_CONTRIB=OFF -DBUILD_TESTING=OFF -DBUILD_APPS=OFF
-cmake --build "$B" -j"$JOBS"
-cmake --install "$B"
+rm -rf "$PREFIX"
+for WINLIBS_CONFIG in Release Debug; do
+    export WINLIBS_CONFIG
+    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
+    B="$BLD/shapelib-$WINLIBS_CONFIG"
+    rm -rf "$B"
+    cmake_mingw -S "$SRC/shapelib-$VER" -B "$B" \
+        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DBUILD_SHAPELIB_CONTRIB=OFF -DBUILD_TESTING=OFF -DBUILD_APPS=OFF
+    cmake --build "$B" -j"$JOBS"
+    cmake --install "$B"
+done
+prune_debug_subtree "$PREFIX/debug"
 strip_prefix "$PREFIX"
 echo "shapelib $VER installed to $PREFIX"

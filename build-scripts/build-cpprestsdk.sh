@@ -213,19 +213,27 @@ sed -i 's|Winhttp\.lib|winhttp|' "$SRC/cpprestsdk-$VER/Release/src/CMakeLists.tx
 sed -i 's|^    winhttp$|    winhttp\n    ws2_32\n    mswsock|' "$SRC/cpprestsdk-$VER/Release/src/CMakeLists.txt"
 
 export WINLIBS_FIND_ROOT="$BOOST;$OPENSSL;$ZLIB"
-B="$BLD/cpprestsdk"
-rm -rf "$B" "$PREFIX"
-cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-    -DBUILD_TESTS=OFF -DBUILD_SAMPLES=OFF -DWERROR=OFF \
-    -DCMAKE_CXX_FLAGS="-D_TURN_OFF_PLATFORM_STRING" \
-    -DCPPREST_PPLX_IMPL=winpplx \
-    -DCPPREST_EXCLUDE_BROTLI=ON \
-    -DCPPREST_FILEIO_IMPL=posix \
-    -DCPPREST_HTTP_LISTENER_IMPL=asio \
-    -DBoost_ROOT="$BOOST" -DBoost_USE_STATIC_LIBS=ON \
-    -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
-cmake --build "$B" -j"$JOBS"
-cmake --install "$B"
+rm -rf "$PREFIX"
+for WINLIBS_CONFIG in Release Debug; do
+    export WINLIBS_CONFIG
+    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
+    B="$BLD/cpprestsdk-$WINLIBS_CONFIG"
+    rm -rf "$B"
+    # -Og -g1 in debug keeps the DLL under GitHub's 100 MB per-file limit.
+    cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
+        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DBUILD_TESTS=OFF -DBUILD_SAMPLES=OFF -DWERROR=OFF \
+        -DCMAKE_CXX_FLAGS="-D_TURN_OFF_PLATFORM_STRING" \
+        -DCMAKE_C_FLAGS_DEBUG="-Og -g1" -DCMAKE_CXX_FLAGS_DEBUG="-Og -g1" \
+        -DCPPREST_PPLX_IMPL=winpplx \
+        -DCPPREST_EXCLUDE_BROTLI=ON \
+        -DCPPREST_FILEIO_IMPL=posix \
+        -DCPPREST_HTTP_LISTENER_IMPL=asio \
+        -DBoost_ROOT="$BOOST" -DBoost_USE_STATIC_LIBS=ON \
+        -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
+    cmake --build "$B" -j"$JOBS"
+    cmake --install "$B"
+done
+prune_debug_subtree "$PREFIX/debug"
 strip_prefix "$PREFIX"
 echo "cpprestsdk $VER installed to $PREFIX"

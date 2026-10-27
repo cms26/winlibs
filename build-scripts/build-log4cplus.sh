@@ -12,13 +12,19 @@ if [ ! -d "$SRC/log4cplus-$VER" ]; then
     tar -C "$SRC" -xf "$SRC/log4cplus-$VER.tar.xz"
 fi
 
-B="$BLD/log4cplus"
-rm -rf "$B" "$PREFIX"
-cmake_mingw -S "$SRC/log4cplus-$VER" -B "$B" \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-    -DLOG4CPLUS_BUILD_TESTING=OFF -DLOG4CPLUS_BUILD_LOGGINGSERVER=OFF \
-    -DWITH_UNIT_TESTS=OFF
-cmake --build "$B" -j"$JOBS"
-cmake --install "$B"
+rm -rf "$PREFIX"
+for WINLIBS_CONFIG in Release Debug; do
+    export WINLIBS_CONFIG
+    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
+    B="$BLD/log4cplus-$WINLIBS_CONFIG"
+    rm -rf "$B"
+    cmake_mingw -S "$SRC/log4cplus-$VER" -B "$B" \
+        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DLOG4CPLUS_BUILD_TESTING=OFF -DLOG4CPLUS_BUILD_LOGGINGSERVER=OFF \
+        -DWITH_UNIT_TESTS=OFF
+    cmake --build "$B" -j"$JOBS"
+    cmake --install "$B"
+done
+prune_debug_subtree "$PREFIX/debug"
 strip_prefix "$PREFIX"
 echo "log4cplus $VER installed to $PREFIX"

@@ -12,13 +12,28 @@ if [ ! -d "$SRC/openssl-$VER" ]; then
 fi
 
 cd "$SRC/openssl-$VER"
+rm -rf "$PREFIX"
+
+# Release
+make distclean >/dev/null 2>&1 || true
 ./Configure mingw64 shared \
     --cross-compile-prefix=${TRIPLET}- \
     --prefix="$PREFIX" \
     --libdir=lib \
     no-tests no-docs
 make -s -j"$JOBS"
-rm -rf "$PREFIX"
 make -s install_sw
 strip_prefix "$PREFIX"
+
+# Debug (unoptimized, with symbols) into the debug/ subtree.
+make distclean >/dev/null 2>&1 || true
+./Configure --debug mingw64 shared \
+    --cross-compile-prefix=${TRIPLET}- \
+    --prefix="$PREFIX/debug" \
+    --libdir=lib \
+    no-tests no-docs
+make -s -j"$JOBS"
+make -s install_sw
+prune_debug_subtree "$PREFIX/debug"
+
 echo "openssl $VER installed to $PREFIX"

@@ -86,23 +86,28 @@ if [ ! -f configure ]; then
     [ -f configure ] || autoreconf -fvi
 fi
 rm -rf "$PREFIX"
-make distclean >/dev/null 2>&1 || true
-CC="$CC_MINGW" CXX="$CXX_MINGW" ./configure \
-    --host=$TRIPLET --prefix="$PREFIX" \
-    --enable-simdoverride
-make -s -j"$JOBS"
-make -s install
+for CFG in Release Debug; do
+    IPREFIX="$PREFIX"; [ "$CFG" = Debug ] && IPREFIX="$PREFIX/debug"
+    CFGFLAGS="-O2"; [ "$CFG" = Debug ] && CFGFLAGS="-Og -g"
+    make distclean >/dev/null 2>&1 || true
+    CC="$CC_MINGW" CXX="$CXX_MINGW" CFLAGS="$CFGFLAGS" ./configure \
+        --host=$TRIPLET --prefix="$IPREFIX" \
+        --enable-simdoverride
+    make -s -j"$JOBS"
+    make -s install
 
-# liquid's makefile names the Windows DLL like an ELF .so; fix that up and
-# generate a proper import library.
-if [ -f "$PREFIX/lib/libliquid.so.$VER" ]; then
-    mkdir -p "$PREFIX/bin"
-    mv "$PREFIX/lib/libliquid.so.$VER" "$PREFIX/bin/libliquid.dll"
-    rm -f "$PREFIX/lib/libliquid.so" "$PREFIX/lib/libliquid.so".[0-9]*
-    (cd "$PREFIX/bin" \
-        && gendef libliquid.dll >/dev/null \
-        && ${TRIPLET}-dlltool -d libliquid.def -l "$PREFIX/lib/libliquid.dll.a" -D libliquid.dll \
-        && rm -f libliquid.def)
-fi
+    # liquid's makefile names the Windows DLL like an ELF .so; fix that up and
+    # generate a proper import library.
+    if [ -f "$IPREFIX/lib/libliquid.so.$VER" ]; then
+        mkdir -p "$IPREFIX/bin"
+        mv "$IPREFIX/lib/libliquid.so.$VER" "$IPREFIX/bin/libliquid.dll"
+        rm -f "$IPREFIX/lib/libliquid.so" "$IPREFIX/lib/libliquid.so".[0-9]*
+        (cd "$IPREFIX/bin" \
+            && gendef libliquid.dll >/dev/null \
+            && ${TRIPLET}-dlltool -d libliquid.def -l "$IPREFIX/lib/libliquid.dll.a" -D libliquid.dll \
+            && rm -f libliquid.def)
+    fi
+done
+prune_debug_subtree "$PREFIX/debug"
 strip_prefix "$PREFIX"
 echo "liquid-dsp $VER installed to $PREFIX"
