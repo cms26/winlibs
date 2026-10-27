@@ -19,7 +19,7 @@ library.
 | `eigen/eigen-3.4.1` | Eigen | 3.4.1 | header-only, 3.4 LTS branch |
 | `fftw/fftw-3.3.10` | FFTW | 3.3.10 | double + single precision, SSE2/AVX/AVX2, threads |
 | `flatbuffer/25.12.19` | FlatBuffers | 25.12.19 | includes Windows `flatc.exe` |
-| `gpb/protobuf-36.0` | Protocol Buffers | 36.0 | static libs + `protoc.exe`, bundled Abseil |
+| `gpb/36.0` | Protocol Buffers | 36.0 | legacy layout: `bin/` (protoc.exe + plugins), `c++/` (headers at root: google/, absl/, upb/), `c++/lib/` (static libs, bundled Abseil) |
 | `libssh/libssh-0.12.2` | libssh | 0.12.2 | linked against repo OpenSSL + zlib |
 | `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp | 1.8.2 | small Win32 compat shims (getrusage/timespec_get/strsep) |
 | `log4cplus/log4cplus-2.2.0.1` | log4cplus | 2.2.0.1 | |

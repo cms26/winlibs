@@ -1,10 +1,15 @@
 #!/bin/bash
 # Protocol Buffers (gpb) for 64-bit Windows: static libs + protoc.exe,
 # with bundled Abseil.
+#
+# Installed in the legacy codelibrary layout:
+#   gpb/<ver>/bin/            protoc.exe and plugins
+#   gpb/<ver>/c++/            headers (google/, absl/, upb/, ...)
+#   gpb/<ver>/c++/lib/        static libs + cmake/pkgconfig files
 source "$(dirname "$0")/env.sh"
 
 VER=36.0
-PREFIX="$REPO_ROOT/gpb/protobuf-$VER"
+PREFIX="$REPO_ROOT/gpb/$VER"
 ZLIB="$REPO_ROOT/zlib/zlib-1.3.2"
 
 if [ ! -d "$SRC/protobuf-$VER" ]; then
@@ -15,7 +20,7 @@ fi
 B="$BLD/protobuf"
 rm -rf "$B" "$PREFIX"
 cmake_mingw -S "$SRC/protobuf-$VER" -B "$B" \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+    -DCMAKE_INSTALL_PREFIX="$PREFIX/c++" \
     -DCMAKE_PREFIX_PATH="$ZLIB" -DZLIB_ROOT="$ZLIB" \
     -Dprotobuf_BUILD_TESTS=OFF \
     -Dprotobuf_BUILD_SHARED_LIBS=OFF \
@@ -23,5 +28,23 @@ cmake_mingw -S "$SRC/protobuf-$VER" -B "$B" \
     -Dprotobuf_WITH_ZLIB=ON
 cmake --build "$B" -j"$JOBS"
 cmake --install "$B"
+
+# Rearrange into the legacy layout: tools out of c++/, headers at c++/ root.
+mv "$PREFIX/c++/bin" "$PREFIX/bin"
+mv "$PREFIX/c++/include/"* "$PREFIX/c++/"
+rmdir "$PREFIX/c++/include"
+# Keep the cmake package configs working from their new location
+# (configs live at c++/lib/cmake/<pkg>, so _IMPORT_PREFIX = c++).
+grep -rl '${_IMPORT_PREFIX}/include' "$PREFIX/c++/lib/cmake" | while read -r f; do
+    sed -i 's|${_IMPORT_PREFIX}/include|${_IMPORT_PREFIX}|g' "$f"
+done
+grep -rl '${_IMPORT_PREFIX}/bin/' "$PREFIX/c++/lib/cmake" | while read -r f; do
+    sed -i 's|${_IMPORT_PREFIX}/bin/|${_IMPORT_PREFIX}/../bin/|g' "$f"
+done
+# Relocatable pkg-config files (headers sit at the c++ prefix root).
+find "$PREFIX/c++/lib/pkgconfig" -name '*.pc' | while read -r f; do
+    sed -i 's|^prefix=.*|prefix=${pcfiledir}/../..|; s|^exec_prefix=.*|exec_prefix=${prefix}|; s|^libdir=.*|libdir=${prefix}/lib|; s|^includedir=.*|includedir=${prefix}|' "$f"
+done
+
 strip_prefix "$PREFIX"
 echo "protobuf $VER installed to $PREFIX"

@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}
+
+Name: absl_raw_hash_set_resize_impl
+Description: Abseil raw_hash_set_resize_impl library
+URL: https://abseil.io/
+Version: 20250512
+Requires: absl_config = 20250512
+Libs: -L${libdir}  
+Cflags: -I${includedir} -DNOMINMAX
