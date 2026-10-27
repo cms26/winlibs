@@ -234,4 +234,17 @@ for WINLIBS_CONFIG in Release Debug; do
     cmake --install "$B"
     [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
 done
+
+# Legacy codelibrary layout: everything together in lib/ — the cpprest
+# release+debug DLLs and import libs plus the dependency DLLs they load
+# (OpenSSL, zlib), so lib/ is self-contained like the old repo.
+mv "$PREFIX"/bin/*.dll "$PREFIX/lib/"
+rmdir "$PREFIX/bin" 2>/dev/null || true
+cp "$OPENSSL/bin/libssl-3-x64.dll" "$OPENSSL/bin/libcrypto-3-x64.dll" \
+   "$ZLIB/bin/libz.dll" "$PREFIX/lib/"
+[ -f "$ZLIB/bin/libzd.dll" ] && cp "$ZLIB/bin/libzd.dll" "$PREFIX/lib/"
+# Point the exported cmake targets at the DLLs' new location.
+{ grep -rl '${_IMPORT_PREFIX}/bin/' "$PREFIX/lib/cmake" 2>/dev/null || true; } | while read -r f; do
+    sed -i 's|${_IMPORT_PREFIX}/bin/|${_IMPORT_PREFIX}/lib/|g' "$f"
+done
 echo "cpprestsdk $VER installed to $PREFIX"
