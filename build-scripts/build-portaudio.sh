@@ -12,17 +12,15 @@ fi
 rm -rf "$PREFIX"
 for WINLIBS_CONFIG in Release Debug; do
     export WINLIBS_CONFIG
-    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
     B="$BLD/portaudio-$WINLIBS_CONFIG"
     rm -rf "$B"
     cmake_mingw -S "$SRC/portaudio-$VER" -B "$B" \
-        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DCMAKE_INSTALL_PREFIX="$PREFIX" \
         -DPA_BUILD_SHARED=ON -DPA_BUILD_STATIC=ON \
         -DPA_USE_WASAPI=ON -DPA_USE_WDMKS=ON -DPA_USE_DS=ON -DPA_USE_WMME=ON \
         -DPA_BUILD_TESTS=OFF -DPA_BUILD_EXAMPLES=OFF
     cmake --build "$B" -j"$JOBS"
     cmake --install "$B"
+    [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
 done
-prune_debug_subtree "$PREFIX/debug"
-strip_prefix "$PREFIX"
 echo "portaudio $VER installed to $PREFIX"

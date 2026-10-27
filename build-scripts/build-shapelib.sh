@@ -12,15 +12,13 @@ fi
 rm -rf "$PREFIX"
 for WINLIBS_CONFIG in Release Debug; do
     export WINLIBS_CONFIG
-    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
     B="$BLD/shapelib-$WINLIBS_CONFIG"
     rm -rf "$B"
     cmake_mingw -S "$SRC/shapelib-$VER" -B "$B" \
-        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DCMAKE_INSTALL_PREFIX="$PREFIX" \
         -DBUILD_SHAPELIB_CONTRIB=OFF -DBUILD_TESTING=OFF -DBUILD_APPS=OFF
     cmake --build "$B" -j"$JOBS"
     cmake --install "$B"
+    [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
 done
-prune_debug_subtree "$PREFIX/debug"
-strip_prefix "$PREFIX"
 echo "shapelib $VER installed to $PREFIX"

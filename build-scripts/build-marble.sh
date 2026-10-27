@@ -27,15 +27,15 @@ fi
 export WINLIBS_FIND_ROOT="$ZLIB"
 rm -rf "$PREFIX"
 for CFG in Release Debug; do
-    IPREFIX="$PREFIX"; [ "$CFG" = Debug ] && IPREFIX="$PREFIX/debug"
     B="$BLD/marble-$CFG"
     rm -rf "$B"
     # -Og -g1 in debug keeps the DLLs under GitHub's 100 MB per-file limit.
     cmake -G Ninja -S "$SRC/marble-$VER" -B "$B" \
         -DCMAKE_TOOLCHAIN_FILE="$QT/lib/cmake/Qt6/qt.toolchain.cmake" \
         -DCMAKE_BUILD_TYPE=$CFG \
+        -DCMAKE_DEBUG_POSTFIX=d \
         -DCMAKE_C_FLAGS_DEBUG="-Og -g1" -DCMAKE_CXX_FLAGS_DEBUG="-Og -g1" \
-        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DCMAKE_INSTALL_PREFIX="$PREFIX" \
         -DECM_DIR="$ECM_PREFIX/share/ECM/cmake" \
         -DZLIB_ROOT="$ZLIB" \
         -DBUILD_MARBLE_TESTS=OFF -DBUILD_MARBLE_TOOLS=OFF \
@@ -43,12 +43,6 @@ for CFG in Release Debug; do
         -DWITH_DESIGNER_PLUGIN=OFF -DBUILD_WITH_DBUS=OFF
     cmake --build "$B" -j"$JOBS"
     cmake --install "$B"
-    if [ "$CFG" = Debug ]; then
-        # marble installs data/plugins too; the debug subtree only carries
-        # binaries (data is shared with the release install).
-        prune_debug_subtree "$IPREFIX"
-        rm -rf "$IPREFIX/data" "$IPREFIX/mkspecs"
-    fi
+    [ "$CFG" = Release ] && strip_prefix "$PREFIX"
 done
-strip_prefix "$PREFIX"
 echo "marble $VER installed to $PREFIX"

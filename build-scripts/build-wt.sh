@@ -17,13 +17,12 @@ export WINLIBS_FIND_ROOT="$BOOST;$OPENSSL;$ZLIB"
 rm -rf "$PREFIX"
 for WINLIBS_CONFIG in Release Debug; do
     export WINLIBS_CONFIG
-    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
     B="$BLD/wt-$WINLIBS_CONFIG"
     rm -rf "$B"
     # -Og -g1 in debug: full -g static archives would exceed GitHub's
     # 100 MB per-file limit.
     cmake_mingw -S "$SRC/wt-$VER" -B "$B" \
-        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DCMAKE_INSTALL_PREFIX="$PREFIX" \
         -DCMAKE_C_FLAGS_DEBUG="-Og -g1" -DCMAKE_CXX_FLAGS_DEBUG="-Og -g1" \
         -DBOOST_PREFIX="$BOOST" -DOPENSSL_PREFIX="$OPENSSL" -DZLIB_ROOT="$ZLIB" \
         -DCONNECTOR_FCGI=OFF -DCONNECTOR_HTTP=ON \
@@ -40,12 +39,11 @@ for WINLIBS_CONFIG in Release Debug; do
     # which is an invalid filename on Windows and breaks git checkout there.
     # Keep the sample config under etc/wt instead (at run time Wt still looks
     # in c:/witty by default, or wherever --config points).
-    if [ -d "$IPREFIX/c:" ]; then
-        mkdir -p "$IPREFIX/etc/wt"
-        mv "$IPREFIX/c:/witty/"* "$IPREFIX/etc/wt/"
-        rm -rf "$IPREFIX/c:"
+    if [ -d "$PREFIX/c:" ]; then
+        mkdir -p "$PREFIX/etc/wt"
+        mv "$PREFIX/c:/witty/"* "$PREFIX/etc/wt/"
+        rm -rf "$PREFIX/c:"
     fi
+    [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
 done
-prune_debug_subtree "$PREFIX/debug"
-strip_prefix "$PREFIX"
 echo "wt $VER installed to $PREFIX"

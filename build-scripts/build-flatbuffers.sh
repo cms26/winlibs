@@ -14,16 +14,14 @@ for WINLIBS_CONFIG in Release Debug; do
     export WINLIBS_CONFIG
     # flatc.exe is a build tool, not a library; no debug variant needed.
     FLATC=ON; [ "$WINLIBS_CONFIG" = Debug ] && FLATC=OFF
-    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
     B="$BLD/flatbuffers-$WINLIBS_CONFIG"
     rm -rf "$B"
     cmake_mingw -S "$SRC/flatbuffers-$VER" -B "$B" \
-        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DCMAKE_INSTALL_PREFIX="$PREFIX" \
         -DFLATBUFFERS_BUILD_TESTS=OFF -DFLATBUFFERS_BUILD_FLATC=$FLATC \
         -DFLATBUFFERS_BUILD_SHAREDLIB=ON
     cmake --build "$B" -j"$JOBS"
     cmake --install "$B"
+    [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
 done
-prune_debug_subtree "$PREFIX/debug"
-strip_prefix "$PREFIX"
 echo "flatbuffers $VER installed to $PREFIX"

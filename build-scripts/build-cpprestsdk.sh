@@ -216,12 +216,11 @@ export WINLIBS_FIND_ROOT="$BOOST;$OPENSSL;$ZLIB"
 rm -rf "$PREFIX"
 for WINLIBS_CONFIG in Release Debug; do
     export WINLIBS_CONFIG
-    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
     B="$BLD/cpprestsdk-$WINLIBS_CONFIG"
     rm -rf "$B"
     # -Og -g1 in debug keeps the DLL under GitHub's 100 MB per-file limit.
     cmake_mingw -S "$SRC/cpprestsdk-$VER" -B "$B" \
-        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DCMAKE_INSTALL_PREFIX="$PREFIX" \
         -DBUILD_TESTS=OFF -DBUILD_SAMPLES=OFF -DWERROR=OFF \
         -DCMAKE_CXX_FLAGS="-D_TURN_OFF_PLATFORM_STRING" \
         -DCMAKE_C_FLAGS_DEBUG="-Og -g1" -DCMAKE_CXX_FLAGS_DEBUG="-Og -g1" \
@@ -233,7 +232,6 @@ for WINLIBS_CONFIG in Release Debug; do
         -DOPENSSL_ROOT_DIR="$OPENSSL" -DZLIB_ROOT="$ZLIB"
     cmake --build "$B" -j"$JOBS"
     cmake --install "$B"
+    [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
 done
-prune_debug_subtree "$PREFIX/debug"
-strip_prefix "$PREFIX"
 echo "cpprestsdk $VER installed to $PREFIX"

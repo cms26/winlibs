@@ -18,18 +18,16 @@ export WINLIBS_FIND_ROOT="$OPENSSL;$ZLIB"
 rm -rf "$PREFIX"
 for WINLIBS_CONFIG in Release Debug; do
     export WINLIBS_CONFIG
-    IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
     B="$BLD/libssh-$WINLIBS_CONFIG"
     rm -rf "$B"
     cmake_mingw -S "$SRC/libssh-$VER" -B "$B" \
-        -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+        -DCMAKE_INSTALL_PREFIX="$PREFIX" \
         -DCMAKE_PREFIX_PATH="$OPENSSL;$ZLIB" \
         -DOPENSSL_ROOT_DIR="$OPENSSL" \
         -DZLIB_ROOT="$ZLIB" \
         -DWITH_EXAMPLES=OFF -DUNIT_TESTING=OFF -DWITH_SERVER=ON
     cmake --build "$B" -j"$JOBS"
     cmake --install "$B"
+    [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
 done
-prune_debug_subtree "$PREFIX/debug"
-strip_prefix "$PREFIX"
 echo "libssh $VER installed to $PREFIX"

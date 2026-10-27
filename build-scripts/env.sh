@@ -33,18 +33,20 @@ fi
 STRIP=${TRIPLET}-strip
 
 # cmake configured for cross-compiling to Windows.
-# WINLIBS_CONFIG selects the configuration (default Release); debug builds
-# install into the library's debug/ subtree, see build_both_configs below.
+# WINLIBS_CONFIG selects the configuration (default Release). Debug builds
+# install side by side with release using the usual Windows 'd' suffix
+# (libfoo.dll / libfood.dll), giving two-config CMake packages.
 cmake_mingw() {
     cmake -G Ninja \
         -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE" \
         -DCMAKE_BUILD_TYPE="${WINLIBS_CONFIG:-Release}" \
+        -DCMAKE_DEBUG_POSTFIX=d \
         "$@"
 }
 
-# Trim a debug/ subtree down to binaries: headers/data are shared with the
-# release install, and the per-config cmake/pkgconfig files would carry wrong
-# include paths from inside debug/.
+# Trim a debug/ subtree down to binaries (used by the few libraries whose
+# build system cannot produce side-by-side 'd'-suffixed binaries): headers
+# and data are shared with the release install.
 prune_debug_subtree() {
     rm -rf "$1/include" "$1/share" "$1/cmake" "$1/etc" \
            "$1/lib/cmake" "$1/lib/pkgconfig"

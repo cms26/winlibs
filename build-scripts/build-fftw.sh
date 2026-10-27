@@ -17,7 +17,6 @@ fi
 rm -rf "$PREFIX"
 for WINLIBS_CONFIG in Release Debug; do
   export WINLIBS_CONFIG
-  IPREFIX="$PREFIX"; [ "$WINLIBS_CONFIG" = Debug ] && IPREFIX="$PREFIX/debug"
   for cfg in double single; do
     EXTRA=""
     if [ "$cfg" = single ]; then EXTRA="-DENABLE_FLOAT=ON -DENABLE_SSE=ON"; fi
@@ -26,7 +25,7 @@ for WINLIBS_CONFIG in Release Debug; do
         rm -rf "$B"
         SHARED=OFF; [ "$linkage" = shared ] && SHARED=ON
         cmake_mingw -S "$SRC/fftw-$VER" -B "$B" \
-            -DCMAKE_INSTALL_PREFIX="$IPREFIX" \
+            -DCMAKE_INSTALL_PREFIX="$PREFIX" \
             -DBUILD_SHARED_LIBS=$SHARED \
             -DBUILD_TESTS=OFF \
             -DCMAKE_C_FLAGS="-DWITH_OUR_MALLOC" \
@@ -37,7 +36,6 @@ for WINLIBS_CONFIG in Release Debug; do
         cmake --install "$B"
     done
   done
+  [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
 done
-prune_debug_subtree "$PREFIX/debug"
-strip_prefix "$PREFIX"
 echo "fftw $VER installed to $PREFIX"

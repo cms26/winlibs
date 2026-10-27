@@ -15,16 +15,15 @@ cp "$SCRIPT_DIR/qwt-CMakeLists.txt" "$SRC/qwt-$VER/CMakeLists.txt"
 
 rm -rf "$PREFIX"
 for CFG in Release Debug; do
-    IPREFIX="$PREFIX"; [ "$CFG" = Debug ] && IPREFIX="$PREFIX/debug"
     B="$BLD/qwt-$CFG"
     rm -rf "$B"
     cmake -G Ninja -S "$SRC/qwt-$VER" -B "$B" \
         -DCMAKE_TOOLCHAIN_FILE="$QT/lib/cmake/Qt6/qt.toolchain.cmake" \
         -DCMAKE_BUILD_TYPE=$CFG \
-        -DCMAKE_INSTALL_PREFIX="$IPREFIX"
+        -DCMAKE_DEBUG_POSTFIX=d \
+        -DCMAKE_INSTALL_PREFIX="$PREFIX"
     cmake --build "$B" -j"$JOBS"
     cmake --install "$B"
+    [ "$CFG" = Release ] && strip_prefix "$PREFIX"
 done
-prune_debug_subtree "$PREFIX/debug"
-strip_prefix "$PREFIX"
 echo "qwt $VER installed to $PREFIX"
