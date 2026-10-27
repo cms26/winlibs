@@ -90,6 +90,8 @@ for CFG in Release Debug; do
     IPREFIX="$PREFIX"; [ "$CFG" = Debug ] && IPREFIX="$PREFIX/debug"
     CFGFLAGS="-O2"; [ "$CFG" = Debug ] && CFGFLAGS="-Og -g"
     make distclean >/dev/null 2>&1 || true
+    # liquid's distclean removes configure itself; regenerate it.
+    if [ ! -f configure ]; then sh bootstrap.sh || autoreconf -fvi; fi
     CC="$CC_MINGW" CXX="$CXX_MINGW" CFLAGS="$CFGFLAGS" ./configure \
         --host=$TRIPLET --prefix="$IPREFIX" \
         --enable-simdoverride
