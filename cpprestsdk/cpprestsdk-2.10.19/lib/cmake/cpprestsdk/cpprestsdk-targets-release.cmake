@@ -9,11 +9,11 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set_property(TARGET cpprestsdk::cpprest APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(cpprestsdk::cpprest PROPERTIES
   IMPORTED_IMPLIB_RELEASE "${_IMPORT_PREFIX}/lib/libcpprest_2_10.dll.a"
-  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/bin/libcpprest_2_10.dll"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libcpprest_2_10.dll"
   )
 
 list(APPEND _cmake_import_check_targets cpprestsdk::cpprest )
-list(APPEND _cmake_import_check_files_for_cpprestsdk::cpprest "${_IMPORT_PREFIX}/lib/libcpprest_2_10.dll.a" "${_IMPORT_PREFIX}/bin/libcpprest_2_10.dll" )
+list(APPEND _cmake_import_check_files_for_cpprestsdk::cpprest "${_IMPORT_PREFIX}/lib/libcpprest_2_10.dll.a" "${_IMPORT_PREFIX}/lib/libcpprest_2_10.dll" )
 
 # Commands beyond this point should not need to know the version.
 set(CMAKE_IMPORT_FILE_VERSION)
