@@ -5,7 +5,7 @@
 source "$(dirname "$0")/env.sh"
 
 VER=6.2.0
-PREFIX="$REPO_ROOT/qwt/qwt-$VER"
+PREFIX="$REPO_ROOT/qwt/$VER"
 QT="$REPO_ROOT/qt/6.11.2"
 
 if [ ! -d "$SRC/qwt-$VER" ]; then

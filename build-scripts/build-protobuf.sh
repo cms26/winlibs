@@ -22,6 +22,7 @@ rm -rf "$B" "$PREFIX"
 cmake_mingw -S "$SRC/protobuf-$VER" -B "$B" \
     -DCMAKE_INSTALL_PREFIX="$PREFIX/c++" \
     -DCMAKE_PREFIX_PATH="$ZLIB" -DZLIB_ROOT="$ZLIB" \
+    -DCMAKE_EXE_LINKER_FLAGS="-static" \
     -Dprotobuf_BUILD_TESTS=OFF \
     -Dprotobuf_BUILD_SHARED_LIBS=OFF \
     -Dprotobuf_BUILD_PROTOC_BINARIES=ON \

@@ -19,6 +19,7 @@ for WINLIBS_CONFIG in Release Debug; do
     cmake_mingw -S "$SRC/flatbuffers-$VER" -B "$B" \
         -DCMAKE_INSTALL_PREFIX="$PREFIX" \
         -DFLATBUFFERS_BUILD_TESTS=OFF -DFLATBUFFERS_BUILD_FLATC=$FLATC \
+        -DFLATBUFFERS_STATIC_FLATC=ON \
         -DFLATBUFFERS_BUILD_SHAREDLIB=ON
     cmake --build "$B" -j"$JOBS"
     cmake --install "$B"

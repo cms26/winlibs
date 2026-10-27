@@ -24,19 +24,25 @@ set(QWT_QT_LIBS
     Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::PrintSupport
     Qt6::Svg Qt6::OpenGL Qt6::OpenGLWidgets)
 
-# Shared library (consumers define QWT_DLL)
+# Shared library (consumers define QWT_DLL).
+# Naming and layout match the old VS codelibrary: qwt.dll / qwtd.dll (no
+# 'lib' prefix) living in lib/ next to the import libraries.
 add_library(qwt SHARED ${QWT_SOURCES} ${QWT_HEADERS})
 target_compile_definitions(qwt PRIVATE QWT_MAKEDLL QWT_MOC_INCLUDE=1)
 target_link_libraries(qwt PUBLIC ${QWT_QT_LIBS})
+set_target_properties(qwt PROPERTIES
+    PREFIX "" IMPORT_PREFIX "" DEBUG_POSTFIX d)
 
 # Static library
 add_library(qwt-static STATIC ${QWT_SOURCES} ${QWT_HEADERS})
 target_compile_definitions(qwt-static PRIVATE QWT_MOC_INCLUDE=1)
 target_link_libraries(qwt-static PUBLIC ${QWT_QT_LIBS})
+set_target_properties(qwt-static PROPERTIES
+    PREFIX "" OUTPUT_NAME qwt-static DEBUG_POSTFIX d)
 
 include(GNUInstallDirs)
 install(TARGETS qwt qwt-static
-    RUNTIME DESTINATION bin
+    RUNTIME DESTINATION lib
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib)
 install(FILES ${QWT_HEADERS} DESTINATION include/qwt)
