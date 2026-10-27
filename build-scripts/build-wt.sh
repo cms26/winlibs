@@ -46,4 +46,13 @@ for WINLIBS_CONFIG in Release Debug; do
     fi
     [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
 done
+# GitHub rejects files over 100 MB; drop DWARF from any debug archive that
+# exceeds it (the code stays -Og with assertions; libwt's template-heavy
+# debug info alone is >100 MB even at -g1).
+for f in "$PREFIX"/lib/*d.a; do
+    [ -f "$f" ] || continue
+    if [ "$(stat -c%s "$f")" -gt 95000000 ]; then
+        "$STRIP" --strip-debug "$f"
+    fi
+done
 echo "wt $VER installed to $PREFIX"

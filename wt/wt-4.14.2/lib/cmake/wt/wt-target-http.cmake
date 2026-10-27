@@ -59,7 +59,7 @@ endif()
 add_library(Wt::HTTP STATIC IMPORTED)
 
 set_target_properties(Wt::HTTP PROPERTIES
-  INTERFACE_LINK_LIBRARIES "Wt::Wt;/home/user/winlibs/zlib/zlib-1.3.2/lib/libz.dll.a;\$<LINK_ONLY:Boost::thread>;\$<LINK_ONLY:Boost::program_options>;\$<LINK_ONLY:Boost::filesystem>;\$<LINK_ONLY:Boost::headers>;\$<LINK_ONLY:ws2_32>;\$<LINK_ONLY:mswsock>;\$<LINK_ONLY:Threads::Threads>"
+  INTERFACE_LINK_LIBRARIES "Wt::Wt;\$<\$<NOT:\$<CONFIG:DEBUG>>:/home/user/winlibs/zlib/zlib-1.3.2/lib/libz.dll.a>;\$<\$<CONFIG:DEBUG>:/home/user/winlibs/zlib/zlib-1.3.2/lib/libzd.dll.a>;\$<LINK_ONLY:Boost::thread>;\$<LINK_ONLY:Boost::program_options>;\$<LINK_ONLY:Boost::filesystem>;\$<LINK_ONLY:Boost::headers>;\$<LINK_ONLY:ws2_32>;\$<LINK_ONLY:mswsock>;\$<LINK_ONLY:Threads::Threads>"
 )
 
 if(CMAKE_VERSION VERSION_LESS 2.8.12)
