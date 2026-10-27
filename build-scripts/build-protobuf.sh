@@ -48,7 +48,13 @@ cmake_mingw -S "$SRC/protobuf-$VER" -B "$BD" \
     -Dprotobuf_BUILD_PROTOC_BINARIES=OFF \
     -Dprotobuf_WITH_ZLIB=ON
 cmake --build "$BD" -j"$JOBS"
+CMDIR="$PREFIX/c++/lib/cmake/protobuf"
+cp "$CMDIR/protobuf-targets.cmake" "$CMDIR/protobuf-targets-release.cmake" "$BD/"
 cmake --install "$BD"
+# The debug pass exports fewer targets (no protoc); restore the release
+# export files that cmake removed as stale. The debug per-config file only
+# references library targets, which the release main file defines.
+cp "$BD/protobuf-targets.cmake" "$BD/protobuf-targets-release.cmake" "$CMDIR/"
 unset WINLIBS_CONFIG
 
 # Rearrange into the legacy layout: tools out of c++/, headers at c++/ root.
@@ -57,10 +63,10 @@ mv "$PREFIX/c++/include/"* "$PREFIX/c++/"
 rmdir "$PREFIX/c++/include"
 # Keep the cmake package configs working from their new location
 # (configs live at c++/lib/cmake/<pkg>, so _IMPORT_PREFIX = c++).
-grep -rl '${_IMPORT_PREFIX}/include' "$PREFIX/c++/lib/cmake" | while read -r f; do
+{ grep -rl '${_IMPORT_PREFIX}/include' "$PREFIX/c++/lib/cmake" || true; } | while read -r f; do
     sed -i 's|${_IMPORT_PREFIX}/include|${_IMPORT_PREFIX}|g' "$f"
 done
-grep -rl '${_IMPORT_PREFIX}/bin/' "$PREFIX/c++/lib/cmake" | while read -r f; do
+{ grep -rl '${_IMPORT_PREFIX}/bin/' "$PREFIX/c++/lib/cmake" || true; } | while read -r f; do
     sed -i 's|${_IMPORT_PREFIX}/bin/|${_IMPORT_PREFIX}/../bin/|g' "$f"
 done
 # Relocatable pkg-config files (headers sit at the c++ prefix root).

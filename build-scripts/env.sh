@@ -56,8 +56,10 @@ prune_debug_subtree() {
 # Debug subtrees keep their symbols.
 strip_prefix() {
     local prefix="$1"
-    find "$prefix" -not -path '*/debug/*' \( -name '*.dll' -o -name '*.exe' \) \
+    find "$prefix" -not -path '*/debug/*' -not -path '*/Debug/*' \
+        \( -name '*.dll' -o -name '*.exe' \) \
         | xargs -r "$STRIP" --strip-unneeded || true
-    find "$prefix" -not -path '*/debug/*' -name '*.a' ! -name '*.dll.a' \
+    find "$prefix" -not -path '*/debug/*' -not -path '*/Debug/*' \
+        -name '*.a' ! -name '*.dll.a' \
         | xargs -r "$STRIP" --strip-debug || true
 }
