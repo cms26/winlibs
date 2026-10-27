@@ -26,4 +26,9 @@ for CFG in Release Debug; do
     cmake --install "$B"
     [ "$CFG" = Release ] && strip_prefix "$PREFIX"
 done
+# GitHub rejects files over 100 MB; the full-DWARF static debug archive
+# exceeds it (qwtd.dll keeps complete debug symbols).
+if [ "$(stat -c%s "$PREFIX/lib/qwt-staticd.a")" -gt 95000000 ]; then
+    "$STRIP" --strip-debug "$PREFIX/lib/qwt-staticd.a"
+fi
 echo "qwt $VER installed to $PREFIX"
