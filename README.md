@@ -15,7 +15,7 @@ library.
 | Folder | Library | Version | Notes |
 |---|---|---|---|
 | `boost/boost-1.92.0` | Boost | 1.92.0 | shared + static, tagged layout; no python/mpi |
-| `cpprestsdk/cpprestsdk-2.10.19` | C++ REST SDK | 2.10.19 | final upstream release (project archived); winhttp client, asio listener, websocketpp websockets, Boost 1.86 statically linked in |
+| `cpprestsdk/cpprestsdk-2.10.19` | C++ REST SDK | 2.10.19 | final upstream release (project archived); winhttp client, asio listener, websocketpp websockets, Boost 1.86 statically linked in; `lib/` is self-contained (release+debug DLLs plus the OpenSSL/zlib DLLs) |
 | `eigen/eigen-3.4.1` | Eigen | 3.4.1 | header-only, 3.4 LTS branch |
 | `fftw/fftw-3.3.10` | FFTW | 3.3.10 | double + single precision, SSE2/AVX/AVX2, threads |
 | `flatbuffer/25.12.19` | FlatBuffers | 25.12.19 | includes Windows `flatc.exe` |
@@ -27,15 +27,43 @@ library.
 | `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only |
 | `openssl/openssl-3.5.8` | OpenSSL | 3.5.8 | 3.5 LTS line |
 | `portaudio/portaudio-19.7.0` | PortAudio | v19.7.0 | WMME/DirectSound/WASAPI/WDM-KS |
-| `qt/6.11.2` | Qt | 6.11.2 | qtbase, qtsvg, qtimageformats, qtserialport, qt5compat, qtshadertools, qtdeclarative (QtQuick/QML); OpenSSL linked |
-| `qwt/qwt-6.2.0` | Qwt | 6.2.0 | built against Qt 6.11.2; headers in `include/qwt`; newest release available from an accessible mirror (6.3.0 is SourceForge-only) |
+| `qt/6.11.2` | Qt | 6.11.2 | release build: qtbase, qtsvg, qtimageformats, qtserialport, qt5compat, qtshadertools, qtdeclarative (QtQuick/QML); OpenSSL linked |
+| `qt/6.11.2-debug` | Qt (debug) | 6.11.2 | same module set, debug configuration (own prefix, Qt convention) |
+| `qwt/6.2.0` | Qwt | 6.2.0 | built against Qt 6.11.2; `lib/` holds `qwt.dll`/`qwtd.dll` + import libs + static libs; headers in `include/qwt`; newest release available from an accessible mirror (6.3.0 is SourceForge-only) |
 | `shapelib/1.6.3` | Shapelib | 1.6.3 | |
-| `soapysdr/soapysdr-0.8.1` | SoapySDR | 0.8.1 | no python bindings |
+| `soapysdr/soapysdr-0.8.1` | SoapySDR | 0.8.1 | no python bindings; per-config `lib/Release` + `lib/Debug` |
 | `vkfft/vkfft-1.3.4` | VkFFT | 1.3.4 | header-only |
 | `volk-3.3.0` | VOLK | 3.3.0 | |
 | `wt/wt-4.14.2` | Wt | 4.14.2 | HTTP connector, sqlite3 Dbo backend |
 | `zlib/zlib-1.3.2` | zlib | 1.3.2 | support dependency |
 | `runtime/` | mingw-w64 runtime DLLs | GCC 13 | ship next to your .exe |
+
+## Debug builds
+
+Every compiled library ships a debug configuration next to the release one:
+
+- **Default**: side-by-side `d`-suffixed binaries in the same directories
+  (`libz.dll`/`libzd.dll`, `libprotobuf.a`/`libprotobufd.a`,
+  `qwt.dll`/`qwtd.dll`, ...). The CMake package configs carry both
+  configurations, so `find_package` picks the right one per build type.
+- **Boost**: native tagged names (`libboost_X-mt-x64` / `libboost_X-mt-d-x64`).
+- **SoapySDR**: per-config `lib/Release/` and `lib/Debug/` with same-named files.
+- **OpenSSL, liquid-dsp**: a `debug/` subtree (their build systems cannot
+  produce correctly-named side-by-side debug DLLs).
+- **Qt**: a separate `qt/6.11.2-debug` prefix.
+
+Debug binaries keep their symbols (release binaries are stripped). The
+smaller libraries carry full `-g` debug info; the big C++ ones (protobuf,
+boost, wt, cpprestsdk, marble, Qt) are built `-Og -g1` — assertions on,
+line-level stepping, symbolized backtraces — because full DWARF pushes
+single files past GitHub's hard 100 MB limit. For the same reason a few
+huge static debug archives (`libwtd.a`, `qwt-staticd.a`, `libQt6QmlDom.a`)
+have their DWARF stripped. Rebuilding locally with full `-g` is one flag
+away in the corresponding build script.
+
+With mingw/GCC there is no MSVC-style debug/release CRT split: debug and
+release binaries are ABI-compatible and can be mixed freely (e.g. a debug
+application against release Qt).
 
 ## Using the libraries
 
@@ -45,6 +73,9 @@ library.
   liquid-dsp, shapelib, ...) can be used from MSVC via their DLLs/import libs.
 - **CMake**: most libraries install CMake package configs, e.g.
   `-DCMAKE_PREFIX_PATH=<repo>/qt/6.11.2;<repo>/openssl/openssl-3.5.8;...`
+- **Command-line tools**: `protoc.exe` and `flatc.exe` are fully static and
+  run standalone; `openssl.exe` and `SoapySDRUtil.exe` ship with the mingw
+  runtime DLLs beside them.
 - **Runtime**: applications need the DLLs from the library `bin/` folders
   plus `runtime/*.dll` (`libstdc++-6.dll`, `libgcc_s_seh-1.dll`,
   `libwinpthread-1.dll`) on `PATH` or next to the executable.

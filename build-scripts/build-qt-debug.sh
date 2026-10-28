@@ -63,4 +63,10 @@ for m in $MODULES; do
     rm -rf "$B"
 done
 
+# GitHub rejects files over 100 MB; drop DWARF from any static archive that
+# exceeds it (the DLLs all stay comfortably under with -Og -g1).
+find "$PREFIX" -name '*.a' ! -name '*.dll.a' -size +91M | while read -r f; do
+    "$STRIP" --strip-debug "$f"
+done
+
 echo "Qt $VER (Windows x64, Debug) installed to $PREFIX"
