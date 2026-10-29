@@ -67,4 +67,14 @@ strip_prefix "$PREFIX"
     --layout=tagged --prefix="$PREFIX" \
     --without-python --without-mpi --without-graph_parallel \
     -j"$JOBS" install
+
+# Boost <= 1.86 also picks the DLL install dir from the build host, so the
+# DLLs land in lib/. Move them to bin/ (the 1.92 layout) and point the CMake
+# package configs at the new location.
+if [ ${#TARGET_ABI[@]} -gt 0 ] && compgen -G "$PREFIX/lib/*.dll" >/dev/null; then
+    mkdir -p "$PREFIX/bin"
+    mv "$PREFIX"/lib/*.dll "$PREFIX/bin/"
+    find "$PREFIX/lib/cmake" -name '*.cmake' -exec sed -i \
+        's#\(IMPORTED_LOCATION_[A-Z]* \)"${_BOOST_LIBDIR}/\([^"]*\.dll\)"#\1"${_BOOST_CMAKEDIR}/../../bin/\2"#' {} +
+fi
 echo "boost $VER installed to $PREFIX"
