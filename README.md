@@ -18,7 +18,7 @@ library.
 | `boost/boost-1.86.0` | Boost | 1.86.0 | legacy: last release with the classic Boost.Asio API (`io_service`, `io_service::work`, `.post()`/`.reset()`, ...) removed in 1.87; same build options and layout as 1.92.0, except `stacktrace_from_exception` (POSIX-only for GCC in 1.86) is not built |
 | `cpprestsdk/cpprestsdk-2.10.19` | C++ REST SDK | 2.10.19 | final upstream release (project archived); winhttp client, asio listener, websocketpp websockets, Boost 1.86 statically linked in; `lib/` is self-contained (release+debug DLLs plus the OpenSSL/zlib DLLs) |
 | `eigen/eigen-3.4.1` | Eigen | 3.4.1 | header-only, 3.4 LTS branch |
-| `fftw/fftw-3.3.10` | FFTW | 3.3.10 | double + single precision, SSE2/AVX/AVX2, threads |
+| `fftw/fftw-3.3.10` | FFTW | 3.3.10 | double + single precision, SSE2/AVX/AVX2, threads; CMake packages `FFTW3`/`FFTW3f` (targets `FFTW3::fftw3`/`FFTW3::fftw3f`, static) |
 | `flatbuffer/25.12.19` | FlatBuffers | 25.12.19 | includes Windows `flatc.exe` |
 | `gpb/36.0` | Protocol Buffers | 36.0 | legacy layout: `bin/` (protoc.exe + plugins), `c++/` (headers at root: google/, absl/, upb/), `c++/lib/` (static libs, bundled Abseil) |
 | `libssh/libssh-0.12.2` | libssh | 0.12.2 | linked against repo OpenSSL + zlib |
@@ -31,10 +31,10 @@ library.
 | `portaudio/portaudio-19.7.0` | PortAudio | v19.7.0 | WMME/DirectSound/WASAPI/WDM-KS |
 | `qt/6.11.2` | Qt | 6.11.2 | release build: qtbase, qtsvg, qtimageformats, qtserialport, qt5compat, qtshadertools, qtdeclarative (QtQuick/QML); OpenSSL linked |
 | `qt/6.11.2-debug` | Qt (debug) | 6.11.2 | same module set, debug configuration (own prefix, Qt convention) |
-| `qwt/6.2.0` | Qwt | 6.2.0 | built against Qt 6.11.2; `lib/` holds `qwt.dll`/`qwtd.dll` + import libs + static libs; headers in `include/qwt`; newest release available from an accessible mirror (6.3.0 is SourceForge-only) |
+| `qwt/6.2.0` | Qwt | 6.2.0 | built against Qt 6.11.2; `lib/` holds `qwt.dll`/`qwtd.dll` + import libs + static libs; headers in `include/qwt`; newest release available from an accessible mirror (6.3.0 is SourceForge-only); CMake package `qwt` (targets `qwt::qwt` DLL, `qwt::qwt-static`; needs `qt/6.11.2` on the prefix path) |
 | `shapelib/1.6.3` | Shapelib | 1.6.3 | |
 | `soapysdr/soapysdr-0.8.1` | SoapySDR | 0.8.1 | no python bindings; per-config `lib/Release` + `lib/Debug` |
-| `vkfft/vkfft-1.3.4` | VkFFT | 1.3.4 | header-only |
+| `vkfft/vkfft-1.3.4` | VkFFT | 1.3.4 | header-only; CMake package `VkFFT` (target `VkFFT::VkFFT`; set `VKFFT_BACKEND` before `find_package`, default 0 = Vulkan) |
 | `volk-3.3.0` | VOLK | 3.3.0 | |
 | `wt/wt-4.14.2` | Wt | 4.14.2 | HTTP connector, sqlite3 Dbo backend |
 | `zlib/zlib-1.3.2` | zlib | 1.3.2 | support dependency |

@@ -13,6 +13,10 @@ if [ ! -d "$SRC/fftw-$VER" ]; then
     tar -C "$SRC" -xf "$SRC/fftw-$VER.tar.gz"
     mv "$SRC/fftw3-$VER" "$SRC/fftw-$VER"
 fi
+# FFTW 3.3.10's CMakeLists.txt still says `set (FFTW_VERSION 3.3.9)`, so the
+# installed FFTW3(f)ConfigVersion.cmake and .pc files report 3.3.9 and
+# find_package(FFTW3 3.3.10) fails. Use the real version.
+sed -i "s/^set (FFTW_VERSION [0-9.]*)/set (FFTW_VERSION $VER)/" "$SRC/fftw-$VER/CMakeLists.txt"
 
 rm -rf "$PREFIX"
 for WINLIBS_CONFIG in Release Debug; do
