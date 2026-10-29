@@ -22,7 +22,8 @@ library.
 | `gpb/36.0` | Protocol Buffers | 36.0 | legacy layout: `bin/` (protoc.exe + plugins), `c++/` (headers at root: google/, absl/, upb/), `c++/lib/` (static libs, bundled Abseil) |
 | `libssh/libssh-0.12.2` | libssh | 0.12.2 | linked against repo OpenSSL + zlib |
 | `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp | 1.8.2 | small Win32 compat shims (getrusage/timespec_get/strsep) |
-| `log4cplus/log4cplus-2.2.0.1` | log4cplus | 2.2.0.1 | |
+| `log4cplus/log4cplus-2.2.0.1` | log4cplus | 2.2.0.1 | Unicode (`tchar` = `wchar_t`); target `log4cplus::log4cplusU`, adds `UNICODE`/`_UNICODE` to consumers |
+| `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus | 2.2.0.1 | narrow (`tchar` = `char`); target `log4cplus::log4cplus`; mingw runtime (libgcc, libstdc++, winpthread) linked statically into the DLL, so no `runtime/` DLLs needed for it |
 | `marble/marble-26.08.0` | Marble | 26.08.0 (KDE Gear) | Qt6 build, library only |
 | `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only |
 | `openssl/openssl-3.5.8` | OpenSSL | 3.5.8 | 3.5 LTS line |
