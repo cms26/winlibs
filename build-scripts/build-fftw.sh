@@ -58,15 +58,24 @@ open(path, "w").write(new)
 PY
 
 rm -rf "$PREFIX"
-for WINLIBS_CONFIG in Release Debug; do
-  export WINLIBS_CONFIG
-  for cfg in double single; do
-    EXTRA=""
-    if [ "$cfg" = single ]; then EXTRA="-DENABLE_FLOAT=ON -DENABLE_SSE=ON"; fi
-    for linkage in shared static; do
+# Install order matters for the CMake package: shared and static installs
+# write different FFTW3LibraryDepends.cmake files (SHARED vs STATIC IMPORTED
+# targets), and whenever that file changes CMake deletes the other
+# configurations' FFTW3LibraryDepends-<config>.cmake. Installing
+# Release, Debug, shared, static (the old order) left only the static Debug
+# configuration, so *Release* consumers of FFTW3::fftw3f linked the
+# unoptimized debug library. Install all shared builds first, then static
+# Release and static Debug back to back, so the package keeps both
+# configurations of the (static) targets.
+for linkage in shared static; do
+  SHARED=OFF; [ "$linkage" = shared ] && SHARED=ON
+  for WINLIBS_CONFIG in Release Debug; do
+    export WINLIBS_CONFIG
+    for cfg in double single; do
+        EXTRA=""
+        if [ "$cfg" = single ]; then EXTRA="-DENABLE_FLOAT=ON -DENABLE_SSE=ON"; fi
         B="$BLD/fftw-$cfg-$linkage-$WINLIBS_CONFIG"
         rm -rf "$B"
-        SHARED=OFF; [ "$linkage" = shared ] && SHARED=ON
         cmake_mingw -S "$SRC/fftw-$VER" -B "$B" \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" \
             -DBUILD_SHARED_LIBS=$SHARED \
@@ -79,6 +88,22 @@ for WINLIBS_CONFIG in Release Debug; do
         cmake --install "$B"
     done
   done
-  [ "$WINLIBS_CONFIG" = Release ] && strip_prefix "$PREFIX"
+done
+
+# Strip the release binaries only (debug ones keep their symbols; they share
+# lib/ and bin/ with a 'd' suffix, so strip_prefix can't tell them apart).
+for f in "$PREFIX"/bin/libfftw3.dll "$PREFIX"/bin/libfftw3f.dll; do
+    "$STRIP" --strip-unneeded "$f"
+done
+for f in "$PREFIX"/lib/libfftw3.a "$PREFIX"/lib/libfftw3f.a; do
+    "$STRIP" --strip-debug "$f"
+done
+
+# Both configurations must be in the CMake package.
+for p in fftw3 fftw3f; do
+    for c in release debug; do
+        [ -f "$PREFIX/lib/cmake/$p/FFTW3LibraryDepends-$c.cmake" ] || {
+            echo "ERROR: lib/cmake/$p/FFTW3LibraryDepends-$c.cmake missing" >&2; exit 1; }
+    done
 done
 echo "fftw $VER installed to $PREFIX"
