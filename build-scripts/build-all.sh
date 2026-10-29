@@ -15,8 +15,8 @@ LIBS=(
     # standalone libraries
     fftw shapelib log4cplus portaudio soapysdr volk libssh flatbuffers
     liquid-dsp protobuf
-    # boost, then its consumers
-    boost wt cpprestsdk
+    # boost, then its consumers; boost-1.86 is the legacy-Asio install
+    boost boost-1.86 wt cpprestsdk
     # Qt host tools, Qt for Windows (release + debug), then Qt consumers
     qt-host qt qt-debug qwt marble
     # mingw runtime DLLs

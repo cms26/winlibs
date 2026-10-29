@@ -15,6 +15,7 @@ library.
 | Folder | Library | Version | Notes |
 |---|---|---|---|
 | `boost/boost-1.92.0` | Boost | 1.92.0 | shared + static, tagged layout; no python/mpi |
+| `boost/boost-1.86.0` | Boost | 1.86.0 | legacy: last release with the classic Boost.Asio API (`io_service`, `io_service::work`, `.post()`/`.reset()`, ...) removed in 1.87; same build options and layout as 1.92.0, except `stacktrace_from_exception` (POSIX-only for GCC in 1.86) is not built |
 | `cpprestsdk/cpprestsdk-2.10.19` | C++ REST SDK | 2.10.19 | final upstream release (project archived); winhttp client, asio listener, websocketpp websockets, Boost 1.86 statically linked in; `lib/` is self-contained (release+debug DLLs plus the OpenSSL/zlib DLLs) |
 | `eigen/eigen-3.4.1` | Eigen | 3.4.1 | header-only, 3.4 LTS branch |
 | `fftw/fftw-3.3.10` | FFTW | 3.3.10 | double + single precision, SSE2/AVX/AVX2, threads |

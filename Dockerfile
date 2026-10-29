@@ -60,6 +60,7 @@ RUN build-scripts/build-protobuf.sh
 
 # Boost and its consumers.
 RUN build-scripts/build-boost.sh
+RUN build-scripts/build-boost-1.86.sh
 RUN build-scripts/build-wt.sh
 RUN build-scripts/build-cpprestsdk.sh
 
