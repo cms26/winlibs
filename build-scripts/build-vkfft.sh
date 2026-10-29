@@ -14,4 +14,15 @@ rm -rf "$PREFIX"
 mkdir -p "$PREFIX/include"
 cp -r "$SRC/vkfft-$VER/vkFFT" "$PREFIX/include/"
 cp "$SRC/vkfft-$VER/LICENSE" "$PREFIX/"
+
+# CMake package config (find_package(VkFFT CONFIG); target VkFFT::VkFFT),
+# kept in build-scripts/vkfft-cmake/. Header-only, so arch-independent.
+CMAKE_PKG="$PREFIX/share/cmake/VkFFT"
+mkdir -p "$CMAKE_PKG"
+cp "$SCRIPT_DIR/vkfft-cmake/VkFFTConfig.cmake" "$CMAKE_PKG/"
+cat > "$BLD/vkfft-version.cmake" <<'EOF'
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${OUT}" VERSION "${VER}" COMPATIBILITY SameMinorVersion ARCH_INDEPENDENT)
+EOF
+cmake -DVER="$VER" -DOUT="$CMAKE_PKG/VkFFTConfigVersion.cmake" -P "$BLD/vkfft-version.cmake"
 echo "VkFFT $VER installed to $PREFIX"

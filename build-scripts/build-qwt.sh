@@ -31,4 +31,16 @@ done
 if [ "$(stat -c%s "$PREFIX/lib/qwt-staticd.a")" -gt 95000000 ]; then
     "$STRIP" --strip-debug "$PREFIX/lib/qwt-staticd.a"
 fi
+
+# CMake package config (find_package(qwt CONFIG); targets qwt::qwt and
+# qwt::qwt-static), kept in build-scripts/qwt-cmake/.
+CMAKE_PKG="$PREFIX/lib/cmake/qwt"
+mkdir -p "$CMAKE_PKG"
+cp "$SCRIPT_DIR/qwt-cmake/qwtConfig.cmake" "$CMAKE_PKG/"
+cat > "$BLD/qwt-version.cmake" <<'EOF'
+include(CMakePackageConfigHelpers)
+set(CMAKE_SIZEOF_VOID_P 8)   # 64-bit only, like the binaries
+write_basic_package_version_file("${OUT}" VERSION "${VER}" COMPATIBILITY SameMinorVersion)
+EOF
+cmake -DVER="$VER" -DOUT="$CMAKE_PKG/qwtConfigVersion.cmake" -P "$BLD/qwt-version.cmake"
 echo "qwt $VER installed to $PREFIX"
