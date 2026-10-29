@@ -112,4 +112,17 @@ for CFG in Release Debug; do
 done
 prune_debug_subtree "$PREFIX/debug"
 strip_prefix "$PREFIX"
+
+# The autotools build installs no CMake files. Add a package config with
+# upstream's CMake names (package `liquid`, targets liquid::liquid and
+# liquid::liquid-static) covering the release and debug/ binaries.
+CMAKE_PKG="$PREFIX/lib/cmake/liquid"
+mkdir -p "$CMAKE_PKG"
+cp "$SCRIPT_DIR/liquid-dsp-cmake/liquidConfig.cmake" "$CMAKE_PKG/"
+cat > "$BLD/liquid-version.cmake" <<'EOF'
+include(CMakePackageConfigHelpers)
+set(CMAKE_SIZEOF_VOID_P 8)   # 64-bit only, like the binaries
+write_basic_package_version_file("${OUT}" VERSION "${VER}" COMPATIBILITY SameMinorVersion)
+EOF
+cmake -DVER="$VER" -DOUT="$CMAKE_PKG/liquidConfigVersion.cmake" -P "$BLD/liquid-version.cmake"
 echo "liquid-dsp $VER installed to $PREFIX"
