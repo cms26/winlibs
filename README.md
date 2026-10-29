@@ -26,7 +26,7 @@ library.
 | `log4cplus/log4cplus-2.2.0.1` | log4cplus | 2.2.0.1 | Unicode (`tchar` = `wchar_t`); target `log4cplus::log4cplusU`, adds `UNICODE`/`_UNICODE` to consumers |
 | `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus | 2.2.0.1 | narrow (`tchar` = `char`); target `log4cplus::log4cplus`; mingw runtime (libgcc, libstdc++, winpthread) linked statically into the DLL, so no `runtime/` DLLs needed for it |
 | `marble/marble-26.08.0` | Marble | 26.08.0 (KDE Gear) | Qt6 build, library only |
-| `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only |
+| `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only; CMake package (`find_package(nlohmann_json CONFIG)`, target `nlohmann_json::nlohmann_json`) and pkg-config file in `share/` |
 | `openssl/openssl-3.5.8` | OpenSSL | 3.5.8 | 3.5 LTS line |
 | `portaudio/portaudio-19.7.0` | PortAudio | v19.7.0 | WMME/DirectSound/WASAPI/WDM-KS |
 | `qt/6.11.2` | Qt | 6.11.2 | release build: qtbase, qtsvg, qtimageformats, qtserialport, qt5compat, qtshadertools, qtdeclarative (QtQuick/QML); OpenSSL linked |
