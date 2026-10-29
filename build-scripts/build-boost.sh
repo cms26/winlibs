@@ -1,9 +1,16 @@
 #!/bin/bash
 # Boost for 64-bit Windows (b2 cross build, shared + static, tagged layout).
 # Everything except python/mpi/graph_parallel.
+#
+#   build-boost.sh [version]     (default 1.92.0)
+#
+# Each version installs to its own boost/boost-<version> prefix, so several
+# can coexist. build-boost-1.86.sh uses this for the 1.86.0 install kept for
+# code that still needs the classic Boost.Asio API (io_service, etc.) that
+# Boost removed in 1.87.
 source "$(dirname "$0")/env.sh"
 
-VER=1.92.0
+VER="${1:-1.92.0}"
 PREFIX="$REPO_ROOT/boost/boost-$VER"
 
 if [ ! -d "$SRC/boost-$VER" ]; then
@@ -14,6 +21,14 @@ fi
 
 cd "$SRC/boost-$VER"
 [ -x b2 ] || ./bootstrap.sh
+
+# Boost <= 1.86: Boost.Process declares its Windows system libs (shell32,
+# advapi32, ntdll, user32) only when the *build host* is Windows
+# (`if [ os.name ] = NT`), so cross builds fail with "Unable to find file or
+# target named .../libs/process/build//advapi32". Fixed upstream in 1.87;
+# declare them unconditionally (they are `explicit`, so harmless elsewhere).
+sed -i 's/^if \[ os\.name \] = NT$/if true/' libs/process/build/Jamfile
+
 echo "using gcc : mingw : $CXX_MINGW : <archiver>${TRIPLET}-ar <ranlib>${TRIPLET}-ranlib <rc>${TRIPLET}-windres ;" > user-config.jam
 
 rm -rf "$PREFIX"
