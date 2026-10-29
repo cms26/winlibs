@@ -22,8 +22,7 @@ library.
 | `flatbuffer/25.12.19` | FlatBuffers | 25.12.19 | includes Windows `flatc.exe` |
 | `gpb/36.0` | Protocol Buffers | 36.0 | legacy layout: `bin/` (protoc.exe + plugins), `c++/` (headers at root: google/, absl/, upb/), `c++/lib/` (static libs, bundled Abseil) |
 | `libssh/libssh-0.12.2` | libssh | 0.12.2 | linked against repo OpenSSL + zlib |
-| `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp | 1.8.2 | **runs on any x86-64 CPU**: SSE/AVX/AVX-512 dot-product kernels chosen at run time; linked with FFTW (static) for spgram/fftfilt/channelizers/OFDM, planner made thread-safe; small Win32 compat shims; CMake package `liquid` (targets `liquid::liquid-static`, `liquid::liquid` DLL; upstream names) |
-| `liquid-dsp/liquid-dsp-1.8.2-avx2` | liquid-dsp | 1.8.2 | same, with the whole library also compiled for AVX2+FMA; **requires an AVX2+FMA CPU** (illegal-instruction crash otherwise) |
+| `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp | 1.8.2 | **runs on any x86-64 CPU**: SSE/AVX dot-product kernels chosen at run time (portable loop below 16 taps); linked with FFTW (static) for spgram/fftfilt/channelizers/OFDM, planner made thread-safe; small Win32 compat shims; CMake package `liquid` (targets `liquid::liquid-static`, `liquid::liquid` DLL; upstream names) |
 | `log4cplus/log4cplus-2.2.0.1` | log4cplus | 2.2.0.1 | Unicode (`tchar` = `wchar_t`); target `log4cplus::log4cplusU`, adds `UNICODE`/`_UNICODE` to consumers |
 | `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus | 2.2.0.1 | narrow (`tchar` = `char`); target `log4cplus::log4cplus`; mingw runtime (libgcc, libstdc++, winpthread) linked statically into the DLL, so no `runtime/` DLLs needed for it |
 | `marble/marble-26.08.0` | Marble | 26.08.0 (KDE Gear) | Qt6 build, library only |

@@ -1,17 +1,15 @@
 #!/bin/bash
 # liquid-dsp for 64-bit Windows, built with upstream's CMake build.
 #
-# Two variants, each with release + debug/ binaries, static + DLL, and
-# FFTW (single precision, static, from fftw/) for liquid's FFT-based blocks
-# (spgram, fftfilt, firpfbch channelizers, OFDM, qdetector, ...):
+# Installs liquid-dsp/liquid-dsp-<ver>: release + debug/ binaries, static +
+# DLL. Runs on any x86-64 CPU: liquid's SSE / AVX dot-product
+# kernels are compiled in with per-function target attributes and chosen at
+# run time (cpuid). Linked with FFTW (single precision, static, from fftw/)
+# for liquid's FFT-based blocks (spgram, fftfilt, firpfbch channelizers,
+# OFDM, qdetector, ...).
 #
-#   liquid-dsp/liquid-dsp-<ver>        portable baseline (x86-64). liquid's
-#       SSE / AVX / AVX-512 dot-product kernels are compiled in with
-#       per-function target attributes and chosen at run time (cpuid), so
-#       this build runs on any x86-64 CPU and still uses the best kernel.
-#   liquid-dsp/liquid-dsp-<ver>-avx2   same, but the rest of the library is
-#       also compiled with -mavx2 -mfma -mf16c. Requires an AVX2+FMA CPU
-#       (illegal-instruction crash otherwise).
+# (A variant with the whole library compiled for AVX2+FMA was benchmarked:
+# no measurable gain over the run-time dispatch build, so it isn't shipped.)
 #
 # Requires fftw/ to be built first (build-fftw.sh).
 source "$(dirname "$0")/env.sh"
@@ -113,6 +111,38 @@ if "winlibs:" not in src:
     endif()"""
     if src.count(old) != 1:
         sys.exit("build-liquid-dsp.sh: link block not found in liquid CMakeLists.txt; patch needs updating")
+    src = src.replace(old, new)
+    # Upstream forces -O3 (and -fPIC, meaningless on Windows) on every
+    # build type, overriding CMAKE_C_FLAGS_<CONFIG> (debug builds too). At
+    # -O3 GCC auto-vectorizes the portable dot-product loop into slower code
+    # (strided gathers); let the build type pick the optimization level.
+    opt_old = "add_compile_options(-Wall -fPIC -O3)"
+    if src.count(opt_old) != 1:
+        sys.exit("build-liquid-dsp.sh: -O3 compile options not found in liquid CMakeLists.txt; patch needs updating")
+    src = src.replace(opt_old, "add_compile_options(-Wall)  # winlibs: optimization from the build type")
+    open(path, "w").write(src)
+PY
+
+# For very short vectors liquid's SIMD dot-product kernels are slower than
+# the portable loop (call + horizontal-reduction overhead; measured: 4-8
+# taps ~0.6x, 16+ taps 2-7x faster). Pick the portable kernel below 16
+# elements. Both kernels use the same coefficient layout.
+python3 - src/dotprod/src/dotprod.proto.c <<'PY'
+import sys
+path = sys.argv[1]
+src = open(path).read()
+if "winlibs:" not in src:
+    old = """    // given implementations, find best method
+    liquid_runtime_t selection = liquid_runtime_detect(&impl);"""
+    new = """    // winlibs: the portable loop is faster than the SIMD kernels for very
+    // short vectors
+    if (_q->n < 16)
+        return DOTPROD(_runtime_select)(_q, LIQUID_RUNTIME_PORT);
+
+    // given implementations, find best method
+    liquid_runtime_t selection = liquid_runtime_detect(&impl);"""
+    if src.count(old) != 1:
+        sys.exit("build-liquid-dsp.sh: runtime_detect block not found in dotprod.proto.c; patch needs updating")
     open(path, "w").write(src.replace(old, new))
 PY
 
@@ -138,13 +168,20 @@ build_variant() {
     rm -rf "$prefix"
     for WINLIBS_CONFIG in Release Debug; do
         export WINLIBS_CONFIG
-        local iprefix="$prefix" opt="-O3 -DNDEBUG"
+        # LIQUID_LOG_LEVEL_COMPILE=2 compiles out trace/debug logging: liquid
+        # 1.8.2's SIMD kernels call liquid_log_trace() on every execute, which
+        # made them slower than the portable code. Info/warning/error logging
+        # stays. Debug builds keep trace logging.
+        local iprefix="$prefix" opt="-O2 -DNDEBUG -DLIQUID_LOG_LEVEL_COMPILE=2"
         [ "$WINLIBS_CONFIG" = Debug ] && { iprefix="$prefix/debug"; opt="-Og -g"; }
         local b="$BLD/liquid-dsp-$(basename "$prefix")-$WINLIBS_CONFIG"
         rm -rf "$b"
         # SIMD: detection runs test programs, which can't run when cross
         # compiling, so declare the x86 kernels available; liquid picks one
         # at run time from cpuid. FMA3/AMX are not used by liquid's kernels.
+        # AVX-512 kernels are left out: on sliding-window filters (firfilt,
+        # firdecim, channelizers) their 64-byte loads are almost always
+        # misaligned and they measured slower than the AVX kernels.
         cmake_mingw -S "$SRC/liquid-dsp-$VER" -B "$b" \
             -DCMAKE_INSTALL_PREFIX="$iprefix" \
             -DCMAKE_DEBUG_POSTFIX= \
@@ -156,7 +193,7 @@ build_variant() {
             -DENABLE_SIMD=ON -DFIND_SIMD=OFF \
             -DC_SSE_FOUND=ON -DC_SSE2_FOUND=ON -DC_SSE3_FOUND=ON -DC_SSSE3_FOUND=ON \
             -DC_SSE41_FOUND=ON -DC_SSE42_FOUND=ON -DC_AVX_FOUND=ON -DC_AVX2_FOUND=ON \
-            -DC_AVX512_FOUND=ON \
+            -DC_AVX512_FOUND=OFF \
             -DFIND_FFTW=ON \
             -Dfftw3f_INCLUDE_DIR="$FFTW/include" -Dfftw3f_LIBRARY="$FFTW/lib/libfftw3f.a"
         cmake --build "$b" -j"$JOBS"
@@ -190,4 +227,3 @@ CM
 }
 
 build_variant "$REPO_ROOT/liquid-dsp/liquid-dsp-$VER" ""
-build_variant "$REPO_ROOT/liquid-dsp/liquid-dsp-$VER-avx2" "-mavx2 -mfma -mf16c"

@@ -1,17 +1,15 @@
-# CMake package config for the winlibs liquid-dsp builds.
+# CMake package config for the winlibs liquid-dsp build.
 #
 # build-liquid-dsp.sh installs this file (plus a generated
-# liquidConfigVersion.cmake) into <prefix>/lib/cmake/liquid of both
-# variants, replacing upstream's own config, which knows neither the debug/
-# layout nor the static FFTW dependency. Package and target names are
-# upstream's:
+# liquidConfigVersion.cmake) into <prefix>/lib/cmake/liquid, replacing
+# upstream's own config, which knows neither the debug/ layout nor the
+# static FFTW dependency. Package and target names are upstream's:
 #
 #   find_package(liquid CONFIG REQUIRED)
 #   target_link_libraries(app PRIVATE liquid::liquid-static)  # static lib
 #   target_link_libraries(app PRIVATE liquid::liquid)         # DLL
 #
-# Variants: liquid-dsp-<ver> runs on any x86-64 CPU (SIMD kernels chosen at
-# run time); liquid-dsp-<ver>-avx2 requires an AVX2+FMA CPU.
+# Runs on any x86-64 CPU (SSE/AVX kernels chosen at run time).
 #
 # liquid is linked against FFTW (single precision, static). The DLL contains
 # it; liquid::liquid-static needs FFTW3::fftw3f, which this config loads from
