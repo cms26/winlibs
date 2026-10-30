@@ -1,13 +1,20 @@
 # CMake package config for the winlibs liquid-dsp build.
 #
-# liquid-dsp is built here with its autotools build, which installs no CMake
-# files, so build-liquid-dsp.sh copies this file (plus a generated
-# liquidConfigVersion.cmake) into <prefix>/lib/cmake/liquid. The package and
-# target names match the ones upstream's own CMake build exports:
+# build-liquid-dsp.sh installs this file (plus a generated
+# liquidConfigVersion.cmake) into <prefix>/lib/cmake/liquid, replacing
+# upstream's own config, which knows neither the debug/ layout nor the
+# static FFTW dependency. Package and target names are upstream's:
 #
 #   find_package(liquid CONFIG REQUIRED)
 #   target_link_libraries(app PRIVATE liquid::liquid-static)  # static lib
 #   target_link_libraries(app PRIVATE liquid::liquid)         # DLL
+#
+# Runs on any x86-64 CPU (SSE/AVX kernels chosen at run time).
+#
+# liquid is linked against FFTW (single precision, static). The DLL contains
+# it; liquid::liquid-static needs FFTW3::fftw3f, which this config loads from
+# the FFTW3f package (put fftw/fftw-3.3.10 on CMAKE_PREFIX_PATH; the winlibs
+# sibling folder is also tried).
 #
 # Release binaries are in <prefix>/{lib,bin}, debug ones in
 # <prefix>/debug/{lib,bin} (same file names). Both targets carry both
@@ -36,10 +43,26 @@ foreach(_liquid_file
 endforeach()
 unset(_liquid_file)
 
+# Dependencies of the static library: FFTW (single precision) and threads.
+include(CMakeFindDependencyMacro)
+find_dependency(Threads)
+if(NOT TARGET FFTW3::fftw3f)
+    find_package(FFTW3f CONFIG QUIET
+        HINTS "${_liquid_prefix}/../../fftw/fftw-3.3.10/lib/cmake/fftw3f")
+endif()
+set(_liquid_static_deps Threads::Threads)
+if(TARGET FFTW3::fftw3f)
+    list(APPEND _liquid_static_deps FFTW3::fftw3f)
+else()
+    message(WARNING "liquid: FFTW3f package not found; liquid::liquid-static will "
+                    "fail to link (undefined fftwf_*). Add fftw/fftw-3.3.10 to CMAKE_PREFIX_PATH.")
+endif()
+
 if(NOT TARGET liquid::liquid-static)
     add_library(liquid::liquid-static STATIC IMPORTED)
     set_target_properties(liquid::liquid-static PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${_liquid_prefix}/include"
+        INTERFACE_LINK_LIBRARIES "${_liquid_static_deps}"
         IMPORTED_LINK_INTERFACE_LANGUAGES "C"
         IMPORTED_LOCATION_RELEASE "${_liquid_prefix}/lib/libliquid.a"
         MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release
@@ -71,5 +94,6 @@ if(NOT TARGET liquid::liquid)
     endif()
 endif()
 
+unset(_liquid_static_deps)
 unset(_liquid_prefix)
 set(liquid_FOUND TRUE)

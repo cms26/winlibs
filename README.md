@@ -18,11 +18,11 @@ library.
 | `boost/boost-1.86.0` | Boost | 1.86.0 | legacy: last release with the classic Boost.Asio API (`io_service`, `io_service::work`, `.post()`/`.reset()`, ...) removed in 1.87; same build options and layout as 1.92.0, except `stacktrace_from_exception` (POSIX-only for GCC in 1.86) is not built |
 | `cpprestsdk/cpprestsdk-2.10.19` | C++ REST SDK | 2.10.19 | final upstream release (project archived); winhttp client, asio listener, websocketpp websockets, Boost 1.86 statically linked in; `lib/` is self-contained (release+debug DLLs plus the OpenSSL/zlib DLLs) |
 | `eigen/eigen-3.4.1` | Eigen | 3.4.1 | header-only, 3.4 LTS branch |
-| `fftw/fftw-3.3.10` | FFTW | 3.3.10 | double + single precision, SSE2/AVX/AVX2, threads; CMake packages `FFTW3`/`FFTW3f` (targets `FFTW3::fftw3`/`FFTW3::fftw3f`, static) |
+| `fftw/fftw-3.3.10` | FFTW | 3.3.10 | double + single precision, SSE2/AVX/AVX2(+FMA) codelets chosen at run time (runs on any x86-64 CPU; FFTW's CMake build is patched to apply SIMD flags only to the SIMD codelets), threads; CMake packages `FFTW3`/`FFTW3f` (targets `FFTW3::fftw3`/`FFTW3::fftw3f`, static; Release and Debug configurations) |
 | `flatbuffer/25.12.19` | FlatBuffers | 25.12.19 | includes Windows `flatc.exe` |
 | `gpb/36.0` | Protocol Buffers | 36.0 | legacy layout: `bin/` (protoc.exe + plugins), `c++/` (headers at root: google/, absl/, upb/), `c++/lib/` (static libs, bundled Abseil) |
 | `libssh/libssh-0.12.2` | libssh | 0.12.2 | linked against repo OpenSSL + zlib |
-| `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp | 1.8.2 | small Win32 compat shims (getrusage/timespec_get/strsep); CMake package `liquid` (targets `liquid::liquid-static`, `liquid::liquid` DLL; upstream names) |
+| `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp | 1.8.2 | **runs on any x86-64 CPU**: SSE/AVX dot-product kernels chosen at run time (portable loop below 16 taps); linked with FFTW (static) for spgram/fftfilt/channelizers/OFDM, planner made thread-safe; small Win32 compat shims; CMake package `liquid` (targets `liquid::liquid-static`, `liquid::liquid` DLL; upstream names) |
 | `log4cplus/log4cplus-2.2.0.1` | log4cplus | 2.2.0.1 | Unicode (`tchar` = `wchar_t`); target `log4cplus::log4cplusU`, adds `UNICODE`/`_UNICODE` to consumers |
 | `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus | 2.2.0.1 | narrow (`tchar` = `char`); target `log4cplus::log4cplus`; mingw runtime (libgcc, libstdc++, winpthread) linked statically into the DLL, so no `runtime/` DLLs needed for it |
 | `marble/marble-26.08.0` | Marble | 26.08.0 (KDE Gear) | Qt6 build, library only |
