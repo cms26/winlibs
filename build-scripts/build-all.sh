@@ -21,6 +21,8 @@ LIBS=(
     qt-host qt qt-debug qwt marble
     # mingw runtime DLLs
     runtime-dlls
+    # developer tools (clang-format, clang-tidy) from the official LLVM release
+    llvm-tools
 )
 
 for lib in "${LIBS[@]}"; do
