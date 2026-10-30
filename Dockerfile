@@ -73,6 +73,9 @@ RUN build-scripts/build-marble.sh
 # mingw runtime DLLs to ship next to application executables.
 RUN build-scripts/build-runtime-dlls.sh
 
+# Developer tools: clang-format / clang-tidy from the official LLVM release.
+RUN build-scripts/build-llvm-tools.sh
+
 # Drop the scratch space so the final image holds only the results.
 FROM toolchain
 COPY --from=build /winlibs/out /winlibs/out

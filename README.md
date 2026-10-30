@@ -39,6 +39,7 @@ library.
 | `wt/wt-4.14.2` | Wt | 4.14.2 | HTTP connector, sqlite3 Dbo backend |
 | `zlib/zlib-1.3.2` | zlib | 1.3.2 | support dependency |
 | `runtime/` | mingw-w64 runtime DLLs | GCC 13 | ship next to your .exe |
+| `tools/llvm-23.1.4` | clang-format, clang-tidy | LLVM 23.1.4 | developer tools, not libraries: official LLVM Windows binaries, static (no VC runtime); also `clang-apply-replacements`, `git-clang-format`, `run-clang-tidy` and clang's builtin headers for clang-tidy. Work with any compiler, including the MinGW/GCC toolchain |
 
 ## Debug builds
 
@@ -90,6 +91,14 @@ application against release Qt).
   `_TURN_OFF_PLATFORM_STRING`; use `_XPLATSTR()`/`utility::string_t`
   conventions as usual — the `U()` convenience macro still works in consumer
   code that does not define `_TURN_OFF_PLATFORM_STRING`.
+- **clang-format / clang-tidy** (`tools/llvm-23.1.4/bin`): run them directly,
+  put the folder on `PATH`, or point CMake at them, e.g.
+  `find_program(CLANG_FORMAT_EXE clang-format HINTS <repo>/tools/llvm-23.1.4/bin NO_DEFAULT_PATH)`.
+  `clang-tidy` finds its builtin headers in `../lib/clang/23/include`; give it
+  your build's `compile_commands.json` (`CMAKE_EXPORT_COMPILE_COMMANDS ON`) so
+  it sees the MinGW headers. `git-clang-format` / `run-clang-tidy` are Python
+  scripts. Note: `BasedOnStyle` must be a built-in style (LLVM, Google,
+  Chromium, Mozilla, WebKit, Microsoft, GNU); Qt's own style is WebKit-based.
 
 ## Rebuilding
 
