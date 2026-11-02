@@ -1,0 +1,7 @@
+syntax = "proto3";
+package smoke;
+
+message Sample {
+    string name = 1;
+    repeated float iq = 2;
+}
