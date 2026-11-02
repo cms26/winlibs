@@ -99,7 +99,13 @@ RUN linux/build-scripts/build-log4cplus.sh   && rm -rf /work
 RUN linux/build-scripts/build-boost.sh       && rm -rf /work
 RUN linux/build-scripts/build-protobuf.sh    && rm -rf /work
 RUN linux/build-scripts/build-xcb-cursor.sh && rm -rf /work
-RUN linux/build-scripts/build-qt.sh          && rm -rf /work
+# Qt in several layers (qtdeclarative alone is about as big as qtbase).
+RUN linux/build-scripts/build-qt.sh qtbase   && rm -rf /work
+RUN linux/build-scripts/build-qt.sh qtshadertools qtsvg qtimageformats qtserialport qt5compat qtwebsockets \
+                                             && rm -rf /work
+RUN linux/build-scripts/build-qt.sh qtdeclarative && rm -rf /work
+RUN linux/build-scripts/build-qt.sh qtgrpc   && rm -rf /work
+RUN linux/build-scripts/build-qt.sh --check
 RUN linux/build-scripts/build-qwt.sh         && rm -rf /work
 
 # Nothing may need a newer glibc than the base system's (2.28).
