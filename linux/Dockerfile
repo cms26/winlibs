@@ -25,9 +25,9 @@
 #   docker run --rm -v "$PWD":/src -w /src winlibs-linux:rocky8 \
 #       bash -c 'cmake --preset linux-release && cmake --build --preset linux-release'
 #
-# Full build: ~4-5 hours on 2 cores, mostly Qt; ~10 GB of scratch space at
-# peak. One layer per library, so bumping one library rebuilds only from
-# that layer on.
+# Full build: ~3 hours on 2 cores, mostly Qt; needs ~20 GB of free disk at
+# the peak (qtdeclarative); the final image is 2.4 GB. One layer per
+# library, so bumping one library rebuilds only from that layer on.
 
 FROM rockylinux/rockylinux:8 AS toolchain
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -125,9 +125,8 @@ RUN $S/build-qwt.sh && rm -rf /work
 COPY $S/build-all.sh $S/
 
 # Nothing may need a newer glibc than the base system's (2.28).
-RUN source $S/env.sh \
- && g=$(max_glibc_needed /opt/winlibs) && echo "newest glibc symbol needed: $g" \
- && [ "$(printf '%s\n' "$g" GLIBC_2.28 | sort -V | tail -1)" = GLIBC_2.28 ]
+COPY $S/check-glibc.sh $S/
+RUN $S/check-glibc.sh /opt/winlibs 2.28
 
 FROM toolchain
 COPY --from=build /opt/winlibs /opt/winlibs

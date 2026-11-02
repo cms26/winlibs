@@ -14,5 +14,6 @@ for lib in "${LIBS[@]}"; do
     echo "=== $lib ($(date +%H:%M)) ==="
     bash "build-$lib.sh"
 done
-source ./env.sh
-echo "=== all libraries built in $PREFIX_ROOT (newest glibc symbol needed: $(max_glibc_needed "$PREFIX_ROOT")) ==="
+echo "=== checking glibc requirements"
+bash check-glibc.sh
+echo "=== all libraries built ==="
