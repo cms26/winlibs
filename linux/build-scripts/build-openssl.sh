@@ -20,10 +20,12 @@ make distclean >/dev/null 2>&1 || true
 # which doesn't exist on the target machines; use the system location.
 ./Configure linux-x86_64 shared \
     --prefix="$PREFIX" --libdir=lib --openssldir=/etc/pki/tls \
-    '-Wl,-rpath,$$ORIGIN' \
+    '-Wl,-rpath,\$$ORIGIN' \
     no-tests no-docs
 make -s -j"$JOBS"
 make -s install_sw
 strip_prefix "$PREFIX"
 make distclean >/dev/null 2>&1 || true
+[ "$(readelf -d "$PREFIX/lib/libssl.so.3" | grep -c 'RUNPATH.*\[\$ORIGIN\]' || true)" -eq 1 ] \
+    || { echo "ERROR: libssl.so.3 has no \$ORIGIN RUNPATH" >&2; exit 1; }
 echo "openssl $VER installed to $PREFIX"

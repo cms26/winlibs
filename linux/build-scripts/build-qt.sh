@@ -14,13 +14,16 @@
 # that are part of every desktop (X11/xcb, GL/EGL, fontconfig, freetype,
 # glib, zlib, dbus) come from the system.
 #
-# Requires build-openssl.sh and build-protobuf.sh.
+# Requires build-openssl.sh, build-protobuf.sh and build-xcb-cursor.sh.
 source "$(dirname "$0")/env.sh"
 
 VER=$QT_VER
 PREFIX="$PREFIX_ROOT/qt/$VER"
 OPENSSL="$PREFIX_ROOT/openssl/openssl-$OPENSSL_VER"
 PROTOBUF="$PREFIX_ROOT/gpb/$PROTOBUF_VER/c++"
+XCB_CURSOR="$PREFIX_ROOT/xcb-util-cursor/0.1.5"
+# xcb-util-cursor isn't in the RHEL 8 base repositories (build-xcb-cursor.sh)
+export PKG_CONFIG_PATH="$XCB_CURSOR/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 
 MODULES="qtshadertools qtdeclarative qtsvg qtimageformats qtserialport qt5compat qtwebsockets qtgrpc"
 for m in qtbase $MODULES; do
@@ -57,8 +60,9 @@ if [ ! -f "$PREFIX/lib/cmake/Qt6/Qt6Config.cmake" ]; then
     rm -rf "$B"
 fi
 
-# Ship OpenSSL inside the Qt prefix (libQt6Network links it; $ORIGIN RPATH).
-cp -a "$OPENSSL"/lib/libssl.so* "$OPENSSL"/lib/libcrypto.so* "$PREFIX/lib/"
+# Ship OpenSSL and xcb-util-cursor inside the Qt prefix (libQt6Network and
+# the xcb plugin link them; $ORIGIN-relative RPATHs find them there).
+cp -a "$OPENSSL"/lib/libssl.so* "$OPENSSL"/lib/libcrypto.so* "$XCB_CURSOR"/lib/libxcb-cursor.so* "$PREFIX/lib/"
 
 for m in $MODULES; do
     B="$BLD/qt-$m"

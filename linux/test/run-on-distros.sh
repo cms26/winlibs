@@ -1,18 +1,31 @@
 #!/bin/bash
-# Build the smoke test in the winlibs Linux image, then run the deployed
-# result on other distributions' stock images (nothing installed there
-# except what a desktop would have; offscreen platform for headless runs).
+# Build the smoke test in the winlibs Linux image, deploy it, and run the
+# deployed folder on other distributions.
 #
-#   linux/test/run-on-distros.sh [image] [distro images...]
+#   linux/test/run-on-distros.sh [build image] [distro image...]
+#
+# On each distribution the usual desktop runtime libraries (GL, fontconfig,
+# xkbcommon, xcb, dbus, glib) are installed first, as on a desktop machine;
+# then every library Qt's xcb platform plugin needs must resolve, and the
+# app runs headless (offscreen platform). Nothing from /opt/winlibs is
+# installed on the distributions: the app must bring all of it along.
+#
+#   ROCKY_MIRROR=https://dl.rockylinux.org/pub/rocky   use a fixed Rocky mirror
+#                                                       (firewalled networks)
 set -euo pipefail
 IMAGE="${1:-winlibs-linux:rocky8}"
 shift || true
-DISTROS=("${@:-rockylinux/rockylinux:8 rockylinux/rockylinux:9 ubuntu:20.04 ubuntu:24.04 debian:11 debian:13}")
-read -r -a DISTROS <<< "${DISTROS[*]}"
+if [ $# -gt 0 ]; then
+    DISTROS=("$@")
+else
+    DISTROS=(rockylinux/rockylinux:8 rockylinux:9 ubuntu:20.04 ubuntu:24.04 debian:11 debian:13)
+fi
 HERE="$(cd "$(dirname "$0")" && pwd)"
 OUT="$(mktemp -d)"
 trap 'rm -rf "$OUT"' EXIT
+NET=(); [ -n "${https_proxy:-${HTTPS_PROXY:-}}" ] && NET=(--network host -e "https_proxy=${https_proxy:-$HTTPS_PROXY}" -e "http_proxy=${https_proxy:-$HTTPS_PROXY}")
 
+echo "=== build + deploy in $IMAGE"
 docker run --rm -v "$HERE":/test:ro -v "$OUT":/out "$IMAGE" bash -c '
     set -e
     cmake -S /test -B /tmp/b -G Ninja -DCMAKE_BUILD_TYPE=Release >/dev/null
@@ -20,21 +33,39 @@ docker run --rm -v "$HERE":/test:ro -v "$OUT":/out "$IMAGE" bash -c '
     cmake --install /tmp/b --prefix /out/dist >/dev/null
     QT_QPA_PLATFORM=offscreen /out/dist/bin/winlibs-smoke'
 
-# Libraries the deployed app still takes from the system (expected: glibc,
-# libstdc++, X11/xcb, GL, fontconfig/freetype, glib, dbus, zlib).
-echo "--- system libraries needed:"
+echo "--- libraries the deployed app takes from the system:"
 find "$OUT/dist" -type f \( -name '*.so*' -o -path '*/bin/*' \) -exec readelf -d {} + 2>/dev/null \
     | sed -n 's/.*NEEDED.*\[\(.*\)\]/\1/p' | sort -u \
-    | while read -r l; do [ -e "$OUT/dist/lib/$l" ] || echo "    $l"; done
+    | while read -r l; do [ -n "$(find "$OUT/dist" -name "$l" -print -quit)" ] || echo "    $l"; done
+
+# Runs inside each distribution container.
+RUNTIME_SCRIPT='
+set -e
+if command -v dnf >/dev/null; then
+    if [ -n "${ROCKY_MIRROR:-}" ]; then
+        sed -i -e "s|^mirrorlist=|#mirrorlist=|" \
+               -e "s|^#baseurl=http://dl.rockylinux.org/\$contentdir|baseurl=$ROCKY_MIRROR|" /etc/yum.repos.d/[Rr]ocky*.repo
+    fi
+    dnf -y -q install libglvnd-glx libglvnd-egl libglvnd-opengl fontconfig freetype \
+        libxkbcommon libxkbcommon-x11 dbus-libs glib2 libX11 libX11-xcb libxcb \
+        xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm libSM libICE >/dev/null
+fi
+missing=$(ldd /app/plugins/platforms/libqxcb.so /app/bin/winlibs-smoke | grep "not found" | sort -u || true)
+if [ -n "$missing" ]; then echo "missing libraries:"; echo "$missing"; exit 1; fi
+. /etc/os-release
+printf "%s, %s: " "$PRETTY_NAME" "$(ldd --version | head -1 | grep -oE "[0-9.]+$")"
+QT_QPA_PLATFORM=offscreen /app/bin/winlibs-smoke > /tmp/out.txt 2>&1 || { cat /tmp/out.txt; exit 1; }
+tail -1 /tmp/out.txt
+'
 
 rc=0
 for d in "${DISTROS[@]}"; do
-    printf '=== %-28s ' "$d"
-    if docker run --rm -v "$OUT/dist":/app:ro -e QT_QPA_PLATFORM=offscreen "$d" \
-            /app/bin/winlibs-smoke > "$OUT/$$.log" 2>&1; then
-        echo "ok"
+    printf '=== %-26s ' "$d"
+    if docker run --rm "${NET[@]}" -e "ROCKY_MIRROR=${ROCKY_MIRROR:-}" -v "$OUT/dist":/app:ro "$d" \
+            bash -c "$RUNTIME_SCRIPT" > "$OUT/run.log" 2>&1; then
+        tail -1 "$OUT/run.log"
     else
-        echo "FAILED"; sed 's/^/    /' "$OUT/$$.log"; rc=1
+        echo "FAILED"; sed 's/^/    /' "$OUT/run.log"; rc=1
     fi
 done
 exit $rc
