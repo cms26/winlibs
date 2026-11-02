@@ -25,7 +25,7 @@ list(APPEND CMAKE_PREFIX_PATH
 
 find_package(Qt6 6.12 REQUIRED COMPONENTS Core Gui Widgets Network WebSockets SerialPort Protobuf Svg)
 find_package(qwt CONFIG REQUIRED)
-find_package(Boost 1.86 EXACT CONFIG REQUIRED COMPONENTS thread filesystem)
+find_package(Boost 1.86.0 EXACT CONFIG REQUIRED COMPONENTS thread filesystem)
 find_package(log4cplus CONFIG REQUIRED)
 find_package(liquid CONFIG REQUIRED)
 find_package(FFTW3f CONFIG REQUIRED)
@@ -47,12 +47,17 @@ target_link_libraries(winlibs-smoke PRIVATE
     nlohmann_json::nlohmann_json
     Eigen3::Eigen)
 
-# Installed layout: bin/winlibs-smoke, lib/ (all non-system .so files),
-# plugins/; RPATH $ORIGIN/../lib.
-set_target_properties(winlibs-smoke PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
+# Installed layout: bin/winlibs-smoke, lib64/ (CMAKE_INSTALL_LIBDIR: lib64
+# on RHEL-family build hosts; all non-system .so files), plugins/. Qt's
+# deployment puts libraries in CMAKE_INSTALL_LIBDIR and points the plugins
+# there, so the executable's RPATH must use the same directory.
+include(GNUInstallDirs)
+set_target_properties(winlibs-smoke PROPERTIES INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
 install(TARGETS winlibs-smoke RUNTIME DESTINATION bin)
 qt_generate_deploy_app_script(TARGET winlibs-smoke
     OUTPUT_SCRIPT deploy_script
     NO_UNSUPPORTED_PLATFORM_ERROR
-    DEPLOY_TOOL_OPTIONS "")
+    # offscreen as well as the default xcb platform plugin, so the test can
+    # run headless on machines without an X server
+    INCLUDE_PLUGINS qoffscreen)
 install(SCRIPT ${deploy_script})

@@ -69,11 +69,3 @@ strip_prefix() {
     find "$prefix" -type f -name '*.a' \
         | xargs -r strip --strip-debug 2>/dev/null || true
 }
-
-# The newest glibc symbol version any ELF file under a prefix requires.
-# Used to check that nothing needs more than the build system's glibc.
-max_glibc_needed() {
-    find "$1" -type f \( -name '*.so*' -o -perm -u+x \) -print0 \
-        | xargs -0 -r objdump -T 2>/dev/null \
-        | grep -oE 'GLIBC_[0-9]+\.[0-9]+' | sort -V -u | tail -1
-}
