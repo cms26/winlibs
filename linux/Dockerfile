@@ -1,0 +1,101 @@
+# Linux build environment for the winlibs libraries: Rocky Linux 8 (glibc
+# 2.28) with gcc-toolset-13 (GCC 13, same major version as the Windows
+# MinGW toolchain), the same library versions and build options as the
+# Windows tree, installed under /opt/winlibs.
+#
+# Applications built in this image run on RHEL/Rocky/Alma 8+, Ubuntu 20.04+,
+# Debian 11+ and other distributions with glibc >= 2.28, when deployed with
+# their libraries (Qt, OpenSSL, Boost, ... from /opt/winlibs; see
+# linux/README.md).
+#
+# Build (from the repository root):
+#
+#   docker build -f linux/Dockerfile -t winlibs-linux:rocky8 .
+#
+# Behind a TLS-intercepting proxy, put its CA certificate(s) (*.crt, PEM)
+# into linux/extra-ca/ and pass the proxy as build args:
+#
+#   docker build --network host --build-arg https_proxy=$https_proxy \
+#       -f linux/Dockerfile -t winlibs-linux:rocky8 .
+#
+# Use it to build an application (e.g. from Jenkins):
+#
+#   docker run --rm -v "$PWD":/src -w /src winlibs-linux:rocky8 \
+#       bash -c 'cmake --preset linux-release && cmake --build --preset linux-release'
+#
+# Full build: ~4-5 hours on 2 cores, mostly Qt; ~10 GB of scratch space at
+# peak. One layer per library, so bumping one library rebuilds only from
+# that layer on.
+
+FROM rockylinux/rockylinux:8 AS toolchain
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ARG GCC_TOOLSET=13
+
+# Extra CA certificates (corporate proxy); the folder may be empty.
+COPY linux/extra-ca/ /etc/pki/ca-trust/source/anchors/
+RUN update-ca-trust
+
+RUN dnf -y install dnf-plugins-core \
+ && dnf config-manager --set-enabled powertools \
+ && dnf -y install \
+        gcc-toolset-${GCC_TOOLSET}-gcc gcc-toolset-${GCC_TOOLSET}-gcc-c++ \
+        gcc-toolset-${GCC_TOOLSET}-binutils gcc-toolset-${GCC_TOOLSET}-gdb \
+        git make patch perl perl-IPC-Cmd perl-Pod-Html perl-Time-Piece \
+        python3.11 \
+        curl xz bzip2 unzip which file findutils diffutils \
+        zlib-devel bzip2-devel xz-devel libzstd-devel \
+        fontconfig-devel freetype-devel glib2-devel dbus-devel systemd-devel cups-devel \
+        libX11-devel libXext-devel libXrender-devel libXi-devel libXfixes-devel \
+        libXcursor-devel libXrandr-devel libSM-devel libICE-devel \
+        libxcb-devel xcb-util-devel xcb-util-image-devel xcb-util-keysyms-devel \
+        xcb-util-renderutil-devel xcb-util-wm-devel xcb-util-cursor-devel \
+        libxkbcommon-devel libxkbcommon-x11-devel \
+        mesa-libGL-devel mesa-libEGL-devel mesa-libgbm-devel libdrm-devel \
+ && dnf clean all \
+ && alternatives --set python3 /usr/bin/python3.11
+
+# Current CMake and Ninja from their official GitHub releases (the RHEL 8
+# packages are older than Qt 6.12 likes); both run on glibc 2.17+.
+ARG CMAKE_VER=3.31.10
+ARG NINJA_VER=1.13.1
+RUN curl -sSfL "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VER}/cmake-${CMAKE_VER}-linux-x86_64.tar.gz" \
+        | tar -xz -C /usr/local --strip-components=1 \
+ && curl -sSfL -o /tmp/ninja.zip "https://github.com/ninja-build/ninja/releases/download/v${NINJA_VER}/ninja-linux.zip" \
+ && unzip -q -o /tmp/ninja.zip -d /usr/local/bin && rm /tmp/ninja.zip \
+ && cmake --version | head -1 && ninja --version
+
+# gcc-toolset on PATH for every later step and for application builds
+# (env.sh checks GCC_TOOLSET_ENABLED and doesn't source the toolset again).
+ENV PATH=/opt/rh/gcc-toolset-${GCC_TOOLSET}/root/usr/bin:/usr/local/bin:$PATH \
+    GCC_TOOLSET_ENABLED=/opt/rh/gcc-toolset-${GCC_TOOLSET} \
+    WINLIBS=/opt/winlibs \
+    WINLIBS_PREFIX=/opt/winlibs
+
+FROM toolchain AS build
+
+COPY build-scripts/ /winlibs/build-scripts/
+COPY linux/build-scripts/ /winlibs/linux/build-scripts/
+WORKDIR /winlibs
+ENV WINLIBS_WORK=/work
+
+# Sources and build trees are deleted in the same layer to keep it small.
+RUN linux/build-scripts/build-header-only.sh && rm -rf /work
+RUN linux/build-scripts/build-openssl.sh     && rm -rf /work
+RUN linux/build-scripts/build-fftw.sh        && rm -rf /work
+RUN linux/build-scripts/build-liquid-dsp.sh  && rm -rf /work
+RUN linux/build-scripts/build-log4cplus.sh   && rm -rf /work
+RUN linux/build-scripts/build-boost.sh       && rm -rf /work
+RUN linux/build-scripts/build-protobuf.sh    && rm -rf /work
+RUN linux/build-scripts/build-qt.sh          && rm -rf /work
+RUN linux/build-scripts/build-qwt.sh         && rm -rf /work
+
+# Nothing may need a newer glibc than the base system's (2.28).
+RUN source linux/build-scripts/env.sh \
+ && g=$(max_glibc_needed /opt/winlibs) && echo "newest glibc symbol needed: $g" \
+ && [ "$(printf '%s\n' "$g" GLIBC_2.28 | sort -V | tail -1)" = GLIBC_2.28 ]
+
+FROM toolchain
+COPY --from=build /opt/winlibs /opt/winlibs
+ENV CMAKE_PREFIX_PATH=/opt/winlibs/qt/6.12.0
+WORKDIR /src
