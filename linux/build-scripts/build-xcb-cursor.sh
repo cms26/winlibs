@@ -26,7 +26,9 @@ mkdir -p "$PREFIX/lib/pkgconfig" "$PREFIX/include/xcb"
 # soname libxcb-cursor.so.0 as upstream (libtool -version-info 0:0:0);
 # only the xcb_cursor_* API is exported, as upstream.
 printf '{ global: xcb_cursor_*; local: *; };\n' > exports.map
+# XCURSORPATH: upstream's default cursor theme search path (configure.ac).
 gcc -O2 -fPIC -shared -DHAVE_ENDIAN_H -DHAVE_LE32TOH \
+    -DXCURSORPATH='"~/.icons:/usr/share/icons:/usr/share/pixmaps:/usr/X11R6/lib/X11/icons"' \
     $(pkg-config --cflags $DEPS) \
     cursor.c shape_to_id.c load_cursor.c parse_cursor_file.c \
     -Wl,-soname,libxcb-cursor.so.0 -Wl,--version-script=exports.map -Wl,--no-undefined \
