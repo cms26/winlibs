@@ -10,6 +10,10 @@ This repo recreates the layout of the old VS2017 codelibrary, updated to
 Qt 6.11.2 and the latest stable / long-term-support release of every other
 library.
 
+**Linux:** the same libraries for Linux x86-64 (built on Rocky Linux 8 so
+the results run on RHEL 8+, Ubuntu 20.04+, Debian 10+ and other glibc 2.28+
+distributions) are built as a Docker image, see [`linux/`](linux/README.md).
+
 ## Contents
 
 | Folder | Library | Version | Notes |
