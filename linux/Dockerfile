@@ -13,9 +13,11 @@
 #   docker build -f linux/Dockerfile -t winlibs-linux:rocky8 .
 #
 # Behind a TLS-intercepting proxy, put its CA certificate(s) (*.crt, PEM)
-# into linux/extra-ca/ and pass the proxy as build args:
+# into linux/extra-ca/ and pass the proxy (and, if Rocky's mirror list is
+# blocked, a fixed mirror) as build args:
 #
 #   docker build --network host --build-arg https_proxy=$https_proxy \
+#       --build-arg ROCKY_MIRROR=https://dl.rockylinux.org/pub/rocky \
 #       -f linux/Dockerfile -t winlibs-linux:rocky8 .
 #
 # Use it to build an application (e.g. from Jenkins):
@@ -36,12 +38,21 @@ ARG GCC_TOOLSET=13
 COPY linux/extra-ca/ /etc/pki/ca-trust/source/anchors/
 RUN update-ca-trust
 
+# Optional: fixed package mirror instead of Rocky's mirror list (firewalled
+# networks), e.g. --build-arg ROCKY_MIRROR=https://dl.rockylinux.org/pub/rocky
+ARG ROCKY_MIRROR=
+RUN if [ -n "$ROCKY_MIRROR" ]; then \
+        sed -i -e 's|^mirrorlist=|#mirrorlist=|' \
+               -e "s|^#baseurl=http://dl.rockylinux.org/\$contentdir|baseurl=${ROCKY_MIRROR}|" \
+               /etc/yum.repos.d/Rocky-*.repo; \
+    fi
+
 RUN dnf -y install dnf-plugins-core \
  && dnf config-manager --set-enabled powertools \
  && dnf -y install \
         gcc-toolset-${GCC_TOOLSET}-gcc gcc-toolset-${GCC_TOOLSET}-gcc-c++ \
         gcc-toolset-${GCC_TOOLSET}-binutils gcc-toolset-${GCC_TOOLSET}-gdb \
-        git make patch perl perl-IPC-Cmd perl-Pod-Html perl-Time-Piece \
+        git make patch perl perl-IPC-Cmd perl-Pod-Html perl-Time-Piece gperf pkgconf-pkg-config \
         python3.11 \
         curl xz bzip2 unzip which file findutils diffutils \
         zlib-devel bzip2-devel xz-devel libzstd-devel \
@@ -49,7 +60,7 @@ RUN dnf -y install dnf-plugins-core \
         libX11-devel libXext-devel libXrender-devel libXi-devel libXfixes-devel \
         libXcursor-devel libXrandr-devel libSM-devel libICE-devel \
         libxcb-devel xcb-util-devel xcb-util-image-devel xcb-util-keysyms-devel \
-        xcb-util-renderutil-devel xcb-util-wm-devel xcb-util-cursor-devel \
+        xcb-util-renderutil-devel xcb-util-wm-devel \
         libxkbcommon-devel libxkbcommon-x11-devel \
         mesa-libGL-devel mesa-libEGL-devel mesa-libgbm-devel libdrm-devel \
  && dnf clean all \
@@ -87,6 +98,7 @@ RUN linux/build-scripts/build-liquid-dsp.sh  && rm -rf /work
 RUN linux/build-scripts/build-log4cplus.sh   && rm -rf /work
 RUN linux/build-scripts/build-boost.sh       && rm -rf /work
 RUN linux/build-scripts/build-protobuf.sh    && rm -rf /work
+RUN linux/build-scripts/build-xcb-cursor.sh && rm -rf /work
 RUN linux/build-scripts/build-qt.sh          && rm -rf /work
 RUN linux/build-scripts/build-qwt.sh         && rm -rf /work
 

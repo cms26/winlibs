@@ -8,7 +8,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-LIBS=(header-only openssl fftw liquid-dsp log4cplus boost protobuf qt qwt)
+LIBS=(header-only openssl fftw liquid-dsp log4cplus boost protobuf xcb-cursor qt qwt)
 
 for lib in "${LIBS[@]}"; do
     echo "=== $lib ($(date +%H:%M)) ==="
