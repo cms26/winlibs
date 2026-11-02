@@ -85,31 +85,47 @@ ENV PATH=/opt/rh/gcc-toolset-${GCC_TOOLSET}/root/usr/bin:/usr/local/bin:$PATH \
 
 FROM toolchain AS build
 
-COPY build-scripts/ /winlibs/build-scripts/
-COPY linux/build-scripts/ /winlibs/linux/build-scripts/
 WORKDIR /winlibs
 ENV WINLIBS_WORK=/work
-
-# Sources and build trees are deleted in the same layer to keep it small.
-RUN linux/build-scripts/build-header-only.sh && rm -rf /work
-RUN linux/build-scripts/build-openssl.sh     && rm -rf /work
-RUN linux/build-scripts/build-fftw.sh        && rm -rf /work
-RUN linux/build-scripts/build-liquid-dsp.sh  && rm -rf /work
-RUN linux/build-scripts/build-log4cplus.sh   && rm -rf /work
-RUN linux/build-scripts/build-boost.sh       && rm -rf /work
-RUN linux/build-scripts/build-protobuf.sh    && rm -rf /work
-RUN linux/build-scripts/build-xcb-cursor.sh && rm -rf /work
+# Each step copies only the files it uses, so editing one build script
+# rebuilds from that library on, not everything. Sources and build trees
+# are deleted in the same layer to keep it small.
+ARG S=linux/build-scripts
+COPY $S/env.sh $S/
+COPY build-scripts/vkfft-cmake/ build-scripts/vkfft-cmake/
+COPY $S/build-header-only.sh $S/
+RUN $S/build-header-only.sh && rm -rf /work
+COPY $S/build-openssl.sh $S/
+RUN $S/build-openssl.sh && rm -rf /work
+COPY build-scripts/build-fftw.sh build-scripts/
+COPY $S/build-fftw.sh $S/
+RUN $S/build-fftw.sh && rm -rf /work
+COPY $S/cmake/liquidConfig.cmake $S/cmake/
+COPY $S/build-liquid-dsp.sh $S/
+RUN $S/build-liquid-dsp.sh && rm -rf /work
+COPY $S/build-log4cplus.sh $S/
+RUN $S/build-log4cplus.sh && rm -rf /work
+COPY $S/build-boost.sh $S/
+RUN $S/build-boost.sh && rm -rf /work
+COPY $S/build-protobuf.sh $S/
+RUN $S/build-protobuf.sh && rm -rf /work
+COPY $S/build-xcb-cursor.sh $S/
+RUN $S/build-xcb-cursor.sh && rm -rf /work
 # Qt in several layers (qtdeclarative alone is about as big as qtbase).
-RUN linux/build-scripts/build-qt.sh qtbase   && rm -rf /work
-RUN linux/build-scripts/build-qt.sh qtshadertools qtsvg qtimageformats qtserialport qt5compat qtwebsockets \
-                                             && rm -rf /work
-RUN linux/build-scripts/build-qt.sh qtdeclarative && rm -rf /work
-RUN linux/build-scripts/build-qt.sh qtgrpc   && rm -rf /work
-RUN linux/build-scripts/build-qt.sh --check
-RUN linux/build-scripts/build-qwt.sh         && rm -rf /work
+COPY $S/build-qt.sh $S/
+RUN $S/build-qt.sh qtbase && rm -rf /work
+RUN $S/build-qt.sh qtshadertools qtsvg qtimageformats qtserialport qt5compat qtwebsockets && rm -rf /work
+RUN $S/build-qt.sh qtdeclarative && rm -rf /work
+RUN $S/build-qt.sh qtgrpc && rm -rf /work
+RUN $S/build-qt.sh --check
+COPY build-scripts/qwt-CMakeLists.txt build-scripts/
+COPY $S/cmake/qwtConfig.cmake $S/cmake/
+COPY $S/build-qwt.sh $S/
+RUN $S/build-qwt.sh && rm -rf /work
+COPY $S/build-all.sh $S/
 
 # Nothing may need a newer glibc than the base system's (2.28).
-RUN source linux/build-scripts/env.sh \
+RUN source $S/env.sh \
  && g=$(max_glibc_needed /opt/winlibs) && echo "newest glibc symbol needed: $g" \
  && [ "$(printf '%s\n' "$g" GLIBC_2.28 | sort -V | tail -1)" = GLIBC_2.28 ]
 
