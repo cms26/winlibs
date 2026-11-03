@@ -100,6 +100,30 @@ docker tag winlibs-linux:rocky8 registry.example.com/winlibs-linux:rocky8-qt6.12
 docker push registry.example.com/winlibs-linux:rocky8-qt6.12.0
 ```
 
+### Just the libraries, as a `.tar.gz`
+
+To add the libraries to an existing build image instead of using this one:
+
+```sh
+docker build -f linux/Dockerfile --target export --output type=tar,dest=- . \
+    | gzip > winlibs-linux-rocky8.tar.gz
+```
+
+The archive unpacks to `winlibs/`; in the other image's Dockerfile:
+
+```dockerfile
+ADD winlibs-linux-rocky8.tar.gz /opt/
+ENV WINLIBS=/opt/winlibs
+```
+
+That image must be **RHEL/Rocky/Alma 8** (glibc 2.28; anything newer
+makes your app need that newer glibc), with **gcc-toolset-13** (or newer)
+and the X11/xcb/GL/fontconfig/dbus `-devel` packages from this
+Dockerfile's `dnf install` line. Tested: the archive added to a separate
+Rocky 8 image builds and runs `linux/test`. About 130 MB compressed.
+
+### Without Docker
+
 The scripts also run directly on a Rocky/Alma/RHEL 8 machine with the
 Dockerfile's packages installed: `linux/build-scripts/build-all.sh`
 (`WINLIBS_PREFIX` sets the install root, default `/opt/winlibs`).

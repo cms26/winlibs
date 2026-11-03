@@ -1,2 +1,4 @@
 linux/extra-ca/*
 !linux/extra-ca/.gitkeep
+windows/extra-ca/*
+!windows/extra-ca/.gitkeep

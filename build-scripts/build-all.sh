@@ -1,6 +1,6 @@
 #!/bin/bash
 # Build every library in dependency order. Works directly on a Debian/Ubuntu
-# host with the packages from the README (or the repo Dockerfile) installed.
+# host with the packages from the README (or windows/Dockerfile) installed.
 #
 #   WINLIBS_WORK   scratch dir for sources/builds (default ~/winlibs-work)
 #   JOBS           parallel build jobs (default: nproc)
