@@ -17,8 +17,9 @@ LIBS=(
     liquid-dsp protobuf
     # boost, then its consumers; boost-1.86 is the legacy-Asio install
     boost boost-1.86 wt cpprestsdk
-    # Qt host tools, Qt for Windows (release + debug), then Qt consumers
-    qt-host qt qt-debug qwt marble
+    # Qt host tools and a build-only Qt for Windows (not shipped), then the
+    # Qt consumers
+    qt-host qt qwt marble
     # mingw runtime DLLs
     runtime-dlls
     # developer tools (clang-format, clang-tidy) from the official LLVM release

@@ -1,12 +1,13 @@
 #!/bin/bash
-# Qwt for 64-bit Windows, built against the repo's Qt 6.11.2 cross build.
+# Qwt for 64-bit Windows, built against the build-only Qt 6.11.2 from
+# build-qt.sh ($WINLIBS_QT); runs with any installed Qt 6.11 or newer.
 # Upstream qwt is qmake-only; we use the CMakeLists shipped in build-scripts.
 # Source: opencor/qwt GitHub mirror (SourceForge upstream mirror).
 source "$(dirname "$0")/env.sh"
 
 VER=6.2.0
 PREFIX="$REPO_ROOT/qwt/$VER"
-QT="$REPO_ROOT/qt/6.11.2"
+QT="$WINLIBS_QT"
 
 if [ ! -d "$SRC/qwt-$VER" ]; then
     git clone --depth 1 --branch "v$VER" https://github.com/opencor/qwt.git "$SRC/qwt-$VER"
