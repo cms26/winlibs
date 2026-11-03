@@ -1,24 +1,27 @@
-# Rebuilds the entire winlibs codelibrary (Windows x64 binaries, mingw-w64)
-# in one step:
+# Rebuilds the Windows x64 libraries (mingw-w64 cross build on Ubuntu) in
+# one step. Run from the repository root (the build context is filtered by
+# windows/Dockerfile.dockerignore, so the committed binaries aren't sent):
 #
-#   docker build -t winlibs .
+#   docker build -f windows/Dockerfile -t winlibs-windows .
 #
-# then extract the results:
+# Write the results straight to a folder (or a .tar.gz) instead of an image:
 #
-#   id=$(docker create winlibs)
-#   docker cp "$id":/winlibs/out ./winlibs-out
-#   docker rm "$id"
+#   docker build -f windows/Dockerfile --target export --output type=local,dest=winlibs-out .
+#   docker build -f windows/Dockerfile --target export --output type=tar,dest=- . \
+#       | gzip > winlibs-windows.tar.gz
 #
 # Or skip the image-layer output entirely and build straight into a checkout
 # of this repo:
 #
-#   docker build --target toolchain -t winlibs-toolchain .
+#   docker build -f windows/Dockerfile --target toolchain -t winlibs-toolchain .
 #   docker run --rm -v "$PWD":/winlibs -w /winlibs winlibs-toolchain \
 #       build-scripts/build-all.sh
 #
 # Full build takes several hours and ~40 GB of scratch space; almost all of
 # it is Qt. Each library is its own layer, so bumping one library's version
 # only rebuilds from that layer onward.
+#
+# The Linux build is linux/Dockerfile.
 
 FROM ubuntu:24.04 AS toolchain
 
@@ -33,6 +36,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     # Qt (std::thread) needs the posix-threads mingw variant
     && update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix \
     && update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+
+# Extra CA certificates (corporate TLS proxy; *.crt, PEM); the folder may be
+# empty. Pass the proxy itself with --build-arg https_proxy=...
+COPY windows/extra-ca/ /usr/local/share/ca-certificates/
+RUN update-ca-certificates
 
 FROM toolchain AS build
 
@@ -76,6 +84,10 @@ RUN build-scripts/build-runtime-dlls.sh
 # Developer tools: clang-format / clang-tidy from the official LLVM release.
 RUN build-scripts/build-llvm-tools.sh
 
-# Drop the scratch space so the final image holds only the results.
+# Just the results, for --output (see the header).
+FROM scratch AS export
+COPY --from=build /winlibs/out /
+
+# Default target: the toolchain plus the results, without the scratch space.
 FROM toolchain
 COPY --from=build /winlibs/out /winlibs/out

@@ -1,0 +1,5 @@
+# Build context is the repository root; only the build scripts are needed
+# (the committed binaries are many GB).
+*
+!build-scripts/
+!windows/extra-ca/

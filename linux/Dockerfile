@@ -20,6 +20,12 @@
 #       --build-arg ROCKY_MIRROR=https://dl.rockylinux.org/pub/rocky \
 #       -f linux/Dockerfile -t winlibs-linux:rocky8 .
 #
+# Only the libraries, as a .tar.gz for an existing build image (it unpacks
+# to winlibs/; in that image's Dockerfile: ADD winlibs-linux-rocky8.tar.gz /opt/):
+#
+#   docker build -f linux/Dockerfile --target export --output type=tar,dest=- . \
+#       | gzip > winlibs-linux-rocky8.tar.gz
+#
 # Use it to build an application (e.g. from Jenkins):
 #
 #   docker run --rm -v "$PWD":/src -w /src winlibs-linux:rocky8 \
@@ -128,6 +134,12 @@ COPY $S/build-all.sh $S/
 COPY $S/check-glibc.sh $S/
 RUN $S/check-glibc.sh /opt/winlibs 2.28
 
+# Just /opt/winlibs, for --output: a .tar.gz to add to another (RHEL 8
+# family) build image, see the header.
+FROM scratch AS export
+COPY --from=build /opt/winlibs /winlibs
+
+# Default target: the build image (toolchain + /opt/winlibs).
 FROM toolchain
 COPY --from=build /opt/winlibs /opt/winlibs
 ENV CMAKE_PREFIX_PATH=/opt/winlibs/qt/6.12.0

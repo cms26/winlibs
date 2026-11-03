@@ -109,12 +109,26 @@ application against release Qt).
 Every library was produced by a script in [`build-scripts/`](build-scripts/),
 cross-compiled on Linux with the Ubuntu mingw-w64 package.
 
-**One-step rebuild with Docker** (see the [`Dockerfile`](Dockerfile) header
-for output-extraction commands; takes several hours, ~40 GB scratch):
+**One-step rebuild with Docker.** Both Dockerfiles are run from the
+repository root; each has a `.dockerignore` next to it, so only the build
+scripts are sent to Docker, not the committed binaries:
+
+| Dockerfile | Builds |
+|---|---|
+| [`windows/Dockerfile`](windows/Dockerfile) | these Windows libraries (MinGW cross build on Ubuntu; several hours, ~40 GB scratch) |
+| [`linux/Dockerfile`](linux/Dockerfile) | the same libraries for Linux, as a Rocky 8 build image (see [`linux/README.md`](linux/README.md)) |
 
 ```sh
-docker build -t winlibs .
+# Windows: results straight into a folder (or `type=tar,dest=-` for a tarball)
+docker build -f windows/Dockerfile --target export --output type=local,dest=winlibs-out .
+
+# Linux: the build image, or just /opt/winlibs as a .tar.gz
+docker build -f linux/Dockerfile -t winlibs-linux:rocky8 .
+docker build -f linux/Dockerfile --target export --output type=tar,dest=- . | gzip > winlibs-linux-rocky8.tar.gz
 ```
+
+Behind a TLS-intercepting proxy, put its CA certificate (`*.crt`) into
+`windows/extra-ca/` or `linux/extra-ca/` and add `--build-arg https_proxy=...`.
 
 **Directly on a Debian/Ubuntu host:**
 
