@@ -1,12 +1,16 @@
 #!/bin/bash
-# Qt 6.11.2 for 64-bit Windows (mingw-w64 cross build).
-# Modules: qtbase, qtsvg, qtimageformats, qtserialport, qt5compat.
+# Qt 6.11.2 for 64-bit Windows (mingw-w64 cross build), BUILD-ONLY.
+# Not shipped in this repo (applications use the installed Qt); Qwt and
+# Marble are compiled against it. Installs into the scratch folder
+# ($WINLIBS_QT, default $WINLIBS_WORK/qt-<ver>).
+# Modules: qtbase, qtshadertools, qtdeclarative, qtsvg, qtimageformats,
+# qtserialport, qt5compat.
 # Requires build-qt-host.sh to have been run first (QT_HOST_PATH).
 # OpenSSL support is linked against the repo's openssl build.
 source "$(dirname "$0")/env.sh"
 
 VER=6.11.2
-PREFIX="$REPO_ROOT/qt/$VER"
+PREFIX="$WINLIBS_QT"
 HOST_PREFIX="$WORK/qt-host-$VER"
 OPENSSL="$REPO_ROOT/openssl/openssl-3.5.8"
 
@@ -59,4 +63,4 @@ for m in $MODULES; do
 done
 
 strip_prefix "$PREFIX"
-echo "Qt $VER (Windows x64) installed to $PREFIX"
+echo "Qt $VER (Windows x64, build-only) installed to $PREFIX"

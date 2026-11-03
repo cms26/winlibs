@@ -18,7 +18,8 @@
 #       build-scripts/build-all.sh
 #
 # Full build takes several hours and ~40 GB of scratch space; almost all of
-# it is Qt. Each library is its own layer, so bumping one library's version
+# it is Qt (built only to compile Qwt and Marble against; it is not part of
+# the output). Each library is its own layer, so bumping one library's version
 # only rebuilds from that layer onward.
 #
 # The Linux build is linux/Dockerfile.
@@ -72,7 +73,8 @@ RUN build-scripts/build-boost-1.86.sh
 RUN build-scripts/build-wt.sh
 RUN build-scripts/build-cpprestsdk.sh
 
-# Qt host tools (Linux, not shipped), Qt for Windows, Qt consumers.
+# Qt host tools and Qt for Windows (both build-only, in /work, not
+# shipped), then the Qt consumers.
 RUN build-scripts/build-qt-host.sh
 RUN build-scripts/build-qt.sh
 RUN build-scripts/build-qwt.sh

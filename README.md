@@ -7,8 +7,11 @@ usual `include/`, `lib/` (import + static libraries) and `bin/` (DLLs)
 layout.
 
 This repo recreates the layout of the old VS2017 codelibrary, updated to
-Qt 6.11.2 and the latest stable / long-term-support release of every other
-library.
+the latest stable / long-term-support release of every library.
+
+**Qt is not included:** applications use the installed Qt (official
+MinGW 64-bit build, 6.11 or newer). Qwt and Marble here are built against
+Qt 6.11.2 and work with any newer Qt 6 at run time.
 
 **Linux:** the same libraries for Linux x86-64 (built on Rocky Linux 8 so
 the results run on RHEL 8+, Ubuntu 20.04+, Debian 10+ and other glibc 2.28+
@@ -33,9 +36,7 @@ distributions) are built as a Docker image, see [`linux/`](linux/README.md).
 | `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only; CMake package (`find_package(nlohmann_json CONFIG)`, target `nlohmann_json::nlohmann_json`) and pkg-config file in `share/` |
 | `openssl/openssl-3.5.8` | OpenSSL | 3.5.8 | 3.5 LTS line |
 | `portaudio/portaudio-19.7.0` | PortAudio | v19.7.0 | WMME/DirectSound/WASAPI/WDM-KS |
-| `qt/6.11.2` | Qt | 6.11.2 | release build: qtbase, qtsvg, qtimageformats, qtserialport, qt5compat, qtshadertools, qtdeclarative (QtQuick/QML); OpenSSL linked |
-| `qt/6.11.2-debug` | Qt (debug) | 6.11.2 | same module set, debug configuration (own prefix, Qt convention) |
-| `qwt/6.2.0` | Qwt | 6.2.0 | built against Qt 6.11.2; `lib/` holds `qwt.dll`/`qwtd.dll` + import libs + static libs; headers in `include/qwt`; newest release available from an accessible mirror (6.3.0 is SourceForge-only); CMake package `qwt` (targets `qwt::qwt` DLL, `qwt::qwt-static`; needs `qt/6.11.2` on the prefix path) |
+| `qwt/6.2.0` | Qwt | 6.2.0 | built against Qt 6.11.2 (runs with any installed Qt 6.11+); `lib/` holds `qwt.dll`/`qwtd.dll` + import libs + static libs; headers in `include/qwt`; newest release available from an accessible mirror (6.3.0 is SourceForge-only); CMake package `qwt` (targets `qwt::qwt` DLL, `qwt::qwt-static`; needs your installed Qt on the prefix path) |
 | `shapelib/1.6.3` | Shapelib | 1.6.3 | |
 | `soapysdr/soapysdr-0.8.1` | SoapySDR | 0.8.1 | no python bindings; per-config `lib/Release` + `lib/Debug` |
 | `vkfft/vkfft-1.3.4` | VkFFT | 1.3.4 | header-only; CMake package `VkFFT` (target `VkFFT::VkFFT`; set `VKFFT_BACKEND` before `find_package`, default 0 = Vulkan) |
@@ -57,14 +58,13 @@ Every compiled library ships a debug configuration next to the release one:
 - **SoapySDR**: per-config `lib/Release/` and `lib/Debug/` with same-named files.
 - **OpenSSL, liquid-dsp**: a `debug/` subtree (their build systems cannot
   produce correctly-named side-by-side debug DLLs).
-- **Qt**: a separate `qt/6.11.2-debug` prefix.
 
 Debug binaries keep their symbols (release binaries are stripped). The
 smaller libraries carry full `-g` debug info; the big C++ ones (protobuf,
-boost, wt, cpprestsdk, marble, Qt) are built `-Og -g1` — assertions on,
+boost, wt, cpprestsdk, marble) are built `-Og -g1` — assertions on,
 line-level stepping, symbolized backtraces — because full DWARF pushes
 single files past GitHub's hard 100 MB limit. For the same reason a few
-huge static debug archives (`libwtd.a`, `qwt-staticd.a`, `libQt6QmlDom.a`)
+huge static debug archives (`libwtd.a`, `qwt-staticd.a`)
 have their DWARF stripped. Rebuilding locally with full `-g` is one flag
 away in the corresponding build script.
 
@@ -79,18 +79,15 @@ application against release Qt).
   link-compatible with MSVC. C libraries (openssl, fftw, zlib, portaudio,
   liquid-dsp, shapelib, ...) can be used from MSVC via their DLLs/import libs.
 - **CMake**: most libraries install CMake package configs, e.g.
-  `-DCMAKE_PREFIX_PATH=<repo>/qt/6.11.2;<repo>/openssl/openssl-3.5.8;...`
+  `-DCMAKE_PREFIX_PATH=C:/Qt/6.12.0/mingw_64;<repo>/openssl/openssl-3.5.8;...`
 - **Command-line tools**: `protoc.exe` and `flatc.exe` are fully static and
   run standalone; `openssl.exe` and `SoapySDRUtil.exe` ship with the mingw
   runtime DLLs beside them.
 - **Runtime**: applications need the DLLs from the library `bin/` folders
   plus `runtime/*.dll` (`libstdc++-6.dll`, `libgcc_s_seh-1.dll`,
   `libwinpthread-1.dll`) on `PATH` or next to the executable.
-- **Qt**: use `qt/6.11.2` as a normal Qt installation prefix
-  (`find_package(Qt6 ...)` with `CMAKE_PREFIX_PATH`, or point Qt Creator at
-  it). OpenSSL-backed TLS requires `libssl-3-x64.dll`/`libcrypto-3-x64.dll`
-  from `openssl/openssl-3.5.8/bin` at run time. The QML VectorImage element
-  (`quick_vectorimage`) is disabled in this build.
+- **Qt**: not in this repo; use the installed Qt (MinGW 64-bit) on
+  `CMAKE_PREFIX_PATH`. Qwt and Marble need it there too.
 - **cpprestsdk**: built with the portable pplx (`winpplx`) and
   `_TURN_OFF_PLATFORM_STRING`; use `_XPLATSTR()`/`utility::string_t`
   conventions as usual — the `U()` convenience macro still works in consumer
@@ -141,7 +138,9 @@ apt-get install build-essential perl python3-mako mingw-w64 mingw-w64-tools \
 
 Individual `build-<lib>.sh` scripts can be run on their own; the only
 ordering constraints are zlib/openssl before their consumers, boost before
-wt/cpprestsdk, and qt-host → qt → qwt/marble.
+wt/cpprestsdk, and qt-host → qt → qwt/marble (`build-qt.sh` builds a
+Qt only to compile Qwt and Marble against; it goes to the scratch folder,
+not the repo — set `WINLIBS_QT` to an existing mingw Qt prefix to skip it).
 
 Scripts download their own sources (GitHub/GitLab mirrors) and install into
 the repo folders. `WINLIBS_WORK` controls the scratch/build directory
