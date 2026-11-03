@@ -125,7 +125,7 @@ Rocky 8 image builds and runs `linux/test`. About 130 MB compressed.
 ### Without Docker
 
 The scripts also run directly on a Rocky/Alma/RHEL 8 machine with the
-Dockerfile's packages installed: `linux/build-scripts/build-all.sh`
+Dockerfile's packages installed: `bash linux/build-scripts/build-all.sh`
 (`WINLIBS_PREFIX` sets the install root, default `/opt/winlibs`).
 
 ## Building your application in the image

@@ -133,7 +133,7 @@ Behind a TLS-intercepting proxy, put its CA certificate (`*.crt`) into
 apt-get install build-essential perl python3-mako mingw-w64 mingw-w64-tools \
                 cmake ninja-build make autoconf automake libtool pkg-config \
                 libgl-dev libglu1-mesa-dev libxkbcommon-dev curl git unzip xz-utils
-./build-scripts/build-all.sh           # everything, in dependency order
+bash build-scripts/build-all.sh         # everything, in dependency order
 ```
 
 Individual `build-<lib>.sh` scripts can be run on their own; the only
