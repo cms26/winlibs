@@ -23,7 +23,10 @@ list(APPEND CMAKE_PREFIX_PATH
     "${WINLIBS}/eigen/eigen-3.4.1"
     "${WINLIBS}/vkfft/vkfft-1.3.4")
 
-find_package(Qt6 6.12 REQUIRED COMPONENTS Core Gui Widgets Network WebSockets SerialPort Protobuf Svg)
+find_package(Qt6 6.12 REQUIRED COMPONENTS
+    Core Gui Widgets Network WebSockets SerialPort Protobuf Svg
+    Concurrent PrintSupport Sql Xml Test Qml Quick QuickWidgets
+    Positioning Location Multimedia)
 find_package(qwt CONFIG REQUIRED)
 find_package(Boost 1.86.0 EXACT CONFIG REQUIRED COMPONENTS thread filesystem)
 find_package(log4cplus CONFIG REQUIRED)
@@ -33,12 +36,18 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(VkFFT CONFIG REQUIRED)
 
-qt_standard_project_setup()
+# REQUIRES 6.5: current Qt policies, e.g. QML modules under qrc:/qt/qml/ (QTP0001)
+qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(winlibs-smoke main.cpp)
 qt_add_protobuf(winlibs-smoke PROTO_FILES smoke.proto)
+# QML shown in a QQuickWidget. As a QML module, Qt's QML deployment finds its
+# imports (QtQuick) and ships them.
+qt_add_qml_module(winlibs-smoke URI Smoke VERSION 1.0 QML_FILES Smoke.qml)
 target_link_libraries(winlibs-smoke PRIVATE
     Qt6::Widgets Qt6::Network Qt6::WebSockets Qt6::SerialPort Qt6::Protobuf Qt6::Svg
+    Qt6::Concurrent Qt6::PrintSupport Qt6::Sql Qt6::Xml Qt6::Test Qt6::QuickWidgets
+    Qt6::Positioning Qt6::Location Qt6::Multimedia
     qwt::qwt
     Boost::thread Boost::filesystem
     log4cplus::log4cplus
@@ -54,7 +63,9 @@ target_link_libraries(winlibs-smoke PRIVATE
 include(GNUInstallDirs)
 set_target_properties(winlibs-smoke PROPERTIES INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
 install(TARGETS winlibs-smoke RUNTIME DESTINATION bin)
-qt_generate_deploy_app_script(TARGET winlibs-smoke
+# The QML variant: also deploys the QML modules the app imports (needed for
+# Qt Quick / QQuickWidget); otherwise the same as qt_generate_deploy_app_script.
+qt_generate_deploy_qml_app_script(TARGET winlibs-smoke
     OUTPUT_SCRIPT deploy_script
     NO_UNSUPPORTED_PLATFORM_ERROR
     # offscreen as well as the default xcb platform plugin, so the test can

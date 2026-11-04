@@ -5,7 +5,7 @@
 #   linux/test/run-on-distros.sh [build image] [distro image...]
 #
 # On each distribution the usual desktop runtime libraries (GL, fontconfig,
-# xkbcommon, xcb, dbus, glib, Kerberos/GSSAPI) are installed first, as on a
+# xkbcommon, xcb, dbus, glib, Kerberos/GSSAPI, PulseAudio client) are installed first, as on a
 # desktop machine;
 # then every library Qt's xcb platform plugin needs must resolve, and the
 # app runs headless (offscreen platform). Nothing from /opt/winlibs is
@@ -50,18 +50,18 @@ if command -v dnf >/dev/null; then
     fi
     dnf -y -q install libglvnd-glx libglvnd-egl libglvnd-opengl fontconfig freetype \
         libxkbcommon libxkbcommon-x11 dbus-libs glib2 libX11 libX11-xcb libxcb \
-        xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm libSM libICE krb5-libs >/dev/null
+        xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm libSM libICE libXrandr krb5-libs pulseaudio-libs >/dev/null
 elif command -v apt-get >/dev/null; then
     export DEBIAN_FRONTEND=noninteractive
     apt-get -qq update >/dev/null
     apt-get -qq install -y --no-install-recommends libgl1 libegl1 libopengl0 libfontconfig1 libfreetype6 \
         libxkbcommon0 libxkbcommon-x11-0 libdbus-1-3 libx11-6 libx11-xcb1 libxcb1 libxcb-icccm4 \
         libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-shape0 libxcb-randr0 libxcb-xfixes0 \
-        libxcb-sync1 libxcb-xkb1 libsm6 libice6 libgssapi-krb5-2 >/dev/null
+        libxcb-sync1 libxcb-xkb1 libsm6 libice6 libgssapi-krb5-2 libpulse0 libxrandr2 >/dev/null
     apt-get -qq install -y --no-install-recommends libglib2.0-0t64 >/dev/null 2>&1 \
         || apt-get -qq install -y --no-install-recommends libglib2.0-0 >/dev/null
 fi
-missing=$(ldd /app/plugins/platforms/libqxcb.so /app/bin/winlibs-smoke | grep "not found" | sort -u || true)
+missing=$(ldd /app/plugins/platforms/libqxcb.so /app/plugins/multimedia/*.so /app/bin/winlibs-smoke | grep "not found" | sort -u || true)
 if [ -n "$missing" ]; then echo "missing libraries:"; echo "$missing"; exit 1; fi
 . /etc/os-release
 printf "%s, %s: " "$PRETTY_NAME" "$(ldd --version | head -1 | grep -oE "[0-9.]+$")"
