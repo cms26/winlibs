@@ -100,39 +100,39 @@ ARG S=linux/build-scripts
 COPY $S/env.sh $S/
 COPY build-scripts/vkfft-cmake/ build-scripts/vkfft-cmake/
 COPY $S/build-header-only.sh $S/
-RUN $S/build-header-only.sh && rm -rf /work
+RUN bash $S/build-header-only.sh && rm -rf /work
 COPY $S/build-openssl.sh $S/
-RUN $S/build-openssl.sh && rm -rf /work
+RUN bash $S/build-openssl.sh && rm -rf /work
 COPY build-scripts/build-fftw.sh build-scripts/
 COPY $S/build-fftw.sh $S/
-RUN $S/build-fftw.sh && rm -rf /work
+RUN bash $S/build-fftw.sh && rm -rf /work
 COPY $S/cmake/liquidConfig.cmake $S/cmake/
 COPY $S/build-liquid-dsp.sh $S/
-RUN $S/build-liquid-dsp.sh && rm -rf /work
+RUN bash $S/build-liquid-dsp.sh && rm -rf /work
 COPY $S/build-log4cplus.sh $S/
-RUN $S/build-log4cplus.sh && rm -rf /work
+RUN bash $S/build-log4cplus.sh && rm -rf /work
 COPY $S/build-boost.sh $S/
-RUN $S/build-boost.sh && rm -rf /work
+RUN bash $S/build-boost.sh && rm -rf /work
 COPY $S/build-protobuf.sh $S/
-RUN $S/build-protobuf.sh && rm -rf /work
+RUN bash $S/build-protobuf.sh && rm -rf /work
 COPY $S/build-xcb-cursor.sh $S/
-RUN $S/build-xcb-cursor.sh && rm -rf /work
+RUN bash $S/build-xcb-cursor.sh && rm -rf /work
 # Qt in several layers (qtdeclarative alone is about as big as qtbase).
 COPY $S/build-qt.sh $S/
-RUN $S/build-qt.sh qtbase && rm -rf /work
-RUN $S/build-qt.sh qtshadertools qtsvg qtimageformats qtserialport qt5compat qtwebsockets && rm -rf /work
-RUN $S/build-qt.sh qtdeclarative && rm -rf /work
-RUN $S/build-qt.sh qtgrpc && rm -rf /work
-RUN $S/build-qt.sh --check
+RUN bash $S/build-qt.sh qtbase && rm -rf /work
+RUN bash $S/build-qt.sh qtshadertools qtsvg qtimageformats qtserialport qt5compat qtwebsockets && rm -rf /work
+RUN bash $S/build-qt.sh qtdeclarative && rm -rf /work
+RUN bash $S/build-qt.sh qtgrpc && rm -rf /work
+RUN bash $S/build-qt.sh --check
 COPY build-scripts/qwt-CMakeLists.txt build-scripts/
 COPY $S/cmake/qwtConfig.cmake $S/cmake/
 COPY $S/build-qwt.sh $S/
-RUN $S/build-qwt.sh && rm -rf /work
+RUN bash $S/build-qwt.sh && rm -rf /work
 COPY $S/build-all.sh $S/
 
 # Nothing may need a newer glibc than the base system's (2.28).
 COPY $S/check-glibc.sh $S/
-RUN $S/check-glibc.sh /opt/winlibs 2.28
+RUN bash $S/check-glibc.sh /opt/winlibs 2.28
 
 # Just /opt/winlibs, for --output: a .tar.gz to add to another (RHEL 8
 # family) build image, see the header.

@@ -1,0 +1,6 @@
+# Shell scripts and Dockerfiles run inside Linux containers: keep LF line
+# endings even in a Windows checkout (core.autocrlf), or bash fails with
+# "$'\r': command not found".
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+*.dockerignore  text eol=lf

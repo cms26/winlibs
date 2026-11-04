@@ -15,7 +15,7 @@
 #
 #   docker build -f windows/Dockerfile --target toolchain -t winlibs-toolchain .
 #   docker run --rm -v "$PWD":/winlibs -w /winlibs winlibs-toolchain \
-#       build-scripts/build-all.sh
+#       bash build-scripts/build-all.sh
 #
 # Full build takes several hours and ~40 GB of scratch space; almost all of
 # it is Qt (built only to compile Qwt and Marble against; it is not part of
@@ -51,40 +51,40 @@ COPY build-scripts/ build-scripts/
 ENV WINLIBS_WORK=/work
 
 # Support deps, then everything that only needs the toolchain.
-RUN build-scripts/build-zlib.sh
-RUN build-scripts/build-openssl.sh
-RUN build-scripts/build-eigen.sh
-RUN build-scripts/build-nlohmann.sh
-RUN build-scripts/build-vkfft.sh
-RUN build-scripts/build-fftw.sh
-RUN build-scripts/build-shapelib.sh
-RUN build-scripts/build-log4cplus.sh
-RUN build-scripts/build-portaudio.sh
-RUN build-scripts/build-soapysdr.sh
-RUN build-scripts/build-volk.sh
-RUN build-scripts/build-libssh.sh
-RUN build-scripts/build-flatbuffers.sh
-RUN build-scripts/build-liquid-dsp.sh
-RUN build-scripts/build-protobuf.sh
+RUN bash build-scripts/build-zlib.sh
+RUN bash build-scripts/build-openssl.sh
+RUN bash build-scripts/build-eigen.sh
+RUN bash build-scripts/build-nlohmann.sh
+RUN bash build-scripts/build-vkfft.sh
+RUN bash build-scripts/build-fftw.sh
+RUN bash build-scripts/build-shapelib.sh
+RUN bash build-scripts/build-log4cplus.sh
+RUN bash build-scripts/build-portaudio.sh
+RUN bash build-scripts/build-soapysdr.sh
+RUN bash build-scripts/build-volk.sh
+RUN bash build-scripts/build-libssh.sh
+RUN bash build-scripts/build-flatbuffers.sh
+RUN bash build-scripts/build-liquid-dsp.sh
+RUN bash build-scripts/build-protobuf.sh
 
 # Boost and its consumers.
-RUN build-scripts/build-boost.sh
-RUN build-scripts/build-boost-1.86.sh
-RUN build-scripts/build-wt.sh
-RUN build-scripts/build-cpprestsdk.sh
+RUN bash build-scripts/build-boost.sh
+RUN bash build-scripts/build-boost-1.86.sh
+RUN bash build-scripts/build-wt.sh
+RUN bash build-scripts/build-cpprestsdk.sh
 
 # Qt host tools and Qt for Windows (both build-only, in /work, not
 # shipped), then the Qt consumers.
-RUN build-scripts/build-qt-host.sh
-RUN build-scripts/build-qt.sh
-RUN build-scripts/build-qwt.sh
-RUN build-scripts/build-marble.sh
+RUN bash build-scripts/build-qt-host.sh
+RUN bash build-scripts/build-qt.sh
+RUN bash build-scripts/build-qwt.sh
+RUN bash build-scripts/build-marble.sh
 
 # mingw runtime DLLs to ship next to application executables.
-RUN build-scripts/build-runtime-dlls.sh
+RUN bash build-scripts/build-runtime-dlls.sh
 
 # Developer tools: clang-format / clang-tidy from the official LLVM release.
-RUN build-scripts/build-llvm-tools.sh
+RUN bash build-scripts/build-llvm-tools.sh
 
 # Just the results, for --output (see the header).
 FROM scratch AS export
