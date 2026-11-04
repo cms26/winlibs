@@ -25,8 +25,9 @@ Two things make that work:
   Linux desktop come from the system: glibc, libstdc++, X11/xcb,
   OpenGL/EGL (libglvnd), fontconfig/freetype, glib, dbus, zlib/zstd,
   Kerberos GSSAPI (`libgssapi_krb5`, used by Qt Network, as in the official
-  Qt binaries), libudev (Qt Serial Port) and, for the optional CUPS print
-  plugin, libcups.
+  Qt binaries), libudev (Qt Serial Port), libpulse (Qt Multimedia's
+  audio; PulseAudio's client library, also on PipeWire desktops) and, for
+  the optional CUPS print plugin, libcups.
 
 The libraries are delivered as a **Docker image** (not committed like the
 Windows binaries: Qt alone is several GB).
@@ -34,7 +35,9 @@ Windows binaries: Qt alone is several GB).
 ## Verified
 
 `linux/test/run-on-distros.sh` builds `linux/test` (one app using every
-library: Qt Widgets/Network/WebSockets/SerialPort/Svg/Protobuf, Qwt, Boost
+library: Qt Widgets/Network/WebSockets/SerialPort/Svg/Protobuf,
+Concurrent/PrintSupport/Sql/Xml/Test, Quick Widgets (QML), Positioning,
+Location and Multimedia (decoding audio through FFmpeg), Qwt, Boost
 Asio `io_service`/thread/filesystem, log4cplus, liquid-dsp, FFTW, OpenSSL,
 nlohmann, Eigen) in the image, deploys it, and runs the deployed folder on
 stock distributions with only their desktop libraries installed. All checks
@@ -58,7 +61,7 @@ Same folder names as the Windows tree, so CMake paths match:
 
 | Folder | Library | Notes |
 |---|---|---|
-| `qt/6.12.0` | Qt 6.12.0 | qtbase (xcb, OpenGL, dbus, sqlite), qtshadertools, qtdeclarative, qtsvg, qtimageformats, qtserialport, qt5compat, qtwebsockets, qtgrpc (QtProtobuf/QtGrpc, `qt_add_protobuf`); OpenSSL linked and copied into `lib/`; ICU, HarfBuzz, PCRE2, libpng, libjpeg bundled |
+| `qt/6.12.0` | Qt 6.12.0 | qtbase (xcb, OpenGL, dbus, sqlite), qtshadertools, qtdeclarative, qtsvg, qtimageformats, qtserialport, qt5compat, qtwebsockets, qtgrpc (QtProtobuf/QtGrpc, `qt_add_protobuf`), qtmultimedia (FFmpeg backend, PulseAudio/PipeWire audio), qtpositioning, qtlocation; OpenSSL and FFmpeg copied into `lib/`; ICU, HarfBuzz, PCRE2, libpng, libjpeg bundled |
 | `boost/boost-1.86.0` | Boost 1.86.0 | classic Asio API (`io_service`); shared + static, tagged layout |
 | `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus 2.2.0.1 | narrow (`tchar` = `char`), target `log4cplus::log4cplus` |
 | `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp 1.8.2 | same tuning as Windows: run-time SSE/AVX dispatch, FFTW enabled and statically linked; targets `liquid::liquid`, `liquid::liquid-static` |
@@ -66,6 +69,7 @@ Same folder names as the Windows tree, so CMake paths match:
 | `gpb/36.0` | Protocol Buffers 36.0 | same legacy layout as Windows (`bin/protoc`, headers + `lib/` in `c++/`); static, position independent |
 | `qwt/6.2.0` | Qwt 6.2.0 | `libqwt.so` + `libqwt-static.a`; targets `qwt::qwt`, `qwt::qwt-static` |
 | `openssl/openssl-3.5.8` | OpenSSL 3.5.8 | 3.5 LTS |
+| `ffmpeg/ffmpeg-9.0.1` | FFmpeg 9.0.1 | for Qt Multimedia (the version Qt 6.12 documents); shared, LGPL 2.1+ (no GPL/nonfree parts), no hardware video decoding (no libva dependency); also usable directly (headers + `lib/pkgconfig`) |
 | `xcb-util-cursor/0.1.5` | xcb-util-cursor 0.1.5 | needed by Qt's xcb plugin, not in RHEL 8's base repositories; copied into Qt's `lib/` |
 | `eigen/eigen-3.4.1`, `nlohmann/v3.12.0`, `vkfft/vkfft-1.3.4` | header-only | CMake packages as on Windows |
 
@@ -85,7 +89,8 @@ From the repository root (the build context is filtered by
 docker build -f linux/Dockerfile -t winlibs-linux:rocky8 .
 ```
 
-About 3 hours on 2 cores, almost all of it Qt, and ~20 GB of free disk
+About 3 hours on 2 cores, almost all of it Qt (FFmpeg plus Multimedia,
+Positioning and Location add about 20 minutes), and ~20 GB of free disk
 during the build (qtdeclarative's build tree is the peak); the final image
 is 2.4 GB. Each library is its own
 layer, so changing one library only rebuilds from there. Behind a corporate
@@ -119,13 +124,15 @@ ENV WINLIBS=/opt/winlibs
 That image must be **RHEL/Rocky/Alma 8** (glibc 2.28; anything newer
 makes your app need that newer glibc), with **gcc-toolset-13** (or newer)
 and the X11/xcb/GL/fontconfig/dbus `-devel` packages from this
-Dockerfile's `dnf install` line. Tested: the archive added to a separate
+Dockerfile's `dnf install` line, plus `pulseaudio-libs` for Qt Multimedia. Tested: the archive added to a separate
 Rocky 8 image builds and runs `linux/test`. About 130 MB compressed.
 
 ### Without Docker
 
 The scripts also run directly on a Rocky/Alma/RHEL 8 machine with the
-Dockerfile's packages installed: `bash linux/build-scripts/build-all.sh`
+Dockerfile's packages installed (the main `dnf install` list plus `nasm
+pulseaudio-libs-devel pipewire-devel` from the later step):
+`bash linux/build-scripts/build-all.sh`
 (`WINLIBS_PREFIX` sets the install root, default `/opt/winlibs`).
 
 ## Building your application in the image
@@ -180,6 +187,12 @@ qt_generate_deploy_app_script(TARGET myapp OUTPUT_SCRIPT deploy
 install(SCRIPT ${deploy})
 ```
 
+For an app with QML or Qt Quick Widgets, use `qt_generate_deploy_qml_app_script`
+instead (same options): it also ships the QML modules the app imports
+(`QtQuick`, ...), which the plain script doesn't. Qt Multimedia, Positioning
+and Location plugins are deployed automatically when the app links those
+modules.
+
 `cmake --install build/linux-release --prefix dist` then gives a
 self-contained `dist/` (`bin/`, `lib64/`, `plugins/`) to tar up or turn into
 an AppImage. Use `${CMAKE_INSTALL_LIBDIR}` in the RPATH as above: on a
@@ -196,3 +209,7 @@ needs and many machines lack, is deployed with the app). On a minimal
 server install that may mean e.g.
 `dnf install libxkbcommon-x11 xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil`
 or `apt install libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-shape0`.
+Apps using Qt Multimedia also need `pulseaudio-libs` and `libXrandr`
+(`libpulse0` and `libxrandr2` on Debian/Ubuntu); FFmpeg itself is deployed
+with Qt. Building such apps in another image likewise needs `pulseaudio-libs`
+there (`libQt6Multimedia` links `libpulse.so.0`).

@@ -128,6 +128,15 @@ COPY build-scripts/qwt-CMakeLists.txt build-scripts/
 COPY $S/cmake/qwtConfig.cmake $S/cmake/
 COPY $S/build-qwt.sh $S/
 RUN bash $S/build-qwt.sh && rm -rf /work
+# Qt Multimedia (FFmpeg backend), Qt Positioning, Qt Location. Separate
+# steps after the rest, so adding them didn't invalidate the cached Qt
+# layers; their build packages are installed here for the same reason.
+RUN dnf -y install nasm pulseaudio-libs-devel pipewire-devel && dnf clean all
+COPY $S/build-ffmpeg.sh $S/
+RUN bash $S/build-ffmpeg.sh && rm -rf /work
+COPY $S/build-qt-extras.sh $S/
+RUN bash $S/build-qt-extras.sh qtmultimedia && rm -rf /work
+RUN bash $S/build-qt-extras.sh qtpositioning qtlocation && rm -rf /work
 COPY $S/build-all.sh $S/
 
 # Nothing may need a newer glibc than the base system's (2.28).
@@ -141,6 +150,9 @@ COPY --from=build /opt/winlibs /winlibs
 
 # Default target: the build image (toolchain + /opt/winlibs).
 FROM toolchain
+# Qt Multimedia links libpulse (PulseAudio's client library): needed to link
+# and run applications that use it.
+RUN dnf -y install pulseaudio-libs && dnf clean all
 COPY --from=build /opt/winlibs /opt/winlibs
 ENV CMAKE_PREFIX_PATH=/opt/winlibs/qt/6.12.0
 WORKDIR /src
