@@ -29,7 +29,7 @@ QT_VER=6.12.0
 OPENSSL_VER=3.5.8
 FFTW_VER=3.3.10
 PROTOBUF_VER=36.0
-BOOST_VER_DEFAULT=1.86.0
+BOOST_VER_DEFAULT=1.92.0
 
 # gcc-toolset: newer GCC whose binaries still only need the system's
 # libstdc++/libgcc (the newer parts are linked in statically from

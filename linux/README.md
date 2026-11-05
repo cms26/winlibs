@@ -62,7 +62,7 @@ Same folder names as the Windows tree, so CMake paths match:
 | Folder | Library | Notes |
 |---|---|---|
 | `qt/6.12.0` | Qt 6.12.0 | qtbase (xcb, OpenGL, dbus, sqlite), qtshadertools, qtdeclarative, qtsvg, qtimageformats, qtserialport, qt5compat, qtwebsockets, qtgrpc (QtProtobuf/QtGrpc, `qt_add_protobuf`), qtmultimedia (FFmpeg backend, PulseAudio/PipeWire audio), qtpositioning, qtlocation; OpenSSL and FFmpeg copied into `lib/`; ICU, HarfBuzz, PCRE2, libpng, libjpeg bundled |
-| `boost/boost-1.86.0` | Boost 1.86.0 | classic Asio API (`io_service`); shared + static, tagged layout |
+| `boost/boost-1.92.0` | Boost 1.92.0 | same version as Windows; shared + static, tagged layout. Boost 1.86.0 (classic Asio API, `io_service`) can be added next to it with `build-boost.sh 1.86.0` |
 | `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus 2.2.0.1 | narrow (`tchar` = `char`), target `log4cplus::log4cplus` |
 | `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp 1.8.2 | same tuning as Windows: run-time SSE/AVX dispatch, FFTW enabled and statically linked; targets `liquid::liquid`, `liquid::liquid-static` |
 | `fftw/fftw-3.3.10` | FFTW 3.3.10 | double + single, SSE2/AVX/AVX2 codelets chosen at run time, threads; `FFTW3::fftw3`, `FFTW3::fftw3f` |
@@ -76,7 +76,7 @@ Same folder names as the Windows tree, so CMake paths match:
 Release builds only (stripped). Your own code builds in Debug as usual and
 debugs fine against them; `gdb` (gcc-toolset) is in the image.
 
-Not built for Linux (yet): Boost 1.92, cpprestsdk, libssh, Marble,
+Not built for Linux (yet): cpprestsdk, libssh, Marble,
 PortAudio, Shapelib, SoapySDR, VOLK, Wt, FlatBuffers. Adding one is a
 `build-<lib>.sh` in `linux/build-scripts/` plus a line in the Dockerfile.
 
@@ -149,7 +149,7 @@ the Windows ones:
   "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
   "cacheVariables": {
     "CMAKE_BUILD_TYPE": "Release",
-    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.2.0;$env{WINLIBS}/boost/boost-1.86.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.2;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.0/c++;$env{WINLIBS}/nlohmann/v3.12.0"
+    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.2.0;$env{WINLIBS}/boost/boost-1.92.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.2;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.0/c++;$env{WINLIBS}/nlohmann/v3.12.0"
   }
 }
 ```
