@@ -110,10 +110,11 @@ int main(int argc, char **argv)
     back.deserialize(&ser, s.serialize(&ser));
     check("protobuf", back.name() == "iq" && back.iq().size() == 2);
 
-    // Boost (classic Asio API, thread, filesystem)
-    boost::asio::io_service io;
+    // Boost (Asio, thread, filesystem). io_context / asio::post: the API since
+    // Boost 1.66; io_service and io_service::post() were removed in 1.87.
+    boost::asio::io_context io;
     int ran = 0;
-    io.post([&] { ++ran; });
+    boost::asio::post(io, [&] { ++ran; });
     boost::thread t([&] { io.run(); });
     t.join();
     check("boost", ran == 1 && boost::filesystem::path("/a/b.txt").stem() == "b");

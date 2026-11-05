@@ -14,7 +14,7 @@ set(WINLIBS "$ENV{WINLIBS}" CACHE PATH "winlibs Linux root")
 list(APPEND CMAKE_PREFIX_PATH
     "${WINLIBS}/qt/6.12.0"
     "${WINLIBS}/qwt/6.2.0"
-    "${WINLIBS}/boost/boost-1.86.0"
+    "${WINLIBS}/boost/boost-1.92.0"
     "${WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode"
     "${WINLIBS}/liquid-dsp/liquid-dsp-1.8.2"
     "${WINLIBS}/fftw/fftw-3.3.10"
@@ -28,7 +28,7 @@ find_package(Qt6 6.12 REQUIRED COMPONENTS
     Concurrent PrintSupport Sql Xml Test Qml Quick QuickWidgets
     Positioning Location Multimedia)
 find_package(qwt CONFIG REQUIRED)
-find_package(Boost 1.86.0 EXACT CONFIG REQUIRED COMPONENTS thread filesystem)
+find_package(Boost 1.92.0 EXACT CONFIG REQUIRED COMPONENTS thread filesystem)
 find_package(log4cplus CONFIG REQUIRED)
 find_package(liquid CONFIG REQUIRED)
 find_package(FFTW3f CONFIG REQUIRED)

@@ -2,16 +2,17 @@
 # Boost (b2, shared + static, tagged layout), everything except
 # python/mpi/graph_parallel.
 #
-#   build-boost.sh [version]     (default 1.86.0)
+#   build-boost.sh [version]     (default 1.92.0, BOOST_VER_DEFAULT in env.sh)
 #
 # Shared libraries get an $ORIGIN RUNPATH so they find each other (e.g.
 # boost_log -> boost_thread) when deployed next to the application. (b2's
 # dll-path feature can't be used for that: it breaks the install targets,
 # "No best alternative for libs/predef/install".)
 #
-# 1.86.0 is the default on Linux: the last release with the classic
-# Boost.Asio API (io_service, ...) the application still uses. Each version
-# installs to its own boost/boost-<version> prefix.
+# 1.92.0 is the default, the same version as on Windows. Each version
+# installs to its own boost/boost-<version> prefix, so another one can be
+# added next to it, e.g. "build-boost.sh 1.86.0" for the last release with
+# the classic Boost.Asio API (io_service, ...), which 1.87 removed.
 source "$(dirname "$0")/env.sh"
 
 VER="${1:-$BOOST_VER_DEFAULT}"
