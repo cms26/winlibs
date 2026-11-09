@@ -1,16 +1,26 @@
 #!/bin/bash
-# Qwt 6.2.0 against the Linux Qt build: libqwt.so + libqwt-static.a,
+# Qwt 6.3.0 against the Linux Qt build: libqwt.so + libqwt-static.a,
 # headers in include/qwt, CMake package `qwt` (qwt::qwt, qwt::qwt-static),
 # same names as the Windows build. Uses the repo's CMakeLists for Qwt
 # (build-scripts/qwt-CMakeLists.txt) with Linux file naming.
 source "$(dirname "$0")/env.sh"
 
-VER=6.2.0
+VER=6.3.0
 PREFIX="$PREFIX_ROOT/qwt/$VER"
 QT="$PREFIX_ROOT/qt/$QT_VER"
 
+# The official release tarball (Qwt is published on SourceForge only, which
+# build machines often can't reach): Ubuntu's archive carries it unmodified
+# (qwt_<ver>.orig.tar.bz2); the checksum is the SourceForge file's
+# (qwt-6.3.0.tar.bz2, as Homebrew pins it).
+QWT_URL="http://archive.ubuntu.com/ubuntu/pool/universe/q/qwt/qwt_${VER}.orig.tar.bz2"
+QWT_SHA256=dcb085896c28aaec5518cbc08c0ee2b4e60ada7ac929d82639f6189851a6129a
 if [ ! -d "$SRC/qwt-$VER" ]; then
-    git clone -q --depth 1 --branch "v$VER" https://github.com/opencor/qwt.git "$SRC/qwt-$VER"
+    curl -fsSL -o "$SRC/qwt-$VER.tar.bz2" "$QWT_URL"
+    echo "$QWT_SHA256  $SRC/qwt-$VER.tar.bz2" | sha256sum -c --quiet \
+        || { echo "qwt-$VER.tar.bz2: checksum mismatch" >&2; exit 1; }
+    tar -xjf "$SRC/qwt-$VER.tar.bz2" -C "$SRC"
+    rm "$SRC/qwt-$VER.tar.bz2"
 fi
 cp "$WIN_SCRIPTS/qwt-CMakeLists.txt" "$SRC/qwt-$VER/CMakeLists.txt"
 # Windows naming (qwt.dll without the lib prefix) -> libqwt.so / libqwt-static.a

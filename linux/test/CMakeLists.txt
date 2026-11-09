@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(WINLIBS "$ENV{WINLIBS}" CACHE PATH "winlibs Linux root")
 list(APPEND CMAKE_PREFIX_PATH
     "${WINLIBS}/qt/6.12.0"
-    "${WINLIBS}/qwt/6.2.0"
+    "${WINLIBS}/qwt/6.3.0"
     "${WINLIBS}/boost/boost-1.92.0"
     "${WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode"
     "${WINLIBS}/liquid-dsp/liquid-dsp-1.8.2"

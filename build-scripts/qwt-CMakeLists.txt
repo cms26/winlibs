@@ -3,7 +3,7 @@
 # build-qwt.sh). Builds the full Qwt library: plot + polar + widgets + svg +
 # opengl, as shared DLL and static library.
 cmake_minimum_required(VERSION 3.16)
-project(qwt VERSION 6.2.0 LANGUAGES CXX)
+project(qwt VERSION 6.3.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

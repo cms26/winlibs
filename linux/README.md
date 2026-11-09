@@ -71,7 +71,7 @@ Same folder names as the Windows tree, so CMake paths match:
 | `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp 1.8.2 | same tuning as Windows: run-time SSE/AVX dispatch, FFTW enabled and statically linked; targets `liquid::liquid`, `liquid::liquid-static` |
 | `fftw/fftw-3.3.10` | FFTW 3.3.10 | double + single, SSE2/AVX/AVX2 codelets chosen at run time, threads; `FFTW3::fftw3`, `FFTW3::fftw3f` |
 | `gpb/36.0` | Protocol Buffers 36.0 | same legacy layout as Windows (`bin/protoc`, headers + `lib/` in `c++/`); static, position independent |
-| `qwt/6.2.0` | Qwt 6.2.0 | `libqwt.so` + `libqwt-static.a`; targets `qwt::qwt`, `qwt::qwt-static` |
+| `qwt/6.3.0` | Qwt 6.3.0 | `libqwt.so` + `libqwt-static.a`; targets `qwt::qwt`, `qwt::qwt-static` |
 | `openssl/openssl-3.5.8` | OpenSSL 3.5.8 | 3.5 LTS |
 | `ffmpeg/ffmpeg-9.0.1` | FFmpeg 9.0.1 | for Qt Multimedia (the version Qt 6.12 documents); shared, LGPL 2.1+ (no GPL/nonfree parts), no hardware video decoding (no libva dependency); also usable directly (headers + `lib/pkgconfig`) |
 | `xcb-util-cursor/0.1.5` | xcb-util-cursor 0.1.5 | needed by Qt's xcb plugin, not in RHEL 8's base repositories; copied into Qt's `lib/` |
@@ -156,7 +156,7 @@ the Windows ones:
   "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
   "cacheVariables": {
     "CMAKE_BUILD_TYPE": "Release",
-    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.2.0;$env{WINLIBS}/boost/boost-1.92.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.2;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.0/c++;$env{WINLIBS}/nlohmann/v3.12.0;$env{WINLIBS}/eigen/eigen-3.4.1;$env{WINLIBS}/mkl/mkl-2026.2.0"
+    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.3.0;$env{WINLIBS}/boost/boost-1.92.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.2;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.0/c++;$env{WINLIBS}/nlohmann/v3.12.0;$env{WINLIBS}/eigen/eigen-3.4.1;$env{WINLIBS}/mkl/mkl-2026.2.0"
   }
 }
 ```
