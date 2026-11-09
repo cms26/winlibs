@@ -137,6 +137,15 @@ RUN bash $S/build-ffmpeg.sh && rm -rf /work
 COPY $S/build-qt-extras.sh $S/
 RUN bash $S/build-qt-extras.sh qtmultimedia && rm -rf /work
 RUN bash $S/build-qt-extras.sh qtpositioning qtlocation && rm -rf /work
+# Intel oneMKL (Eigen with EIGEN_USE_MKL_ALL, ILP64, GNU OpenMP), prebuilt by
+# Intel; downloaded from conda-forge (pinned files and checksums, see
+# build-mkl.sh; MKL_CONDA_CHANNEL for a mirror).
+ARG MKL_CONDA_CHANNEL=
+RUN dnf -y install zstd && dnf clean all
+COPY $S/cmake/MKLConfig.cmake $S/cmake/
+COPY $S/build-mkl.sh $S/
+RUN MKL_CONDA_CHANNEL="${MKL_CONDA_CHANNEL:-https://conda.anaconda.org/conda-forge/linux-64}" \
+    bash $S/build-mkl.sh && rm -rf /work
 COPY $S/build-all.sh $S/
 
 # Nothing may need a newer glibc than the base system's (2.28).

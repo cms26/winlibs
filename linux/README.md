@@ -72,6 +72,7 @@ Same folder names as the Windows tree, so CMake paths match:
 | `ffmpeg/ffmpeg-9.0.1` | FFmpeg 9.0.1 | for Qt Multimedia (the version Qt 6.12 documents); shared, LGPL 2.1+ (no GPL/nonfree parts), no hardware video decoding (no libva dependency); also usable directly (headers + `lib/pkgconfig`) |
 | `xcb-util-cursor/0.1.5` | xcb-util-cursor 0.1.5 | needed by Qt's xcb plugin, not in RHEL 8's base repositories; copied into Qt's `lib/` |
 | `eigen/eigen-3.4.1`, `nlohmann/v3.12.0`, `vkfft/vkfft-1.3.4` | header-only | CMake packages as on Windows |
+| `mkl/mkl-2026.2.0` | Intel oneMKL 2026.2 | Intel's binaries (from conda-forge, checksums pinned); headers, static + shared libraries (ILP64/LP64, GNU OpenMP/sequential). CMake package `MKL` written for winlibs: `MKL::MKL` and `MKL::Eigen` (Eigen with `EIGEN_USE_MKL_ALL`); see "Eigen with MKL" below. Intel Simplified Software License (redistributable), in `licenses/` |
 
 Release builds only (stripped). Your own code builds in Debug as usual and
 debugs fine against them; `gdb` (gcc-toolset) is in the image.
@@ -149,7 +150,7 @@ the Windows ones:
   "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
   "cacheVariables": {
     "CMAKE_BUILD_TYPE": "Release",
-    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.2.0;$env{WINLIBS}/boost/boost-1.92.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.2;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.0/c++;$env{WINLIBS}/nlohmann/v3.12.0"
+    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.2.0;$env{WINLIBS}/boost/boost-1.92.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.2;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.0/c++;$env{WINLIBS}/nlohmann/v3.12.0;$env{WINLIBS}/eigen/eigen-3.4.1;$env{WINLIBS}/mkl/mkl-2026.2.0"
   }
 }
 ```
@@ -170,6 +171,33 @@ stage('Linux') {
   }
 }
 ```
+
+## Eigen with MKL
+
+Eigen is header-only, so it uses MKL when *your* code is compiled with
+`EIGEN_USE_MKL_ALL` and linked with MKL. The `MKL` package does both:
+
+```cmake
+find_package(Eigen3 CONFIG REQUIRED)
+find_package(MKL CONFIG REQUIRED)            # $WINLIBS/mkl/mkl-2026.2.0 on CMAKE_PREFIX_PATH
+target_link_libraries(mylib PUBLIC MKL::Eigen)
+target_compile_definitions(mylib PRIVATE _GLIBCXX_PARALLEL)   # if you also want libstdc++'s parallel mode
+```
+
+`MKL::Eigen` gives `EIGEN_USE_MKL_ALL` (Eigen's products and decompositions
+go through MKL's BLAS/LAPACKE, its math functions through VML), `MKL_ILP64`
+(64-bit `MKL_INT`), `-fopenmp` with GNU OpenMP threading, and links MKL
+**statically**, so nothing from MKL has to be deployed (the application grows
+by the MKL code it uses, typically tens of MB). Use `MKL::MKL` for MKL alone.
+
+Link it `PUBLIC` (or to every target that includes Eigen): all code that
+includes Eigen headers must agree on `EIGEN_USE_MKL_ALL`. Settings, before
+`find_package(MKL)`: `MKL_INTERFACE` (`ilp64`/`lp64`), `MKL_THREADING`
+(`gnu_thread`/`sequential`), `MKL_LINK` (`static`/`dynamic`; dynamic needs
+`install(FILES ${MKL_RUNTIME_LIBRARIES} ...)` because MKL loads its
+CPU-specific libraries itself). At run time the machine needs `libgomp`
+(GCC's OpenMP runtime, `libgomp1` on Debian/Ubuntu); `MKL_NUM_THREADS` /
+`OMP_NUM_THREADS` limit the threads.
 
 ## Deploying
 

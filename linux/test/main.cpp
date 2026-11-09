@@ -43,6 +43,7 @@
 #include <log4cplus/initializer.h>
 
 #include <Eigen/Dense>
+#include "eigen_mkl.h"
 #include <fftw3.h>
 #include <nlohmann/json.hpp>
 
@@ -148,6 +149,11 @@ int main(int argc, char **argv)
     check("json", nlohmann::json::parse(R"({"a":[1,2]})")["a"][1] == 2);
     Eigen::Matrix2f m; m << 1, 2, 3, 4;
     check("eigen", std::fabs(m.determinant() + 2) < 1e-5f);
+    {
+        std::string info;
+        check("eigen-mkl", eigenMklCheck(info));
+        std::printf("           %s\n", info.c_str());
+    }
 
     // Qt Concurrent, Xml, Test, Sql (SQLite), PrintSupport (PDF)
     check("concurrent", QtConcurrent::run([] { return 42; }).result() == 42);
