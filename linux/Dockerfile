@@ -137,6 +137,12 @@ RUN bash $S/build-ffmpeg.sh && rm -rf /work
 COPY $S/build-qt-extras.sh $S/
 RUN bash $S/build-qt-extras.sh qtmultimedia && rm -rf /work
 RUN bash $S/build-qt-extras.sh qtpositioning qtlocation && rm -rf /work
+# Qt's MySQL driver (QMYSQL) with MariaDB Connector/C (LGPL) as the client
+# library; works with MySQL 8.x/9.x servers.
+COPY $S/build-mariadb-connector-c.sh $S/
+RUN bash $S/build-mariadb-connector-c.sh && rm -rf /work
+COPY $S/build-qt-mysql.sh $S/
+RUN bash $S/build-qt-mysql.sh && rm -rf /work
 # Intel oneMKL (Eigen with EIGEN_USE_MKL_ALL, ILP64, GNU OpenMP), prebuilt by
 # Intel; downloaded from conda-forge (pinned files and checksums, see
 # build-mkl.sh; MKL_CONDA_CHANNEL for a mirror).

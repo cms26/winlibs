@@ -26,8 +26,9 @@ Two things make that work:
   OpenGL/EGL (libglvnd), fontconfig/freetype, glib, dbus, zlib/zstd,
   Kerberos GSSAPI (`libgssapi_krb5`, used by Qt Network, as in the official
   Qt binaries), libudev (Qt Serial Port), libpulse (Qt Multimedia's
-  audio; PulseAudio's client library, also on PipeWire desktops) and, for
-  the optional CUPS print plugin, libcups.
+  audio; PulseAudio's client library, also on PipeWire desktops), libgomp
+  (GCC's OpenMP runtime, for code built with `-fopenmp`, e.g. Eigen with
+  MKL) and, for the optional CUPS print plugin, libcups.
 
 The libraries are delivered as a **Docker image** (not committed like the
 Windows binaries: Qt alone is several GB).
@@ -37,7 +38,10 @@ Windows binaries: Qt alone is several GB).
 `linux/test/run-on-distros.sh` builds `linux/test` (one app using every
 library: Qt Widgets/Network/WebSockets/SerialPort/Svg/Protobuf,
 Concurrent/PrintSupport/Sql/Xml/Test, Quick Widgets (QML), Positioning,
-Location and Multimedia (decoding audio through FFmpeg), Qwt, Boost
+Location and Multimedia (decoding audio through FFmpeg), MySQL (driver
+loads; with `WINLIBS_SMOKE_MYSQL=host:port:user:password` also a TLS
+connection and queries), Eigen with MKL (in a library built with
+`MKL::Eigen` and `_GLIBCXX_PARALLEL`), Qwt, Boost
 Asio `io_service`/thread/filesystem, log4cplus, liquid-dsp, FFTW, OpenSSL,
 nlohmann, Eigen) in the image, deploys it, and runs the deployed folder on
 stock distributions with only their desktop libraries installed. All checks
@@ -72,6 +76,7 @@ Same folder names as the Windows tree, so CMake paths match:
 | `ffmpeg/ffmpeg-9.0.1` | FFmpeg 9.0.1 | for Qt Multimedia (the version Qt 6.12 documents); shared, LGPL 2.1+ (no GPL/nonfree parts), no hardware video decoding (no libva dependency); also usable directly (headers + `lib/pkgconfig`) |
 | `xcb-util-cursor/0.1.5` | xcb-util-cursor 0.1.5 | needed by Qt's xcb plugin, not in RHEL 8's base repositories; copied into Qt's `lib/` |
 | `eigen/eigen-3.4.1`, `nlohmann/v3.12.0`, `vkfft/vkfft-1.3.4` | header-only | CMake packages as on Windows |
+| `mariadb-connector-c/mariadb-connector-c-3.4.11` | MariaDB Connector/C 3.4.11 | MySQL client library for Qt's MySQL driver (`QMYSQL`, in `qt/6.12.0/plugins/sqldrivers`; `libmariadb` copied into Qt's `lib/`). LGPL 2.1; TLS via the winlibs OpenSSL; MySQL 8/9 logins (`caching_sha2_password`) built in. See "MySQL" below |
 | `mkl/mkl-2026.2.0` | Intel oneMKL 2026.2 | Intel's binaries (from conda-forge, checksums pinned); headers, static + shared libraries (ILP64/LP64, GNU OpenMP/sequential). CMake package `MKL` written for winlibs: `MKL::MKL` and `MKL::Eigen` (Eigen with `EIGEN_USE_MKL_ALL`); see "Eigen with MKL" below. Intel Simplified Software License (redistributable), in `licenses/` |
 
 Release builds only (stripped). Your own code builds in Debug as usual and
@@ -93,7 +98,7 @@ docker build -f linux/Dockerfile -t winlibs-linux:rocky8 .
 About 3 hours on 2 cores, almost all of it Qt (FFmpeg plus Multimedia,
 Positioning and Location add about 20 minutes), and ~20 GB of free disk
 during the build (qtdeclarative's build tree is the peak); the final image
-is 2.4 GB. Each library is its own
+is about 4.5 GB (1.3 GB of it oneMKL). Each library is its own
 layer, so changing one library only rebuilds from there. Behind a corporate
 TLS proxy, put its CA certificate (PEM, `*.crt`) into `linux/extra-ca/` and
 pass `--build-arg https_proxy=...`.
@@ -126,7 +131,8 @@ That image must be **RHEL/Rocky/Alma 8** (glibc 2.28; anything newer
 makes your app need that newer glibc), with **gcc-toolset-13** (or newer)
 and the X11/xcb/GL/fontconfig/dbus `-devel` packages from this
 Dockerfile's `dnf install` line, plus `pulseaudio-libs` for Qt Multimedia. Tested: the archive added to a separate
-Rocky 8 image builds and runs `linux/test`. About 130 MB compressed.
+Rocky 8 image builds and runs `linux/test`. About 520 MB compressed, 370 MB of
+it oneMKL.
 
 ### Without Docker
 
@@ -171,6 +177,47 @@ stage('Linux') {
   }
 }
 ```
+
+## MySQL
+
+Qt's MySQL driver is included: `QSqlDatabase::addDatabase("QMYSQL")` with
+`Qt6::Sql`, no extra CMake. It uses **MariaDB Connector/C** as the client
+library rather than MySQL's own `libmysqlclient`: the connector is LGPL
+(MySQL's library is GPL v2 or a commercial Oracle license), so it can ship
+with a closed-source application, and it talks to current MySQL servers
+(8.4 LTS, 9.x), including their default `caching_sha2_password` login.
+Qt's deployment ships the driver plugin and `libmariadb` with the app.
+
+Use TLS (the connector has the winlibs OpenSSL), e.g.
+`db.setConnectOptions("SSL_MODE=SSL_MODE_REQUIRED")`; over an unencrypted
+connection `caching_sha2_password` only works after a server-side cache hit
+or with the server's RSA key. Tested against MySQL Server 9.7.4.
+
+## Qt Location: your own tile server (ArcGIS, ...)
+
+The `osm` plugin (the only map plugin Qt 6 builds; Qt switched off its
+ESRI/ArcGIS, Mapbox and HERE plugins) loads tiles from any URL, `http` or
+`https`, with `%x`, `%y`, `%z` in any order. ArcGIS uses `{z}/{y}/{x}`:
+
+```qml
+Plugin {
+    name: "osm"
+    PluginParameter {
+        name: "osm.mapping.custom.host"
+        value: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/%z/%y/%x"
+    }
+    PluginParameter { name: "osm.mapping.custom.mapcopyright"; value: "Esri" }
+    // Don't look up the built-in styles on maps-redirect.qt.io: no tiles at
+    // all are fetched until that lookup finishes, which never happens on a
+    // network that can't reach it.
+    PluginParameter { name: "osm.mapping.providersrepository.disabled"; value: true }
+}
+```
+
+and select the map type whose `style` is `MapType.CustomMap` ("Custom URL
+Map"). HTTPS uses the bundled OpenSSL and the system's CA certificates;
+tested with a TLS 1.3 tile server in ArcGIS's URL layout. Check the tile
+provider's terms (ArcGIS Online needs an Esri account/API key for most use).
 
 ## Eigen with MKL
 

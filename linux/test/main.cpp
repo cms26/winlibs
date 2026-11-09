@@ -23,6 +23,7 @@
 #include <QQuickWidget>
 #include <QQuickWindow>
 #include <QSqlDatabase>
+#include <QSqlError>
 #include <QSqlQuery>
 #include <QTemporaryDir>
 #include <QTimer>
@@ -171,6 +172,54 @@ int main(int argc, char **argv)
         check("sql", ok);
     }
     QSqlDatabase::removeDatabase("smoke");
+
+    // Qt's MySQL driver (QMYSQL, MariaDB Connector/C). With
+    // WINLIBS_SMOKE_MYSQL=host:port:user:password also connect (TLS
+    // required) and run queries against that server.
+    check("mysql", QSqlDatabase::isDriverAvailable("QMYSQL")
+                   && QSqlDatabase::addDatabase("QMYSQL", "mysql-driver").isValid());
+    QSqlDatabase::removeDatabase("mysql-driver");
+    const QStringList server = qEnvironmentVariable("WINLIBS_SMOKE_MYSQL").split(':');
+    if (server.size() == 4) {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", "mysql-live");
+        db.setHostName(server[0]);
+        db.setPort(server[1].toInt());
+        db.setUserName(server[2]);
+        db.setPassword(server[3]);
+        db.setConnectOptions("SSL_MODE=SSL_MODE_REQUIRED");   // QMYSQL option: fail without TLS
+        bool ok = db.open();
+        QString version, cipher, auth, error;
+        if (ok) {
+            QSqlQuery q(db);
+            ok = q.exec("select version(), "
+                        "(select variable_value from performance_schema.session_status where variable_name = 'Ssl_cipher'), "
+                        "(select plugin from mysql.user where user = substring_index(current_user(), '@', 1) limit 1)")
+                 && q.next();
+            if (ok) {
+                version = q.value(0).toString();
+                cipher = q.value(1).toString();
+                auth = q.value(2).toString();
+            }
+            ok = ok && q.exec("create database if not exists winlibs_smoke") && q.exec("use winlibs_smoke")
+                 && q.exec("create temporary table t (id bigint primary key, name varchar(20))")
+                 && q.prepare("insert into t values (?, ?)");
+            q.addBindValue(QVariant::fromValue<qint64>(5000000000LL));
+            q.addBindValue(QString::fromUtf8("caf\u00e9"));
+            ok = ok && q.exec() && q.exec("select id, name from t") && q.next()
+                 && q.value(0).toLongLong() == 5000000000LL && q.value(1).toString() == QString::fromUtf8("caf\u00e9")
+                 && !cipher.isEmpty();
+            if (q.lastError().isValid())
+                error = q.lastError().text();
+        }
+        if (db.lastError().isValid())
+            error = db.lastError().text();
+        check("mysql-live", ok);
+        std::printf("           server %s, TLS cipher %s, login %s%s%s\n", qPrintable(version),
+                    cipher.isEmpty() ? "(none)" : qPrintable(cipher), qPrintable(auth),
+                    error.isEmpty() ? "" : ", error: ", qPrintable(error));
+        db.close();
+    }
+    QSqlDatabase::removeDatabase("mysql-live");
     {
         QPrinter printer(QPrinter::HighResolution);
         printer.setOutputFormat(QPrinter::PdfFormat);
