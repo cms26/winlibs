@@ -32,6 +32,7 @@ distributions) are built as a Docker image, see [`linux/`](linux/README.md).
 | `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp | 1.8.2 | **runs on any x86-64 CPU**: SSE/AVX dot-product kernels chosen at run time (portable loop below 16 taps); linked with FFTW (static) for spgram/fftfilt/channelizers/OFDM, planner made thread-safe; small Win32 compat shims; CMake package `liquid` (targets `liquid::liquid-static`, `liquid::liquid` DLL; upstream names) |
 | `log4cplus/log4cplus-2.2.0.1` | log4cplus | 2.2.0.1 | Unicode (`tchar` = `wchar_t`); target `log4cplus::log4cplusU`, adds `UNICODE`/`_UNICODE` to consumers |
 | `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus | 2.2.0.1 | narrow (`tchar` = `char`); target `log4cplus::log4cplus`; mingw runtime (libgcc, libstdc++, winpthread) linked statically into the DLL, so no `runtime/` DLLs needed for it |
+| `mariadb-connector-c/mariadb-connector-c-3.4.11` | MariaDB Connector/C | 3.4.11 | MySQL client library for Qt's MySQL driver (`QMYSQL`; build the driver with `windows/build-qt-mysql-driver.ps1`, see below). LGPL 2.1; TLS via Windows Schannel (no OpenSSL DLLs); MySQL 8/9 logins (`caching_sha2_password`) built in; mingw runtime linked statically: `bin/libmariadb.dll` needs only Windows DLLs |
 | `marble/marble-26.08.0` | Marble | 26.08.0 (KDE Gear) | Qt6 build, library only |
 | `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only; CMake package (`find_package(nlohmann_json CONFIG)`, target `nlohmann_json::nlohmann_json`) and pkg-config file in `share/` |
 | `openssl/openssl-3.5.8` | OpenSSL | 3.5.8 | 3.5 LTS line |
@@ -88,6 +89,29 @@ application against release Qt).
   `libwinpthread-1.dll`) on `PATH` or next to the executable.
 - **Qt**: not in this repo; use the installed Qt (MinGW 64-bit) on
   `CMAKE_PREFIX_PATH`. Qwt and Marble need it there too.
+- **MySQL (Qt's `QMYSQL` driver)**: the Qt installer doesn't include it,
+  and a driver only works with the exact Qt version it was built for. Run
+  once per Qt version you install (Qt's MinGW, CMake and Ninja from the Qt
+  installer are used):
+
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File windows\build-qt-mysql-driver.ps1
+  ```
+
+  It finds Qt (`-QtDir`, else `QT_DIR`, else the newest
+  `C:\Qt\6.*\mingw_64`), builds `qsqlmysql.dll` against this repo's MariaDB
+  Connector/C (source from Qt's "Sources" component, or downloaded with git),
+  installs it into Qt's `plugins\sqldrivers`, copies `libmariadb.dll` into
+  Qt's `bin\`, and runs a check program (`-TestConnection
+  host:port:user:password` also connects to a server, TLS required). Then
+  `QSqlDatabase::addDatabase("QMYSQL")` works. When deploying, ship
+  `libmariadb.dll` yourself (Qt's deployment copies the driver but not its
+  DLL), e.g.
+  `install(FILES "$<TARGET_FILE_DIR:Qt6::Core>/libmariadb.dll" DESTINATION ${CMAKE_INSTALL_BINDIR})`.
+  MariaDB Connector/C rather than MySQL's `libmysqlclient`: LGPL instead of
+  GPL v2 / Oracle's commercial license, same Qt code. Tested: the script
+  built the driver for Qt 6.12.0, which connected to MySQL Server 9.7.4 over
+  TLS with `caching_sha2_password`.
 - **cpprestsdk**: built with the portable pplx (`winpplx`) and
   `_TURN_OFF_PLATFORM_STRING`; use `_XPLATSTR()`/`utility::string_t`
   conventions as usual — the `U()` convenience macro still works in consumer

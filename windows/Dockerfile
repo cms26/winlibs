@@ -66,6 +66,7 @@ RUN bash build-scripts/build-libssh.sh
 RUN bash build-scripts/build-flatbuffers.sh
 RUN bash build-scripts/build-liquid-dsp.sh
 RUN bash build-scripts/build-protobuf.sh
+RUN bash build-scripts/build-mariadb-connector-c.sh
 
 # Boost and its consumers.
 RUN bash build-scripts/build-boost.sh
