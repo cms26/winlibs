@@ -14,7 +14,7 @@ LIBS=(
     eigen nlohmann vkfft
     # standalone libraries
     fftw shapelib log4cplus portaudio soapysdr volk libssh flatbuffers
-    liquid-dsp protobuf
+    liquid-dsp protobuf mariadb-connector-c
     # boost, then its consumers; boost-1.86 is the legacy-Asio install
     boost boost-1.86 wt cpprestsdk
     # Qt host tools and a build-only Qt for Windows (not shipped), then the
