@@ -21,7 +21,8 @@ list(APPEND CMAKE_PREFIX_PATH
     "${WINLIBS}/gpb/36.0/c++"
     "${WINLIBS}/nlohmann/v3.12.0"
     "${WINLIBS}/eigen/eigen-3.4.1"
-    "${WINLIBS}/vkfft/vkfft-1.3.4")
+    "${WINLIBS}/vkfft/vkfft-1.3.4"
+    "${WINLIBS}/mkl/mkl-2026.2.0")
 
 find_package(Qt6 6.12 REQUIRED COMPONENTS
     Core Gui Widgets Network WebSockets SerialPort Protobuf Svg
@@ -39,6 +40,15 @@ find_package(VkFFT CONFIG REQUIRED)
 # REQUIRES 6.5: current Qt policies, e.g. QML modules under qrc:/qt/qml/ (QTP0001)
 qt_standard_project_setup(REQUIRES 6.5)
 
+# Eigen with MKL, built like an application library: MKL::Eigen
+# (EIGEN_USE_MKL_ALL, MKL_ILP64, -fopenmp; MKL linked statically) plus
+# libstdc++'s parallel mode. PUBLIC: every file that includes Eigen must see
+# the same EIGEN_USE_MKL_ALL setting.
+find_package(MKL 2026.2 CONFIG REQUIRED)
+add_library(winlibs-eigen-mkl STATIC eigen_mkl.cpp)
+target_link_libraries(winlibs-eigen-mkl PUBLIC MKL::Eigen)
+target_compile_definitions(winlibs-eigen-mkl PRIVATE _GLIBCXX_PARALLEL)
+
 qt_add_executable(winlibs-smoke main.cpp)
 qt_add_protobuf(winlibs-smoke PROTO_FILES smoke.proto)
 # QML shown in a QQuickWidget. As a QML module, Qt's QML deployment finds its
@@ -54,7 +64,8 @@ target_link_libraries(winlibs-smoke PRIVATE
     liquid::liquid
     FFTW3::fftw3f
     nlohmann_json::nlohmann_json
-    Eigen3::Eigen)
+    Eigen3::Eigen
+    winlibs-eigen-mkl)
 
 # Installed layout: bin/winlibs-smoke, lib64/ (CMAKE_INSTALL_LIBDIR: lib64
 # on RHEL-family build hosts; all non-system .so files), plugins/. Qt's
