@@ -8,10 +8,13 @@ Rocky builds:
 
 | Runs on | |
 |---|---|
-| RHEL / Rocky / Alma | 8, 9, 10 |
+| RHEL / Rocky / Alma / Oracle Linux | 8, 9, 10 |
 | Ubuntu | 20.04 and newer |
-| Debian | 10 and newer |
-| anything else | glibc 2.28 or newer (`ldd --version` shows it) |
+| Debian | 11 and newer |
+| anything else | glibc 2.28 or newer (`ldd --version` shows it) and `libxcb-util.so.1` |
+
+The full list, Windows included, is in the main README under
+[Supported operating systems](../README.md#supported-operating-systems).
 
 Two things make that work:
 
