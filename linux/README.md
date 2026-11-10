@@ -70,13 +70,13 @@ Same folder names as the Windows tree, so CMake paths match:
 |---|---|---|
 | `qt/6.12.0` | Qt 6.12.0 | qtbase (xcb, OpenGL, dbus, sqlite), qtshadertools, qtdeclarative, qtsvg, qtimageformats, qtserialport, qt5compat, qtwebsockets, qtgrpc (QtProtobuf/QtGrpc, `qt_add_protobuf`), qtmultimedia (FFmpeg backend, PulseAudio/PipeWire audio), qtpositioning, qtlocation; OpenSSL and FFmpeg copied into `lib/`; ICU, HarfBuzz, PCRE2, libpng, libjpeg bundled |
 | `boost/boost-1.92.0` | Boost 1.92.0 | same version as Windows; shared + static, tagged layout. Boost 1.86.0 (classic Asio API, `io_service`) can be added next to it with `build-boost.sh 1.86.0` |
-| `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus 2.2.0.1 | narrow (`tchar` = `char`), target `log4cplus::log4cplus` |
-| `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp 1.8.2 | same tuning as Windows: run-time SSE/AVX dispatch, FFTW enabled and statically linked; targets `liquid::liquid`, `liquid::liquid-static` |
+| `log4cplus/log4cplus-2.2.1-nonunicode` | log4cplus 2.2.1 | narrow (`tchar` = `char`), target `log4cplus::log4cplus` |
+| `liquid-dsp/liquid-dsp-1.8.3` | liquid-dsp 1.8.3 | same tuning as Windows: run-time SSE/AVX dispatch, FFTW enabled and statically linked; targets `liquid::liquid`, `liquid::liquid-static` |
 | `fftw/fftw-3.3.10` | FFTW 3.3.10 | double + single, SSE2/AVX/AVX2 codelets chosen at run time, threads; `FFTW3::fftw3`, `FFTW3::fftw3f` |
-| `gpb/36.0` | Protocol Buffers 36.0 | same legacy layout as Windows (`bin/protoc`, headers + `lib/` in `c++/`); static, position independent |
+| `gpb/36.2` | Protocol Buffers 36.2 | same legacy layout as Windows (`bin/protoc`, headers + `lib/` in `c++/`); static, position independent |
 | `qwt/6.3.0` | Qwt 6.3.0 | `libqwt.so` + `libqwt-static.a`; targets `qwt::qwt`, `qwt::qwt-static` |
-| `openssl/openssl-3.5.8` | OpenSSL 3.5.8 | 3.5 LTS |
-| `ffmpeg/ffmpeg-9.0.1` | FFmpeg 9.0.1 | for Qt Multimedia (the version Qt 6.12 documents); shared, LGPL 2.1+ (no GPL/nonfree parts), no hardware video decoding (no libva dependency); also usable directly (headers + `lib/pkgconfig`) |
+| `openssl/openssl-3.5.9` | OpenSSL 3.5.9 | 3.5 LTS |
+| `ffmpeg/ffmpeg-9.0.2` | FFmpeg 9.0.2 | for Qt Multimedia (bug-fix release of 9.0.1, the version Qt 6.12 documents); shared, LGPL 2.1+ (no GPL/nonfree parts), no hardware video decoding (no libva dependency); also usable directly (headers + `lib/pkgconfig`) |
 | `xcb-util-cursor/0.1.5` | xcb-util-cursor 0.1.5 | needed by Qt's xcb plugin, not in RHEL 8's base repositories; copied into Qt's `lib/` |
 | `eigen/eigen-3.4.1`, `nlohmann/v3.12.0`, `vkfft/vkfft-1.3.4` | header-only | CMake packages as on Windows |
 | `mariadb-connector-c/mariadb-connector-c-3.4.11` | MariaDB Connector/C 3.4.11 | MySQL client library for Qt's MySQL driver (`QMYSQL`, in `qt/6.12.0/plugins/sqldrivers`; `libmariadb` copied into Qt's `lib/`). LGPL 2.1; TLS via the winlibs OpenSSL; MySQL 8/9 logins (`caching_sha2_password`) built in. See "MySQL" below |
@@ -159,7 +159,7 @@ the Windows ones:
   "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
   "cacheVariables": {
     "CMAKE_BUILD_TYPE": "Release",
-    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.3.0;$env{WINLIBS}/boost/boost-1.92.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.2;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.0/c++;$env{WINLIBS}/nlohmann/v3.12.0;$env{WINLIBS}/eigen/eigen-3.4.1;$env{WINLIBS}/mkl/mkl-2026.2.0"
+    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.3.0;$env{WINLIBS}/boost/boost-1.92.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.3;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.2/c++;$env{WINLIBS}/nlohmann/v3.12.0;$env{WINLIBS}/eigen/eigen-3.4.1;$env{WINLIBS}/mkl/mkl-2026.2.0"
   }
 }
 ```

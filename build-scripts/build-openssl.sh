@@ -2,7 +2,7 @@
 # OpenSSL 3.5 LTS for 64-bit Windows (mingw-w64 cross build).
 source "$(dirname "$0")/env.sh"
 
-VER=3.5.8
+VER=3.5.9
 PREFIX="$REPO_ROOT/openssl/openssl-$VER"
 
 if [ ! -d "$SRC/openssl-$VER" ]; then

@@ -3,11 +3,11 @@
 # HTTP connector + bundled sqlite3 Dbo backend; no FCGI (unix-only).
 source "$(dirname "$0")/env.sh"
 
-VER=4.14.2
+VER=4.15.0
 PREFIX="$REPO_ROOT/wt/wt-$VER"
 BOOST="$REPO_ROOT/boost/boost-1.92.0"
-OPENSSL="$REPO_ROOT/openssl/openssl-3.5.8"
-ZLIB="$REPO_ROOT/zlib/zlib-1.3.2"
+OPENSSL="$REPO_ROOT/openssl/openssl-3.5.9"
+ZLIB="$REPO_ROOT/zlib/zlib-1.4"
 
 if [ ! -d "$SRC/wt-$VER" ]; then
     git clone --depth 1 --branch "$VER" https://github.com/emweb/wt.git "$SRC/wt-$VER"
@@ -55,4 +55,13 @@ for f in "$PREFIX"/lib/*d.a; do
         "$STRIP" --strip-debug "$f"
     fi
 done
+# Wt's exported CMake files name zlib by absolute path (this machine's
+# repository); make it relative to Wt's own folder, so find_package(wt) and
+# Wt::HTTP work from any checkout.
+for f in "$PREFIX"/lib/cmake/wt/*.cmake; do
+    sed -i "s|$REPO_ROOT/|\${_IMPORT_PREFIX}/../../|g" "$f"
+done
+if grep -l "$REPO_ROOT" "$PREFIX"/lib/cmake/wt/*.cmake; then
+    echo "ERROR: absolute paths left in Wt's CMake files" >&2; exit 1
+fi
 echo "wt $VER installed to $PREFIX"

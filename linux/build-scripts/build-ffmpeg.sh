@@ -1,8 +1,9 @@
 #!/bin/bash
 # FFmpeg (shared, LGPL) for Qt Multimedia's FFmpeg backend
-# (build-qt-multimedia.sh), the version Qt 6.12 documents (9.0.1).
+# (build-qt-extras.sh), FFmpeg 9.0, the series Qt 6.12 documents (9.0.1;
+# 9.0.2 is its bug-fix release, same library versions).
 #
-#   build-ffmpeg.sh [version]     (default 9.0.1)
+#   build-ffmpeg.sh [version]     (default 9.0.2)
 #
 # Only what Qt needs (avcodec, avformat, avutil, swresample, swscale, plus
 # avfilter), built with --disable-autodetect so the libraries need nothing
@@ -16,7 +17,7 @@
 # when deployed into one folder.
 source "$(dirname "$0")/env.sh"
 
-VER="${1:-${FFMPEG_VER:-9.0.1}}"
+VER="${1:-${FFMPEG_VER:-9.0.2}}"
 PREFIX="$PREFIX_ROOT/ffmpeg/ffmpeg-$VER"
 OPENSSL="$PREFIX_ROOT/openssl/openssl-$OPENSSL_VER"
 

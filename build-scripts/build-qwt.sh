@@ -1,6 +1,6 @@
 #!/bin/bash
-# Qwt for 64-bit Windows, built against the build-only Qt 6.11.2 from
-# build-qt.sh ($WINLIBS_QT); runs with any installed Qt 6.11 or newer.
+# Qwt for 64-bit Windows, built against the build-only Qt 6.12.0 from
+# build-qt.sh ($WINLIBS_QT); runs with any installed Qt 6.12 or newer.
 # Upstream qwt is qmake-only; we use the CMakeLists shipped in build-scripts.
 # Source: the official 6.3.0 release (see below). 6.3.0 fixes, among others,
 # filled curves with a curve fitter drawing nothing, and blurry legend icons,
@@ -15,7 +15,7 @@ QT="$WINLIBS_QT"
 # build machines often can't reach): Ubuntu's archive carries it unmodified
 # (qwt_<ver>.orig.tar.bz2); the checksum is the SourceForge file's
 # (qwt-6.3.0.tar.bz2, as Homebrew pins it).
-QWT_URL="http://archive.ubuntu.com/ubuntu/pool/universe/q/qwt/qwt_${VER}.orig.tar.bz2"
+QWT_URL="https://archive.ubuntu.com/ubuntu/pool/universe/q/qwt/qwt_${VER}.orig.tar.bz2"
 QWT_SHA256=dcb085896c28aaec5518cbc08c0ee2b4e60ada7ac929d82639f6189851a6129a
 if [ ! -d "$SRC/qwt-$VER" ]; then
     curl -fsSL -o "$SRC/qwt-$VER.tar.bz2" "$QWT_URL"

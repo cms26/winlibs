@@ -16,8 +16,8 @@
 #       no mingw runtime DLLs next to it.
 source "$(dirname "$0")/env.sh"
 
-VER=2.2.0.1
-TAG=REL_2_2_0_1
+VER=2.2.1
+TAG=REL_2_2_1
 OBJDUMP=${TRIPLET}-objdump
 
 if [ ! -d "$SRC/log4cplus-$VER" ]; then

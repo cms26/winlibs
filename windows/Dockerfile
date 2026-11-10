@@ -33,7 +33,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         cmake ninja-build make autoconf automake libtool pkg-config \
         libgl-dev libglu1-mesa-dev libxkbcommon-dev \
         curl git unzip xz-utils ca-certificates \
+        shared-mime-info \
     && rm -rf /var/lib/apt/lists/* \
+    # shared-mime-info: Marble installs share/mime (its map file types) only
+    # when update-mime-database is found.
     # Qt (std::thread) needs the posix-threads mingw variant
     && update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix \
     && update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Protocol Buffers (gpb) 36.0: static libraries (position independent) with
+# Protocol Buffers (gpb): static libraries (position independent) with
 # bundled Abseil, plus protoc. Same legacy layout as the Windows tree, so
 # CMake paths match on both platforms:
 #   gpb/<ver>/bin/        protoc and plugins

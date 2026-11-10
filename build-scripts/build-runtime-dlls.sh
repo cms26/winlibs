@@ -18,7 +18,7 @@ src="$(find /usr/$TRIPLET/lib "$GCC_LIBDIR" -name libwinpthread-1.dll 2>/dev/nul
 # Command-line tools that link their own shared libraries also need these
 # runtime DLLs beside the .exe to run standalone (protoc/flatc are linked
 # fully static and need nothing).
-for tooldir in "$REPO_ROOT/openssl/openssl-3.5.8/bin" \
+for tooldir in "$REPO_ROOT/openssl/openssl-3.5.9/bin" \
                "$REPO_ROOT/soapysdr/soapysdr-0.8.1/bin"; do
     [ -d "$tooldir" ] && cp "$PREFIX"/*.dll "$tooldir/"
 done

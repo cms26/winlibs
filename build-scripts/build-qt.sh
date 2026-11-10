@@ -1,5 +1,5 @@
 #!/bin/bash
-# Qt 6.11.2 for 64-bit Windows (mingw-w64 cross build), BUILD-ONLY.
+# Qt 6.12.0 for 64-bit Windows (mingw-w64 cross build), BUILD-ONLY.
 # Not shipped in this repo (applications use the installed Qt); Qwt and
 # Marble are compiled against it. Installs into the scratch folder
 # ($WINLIBS_QT, default $WINLIBS_WORK/qt-<ver>).
@@ -9,10 +9,10 @@
 # OpenSSL support is linked against the repo's openssl build.
 source "$(dirname "$0")/env.sh"
 
-VER=6.11.2
+VER=6.12.0
 PREFIX="$WINLIBS_QT"
 HOST_PREFIX="$WORK/qt-host-$VER"
-OPENSSL="$REPO_ROOT/openssl/openssl-3.5.8"
+OPENSSL="$REPO_ROOT/openssl/openssl-3.5.9"
 
 export WINLIBS_FIND_ROOT="$OPENSSL"
 

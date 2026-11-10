@@ -13,7 +13,7 @@
 # qwt.dll/qwt.dll.a/qwt-static.a, debug ones carry a 'd' suffix, all in lib/.
 # RelWithDebInfo/MinSizeRel use the release binaries.
 #
-# Qwt was built against Qt 6.11.2 and works with any installed Qt 6.11 or
+# Qwt was built against Qt 6.12.0 and works with any installed Qt 6.12 or
 # newer (mingw x64); this config loads the Qt 6 modules it needs, so Qt must
 # be findable (CMAKE_PREFIX_PATH).
 

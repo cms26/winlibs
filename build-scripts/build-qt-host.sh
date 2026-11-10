@@ -1,9 +1,9 @@
 #!/bin/bash
-# Qt 6.11.2 HOST tools build (runs on the Linux build host, NOT shipped).
+# Qt 6.12.0 HOST tools build (runs on the Linux build host, NOT shipped).
 # Provides moc/rcc/uic/etc. for the Windows cross build via QT_HOST_PATH.
 source "$(dirname "$0")/env.sh"
 
-VER=6.11.2
+VER=6.12.0
 HOST_PREFIX="$WORK/qt-host-$VER"
 
 # gui/widgets must stay enabled: the host qtshadertools/qtdeclarative tools

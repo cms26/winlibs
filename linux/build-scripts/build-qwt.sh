@@ -13,7 +13,7 @@ QT="$PREFIX_ROOT/qt/$QT_VER"
 # build machines often can't reach): Ubuntu's archive carries it unmodified
 # (qwt_<ver>.orig.tar.bz2); the checksum is the SourceForge file's
 # (qwt-6.3.0.tar.bz2, as Homebrew pins it).
-QWT_URL="http://archive.ubuntu.com/ubuntu/pool/universe/q/qwt/qwt_${VER}.orig.tar.bz2"
+QWT_URL="https://archive.ubuntu.com/ubuntu/pool/universe/q/qwt/qwt_${VER}.orig.tar.bz2"
 QWT_SHA256=dcb085896c28aaec5518cbc08c0ee2b4e60ada7ac929d82639f6189851a6129a
 if [ ! -d "$SRC/qwt-$VER" ]; then
     curl -fsSL -o "$SRC/qwt-$VER.tar.bz2" "$QWT_URL"

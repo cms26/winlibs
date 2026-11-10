@@ -1,0 +1,235 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2025 Emweb bv, Herent, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WPASSWORDEDIT_H_
+#define WPASSWORDEDIT_H_
+
+#include "Wt/WJavaScript.h"
+#include "Wt/WLineEdit.h"
+#include "Wt/WPasswordValidator.h"
+#include "Wt/WStackedValidator.h"
+
+namespace Wt {
+
+/*! \class WPasswordEdit Wt/WPasswordEdit.h Wt/WPasswordEdit.h
+ *  \brief A password edit.
+ *
+ *  A password edit is a line edit where the character are hidden.
+ *
+ * The widget corresponds to the HTML <tt>&lt;input type="password"&gt;</tt> tag.
+ */
+class WT_API WPasswordEdit : public WLineEdit
+{
+public:
+  /*! \brief Creates a password edit with empty content.
+   */
+  WPasswordEdit();
+
+  /*! \brief Creates a password edit with given content.
+   */
+  WPasswordEdit(const WT_USTRING& content);
+
+  void setMaxLength(int length) override;
+
+  /*! \brief Changes whether a native HTML5 control is used.
+   *
+   * When enabled the browser's native attribute for password input
+   * (<input type="password">) will be used instead of a validator.
+   *
+   * By default, this option is set to defaultNativeControl(), which is
+   * \c false by default.
+   *
+   * \sa nativeControl() ,setDefaultNativeControl()
+   */
+  void setNativeControl(bool nativeControl);
+
+  /*! \brief Returns whether a native HTML5 control is used.
+   *
+   * \sa setNativeControl(bool)
+   */
+  bool nativeControl() const { return nativeControl_; }
+
+  /*! \brief Sets whether the password is shown in clear text.
+   *
+   * When enabled, the input changes its type from "password" to
+   * "text", revealing the content of the field.
+   *
+   * The default value is false.
+   *
+   * \sa isTextVisible()
+   */
+  void setTextVisible(bool visible);
+
+  /*! \brief Returns whether the password is shown in clear text.
+   *
+   * \sa setTextVisible(bool)
+   */
+  bool isTextVisible() const { return textVisible_; }
+
+  /*! \brief Shows or hides a button allowing the user to reveal the password.
+   *
+   * When enabled, a button is shown inside the line edit which toggles
+   * the visibility of the password. The toggle happens client-side,
+   * without a server round trip, and is reported back with
+   * textVisibilityChanged().
+   *
+   * The default value is false.
+   *
+   * \note The button can only be activated with a pointer device. For a
+   *       keyboard-accessible toggle, connect your own control to
+   *       setTextVisible().
+   *
+   * \note Hiding the button does not hide a password that is currently
+   *       shown; use setTextVisible() for that.
+   *
+   * \sa revealButtonEnabled(), setTextVisible(), textVisibilityChanged()
+   */
+  void setRevealButtonEnabled(bool enabled);
+
+  /*! \brief Returns whether the reveal button is shown.
+   *
+   * \sa setRevealButtonEnabled(bool)
+   */
+  bool revealButtonEnabled() const { return revealButtonEnabled_; }
+
+  /*! \brief Signal emitted when the user toggles the text visibility.
+   *
+   * This is emitted when the visibility of the password is changed with
+   * the reveal button. The argument is whether the password is now shown
+   * in clear text.
+   *
+   * \sa setRevealButtonEnabled(bool), isTextVisible()
+   */
+  JSignal<bool>& textVisibilityChanged();
+
+  /*! \brief Specifies the minimum length of text that can be entered.
+   *
+   * The default value is 0.
+   */
+  void setMinLength(int length);
+
+  /*! \brief Returns the minimum length of text that can be entered.
+   *
+   * \sa setMinLength(int)
+   */
+  int minLength() const { return pwdValidator_->minLength(); }
+
+  /*! \brief Specifies if the password is required.
+   *
+   * If true, the password cannot be empty.
+   *
+   * The default value is true.
+   */
+  void setRequired(bool required);
+
+  /*! \brief Return if the password is required.
+   *
+   * \sa setRequired(bool)
+   */
+  bool isRequired() const { return pwdValidator_->isMandatory(); }
+
+  /*! \brief Specifies the pattern that the password must match
+   *
+   * The default value is "".
+   */
+  void setPattern(const WT_USTRING& pattern);
+
+  /*! \brief Return the pattern the password must match.
+   *
+   * \sa setPattern()
+   */
+  WString pattern() const { return pwdValidator_->regExpPattern(); }
+
+  /*! \brief Sets the message to display when the password is too long.
+   *
+   * The default value is "Password too long".
+   */
+  void setInvalidTooLongText(const WString& text);
+
+  /*! \brief Returns the message displayed when the password is too long.
+   *
+   * \sa setInvalidTooLongText(const WString&)
+   */
+  WString invalidTooLongText() const { return pwdValidator_->invalidTooLongText(); }
+
+  /*! \brief Sets the message to display when the password is too small.
+   *
+   * The default value is "Password too small".
+   */
+  void setInvalidTooShortText(const WString& text);
+
+  /*! \brief Returns the message displayed when the password is too small.
+   *
+   * \sa setInvalidTooShortText(const WString&)
+   */
+  WString invalidTooShortText() const { return pwdValidator_->invalidTooShortText(); }
+
+    /*! \brief Sets the message to display when the password does not match the pattern.
+   *
+   * The default value is "Invalid input".
+   */
+  void setInvalidNoMatchText(const WString& text);
+
+  /*! \brief Returns the message displayed when the password does not match the pattern.
+   *
+   * \sa setInvalidNoMatchText(const WString&)
+   */
+  WString invalidNoMatchText() const { return pwdValidator_->invalidNoMatchText(); };
+
+  /*! \brief Sets the message to display when the password is empty and required.
+   *
+   * The default value is "This field cannot be empty".
+   */
+  void setInvalidBlankText(const WString& text);
+
+  /*! \brief Returns the message displayed when the password is empty and required.
+   *
+   * \sa setInvalidBlankText(const WString&)
+   */
+  WString invalidBlankText() const { return pwdValidator_->invalidBlankText(); }
+
+  void setValidator(const std::shared_ptr<WValidator>& validator) override;
+
+  std::shared_ptr<WValidator> validator() const override { return otherValidator_; }
+
+  ValidationState validate() override;
+
+protected:
+  void updateDom(DomElement& element, bool all) override;
+  void render(WFlags<RenderFlag> flags) override;
+  WT_NODISCARD std::string type() const noexcept override { return textVisible_ ? "text" : "password"; }
+  std::shared_ptr<WValidator> realValidator() const override { return WLineEdit::validator(); }
+
+private:
+  bool nativeControl_;
+  bool textVisible_;
+  bool revealButtonEnabled_;
+  bool javaScriptDefined_;
+  bool textVisibilityChangedUsed_;
+  bool textVisibilityChangedUsedRendered_;
+  JSignal<bool> textVisibilityChanged_;
+  std::shared_ptr<WPasswordValidator> pwdValidator_;
+  std::shared_ptr<WValidator> otherValidator_;
+
+  static const int BIT_MIN_LENGTH_CHANGED   = 0;
+  static const int BIT_REQUIRED_CHANGED     = 1;
+  static const int BIT_CONTROL_CHANGED      = 2;
+  static const int BIT_PATTERN_CHANGED      = 3;
+  static const int BIT_TEXT_VISIBLE_CHANGED = 4;
+
+  std::bitset<5> flags_;
+
+  std::shared_ptr<WStackedValidator> stackedValidator() const { return std::dynamic_pointer_cast<WStackedValidator>(WLineEdit::validator()); }
+
+  void init();
+  void handleTextVisibilityChanged(bool visible);
+  void defineJavaScript();
+  void connectJavaScript(Wt::EventSignalBase& s, const std::string& methodName);
+};
+
+}
+
+#endif // WPASSWORDEDIT_H_

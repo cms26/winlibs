@@ -24,7 +24,7 @@ mkdir -p "$SRC" "$BLD"
 # Not part of the repo: applications use the installed Qt. Point this at
 # another mingw x64 Qt 6 prefix (one with lib/cmake/Qt6/qt.toolchain.cmake)
 # to skip build-qt.sh.
-WINLIBS_QT="${WINLIBS_QT:-$WORK/qt-6.11.2}"
+WINLIBS_QT="${WINLIBS_QT:-$WORK/qt-6.12.0}"
 
 # Prefer the posix-threads compilers explicitly so the scripts work even when
 # update-alternatives still points at the win32-threads variant.
