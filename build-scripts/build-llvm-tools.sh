@@ -12,7 +12,7 @@
 # Installs to tools/llvm-<ver>/{bin,lib/clang/<major>/include,LICENSE.TXT}.
 source "$(dirname "$0")/env.sh"
 
-VER=23.1.4
+VER=23.1.5
 MAJOR=${VER%%.*}
 PREFIX="$REPO_ROOT/tools/llvm-$VER"
 PKG="clang+llvm-$VER-x86_64-pc-windows-msvc"
