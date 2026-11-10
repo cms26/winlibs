@@ -18,7 +18,7 @@ list(APPEND CMAKE_PREFIX_PATH
     "${WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode"
     "${WINLIBS}/liquid-dsp/liquid-dsp-1.8.2"
     "${WINLIBS}/fftw/fftw-3.3.10"
-    "${WINLIBS}/gpb/36.0/c++"
+    "${WINLIBS}/gpb/36.2/c++"
     "${WINLIBS}/nlohmann/v3.12.0"
     "${WINLIBS}/eigen/eigen-3.4.1"
     "${WINLIBS}/vkfft/vkfft-1.3.4"

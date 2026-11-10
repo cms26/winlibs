@@ -8,7 +8,7 @@
 #   gpb/<ver>/c++/lib/        static libs + cmake/pkgconfig files
 source "$(dirname "$0")/env.sh"
 
-VER=36.0
+VER=36.2
 PREFIX="$REPO_ROOT/gpb/$VER"
 ZLIB="$REPO_ROOT/zlib/zlib-1.4"
 
