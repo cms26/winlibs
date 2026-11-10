@@ -14,8 +14,53 @@ MinGW 64-bit build, 6.11 or newer). Qwt and Marble here are built against
 Qt 6.11.2 and work with any newer Qt 6 at run time.
 
 **Linux:** the same libraries for Linux x86-64 (built on Rocky Linux 8 so
-the results run on RHEL 8+, Ubuntu 20.04+, Debian 10+ and other glibc 2.28+
+the results run on RHEL 8+, Ubuntu 20.04+, Debian 11+ and other glibc 2.28+
 distributions) are built as a Docker image, see [`linux/`](linux/README.md).
+
+## Supported operating systems
+
+Applications built with these libraries (and Qt 6.12) run on the following,
+64-bit (x86-64) only.
+
+### Windows
+
+| OS | Minimum | Notes |
+|---|---|---|
+| Windows 10 | **version 1809** (October 2018 Update) | set by Qt 6.12 ([Qt for Windows](https://doc.qt.io/qt-6.12/windows.html)) |
+| Windows 11 | all versions | |
+| Windows Server | 2019 or later (expected) | same base as Windows 10 1809; not listed by Qt, not tested |
+
+**Qt 6.12 is the last Qt release that supports Windows 10**
+([Qt blog](https://www.qt.io/blog/windows-10-eol-plans-in-qt)). It is an LTS
+release supported until about 2031: to keep Windows 10 as the minimum, stay
+on Qt 6.12.x patch releases rather than 6.13 or later. The libraries in this
+repository run on Windows 10 (most on older versions too).
+
+### Linux
+
+| OS | Minimum | Tested |
+|---|---|---|
+| RHEL / Rocky Linux / AlmaLinux / Oracle Linux | **8** | Rocky 8.10, 9.8 |
+| Ubuntu | **20.04 LTS** | 20.04, 24.04 |
+| Debian | **11 (bullseye)** | 11, 13 |
+| Fedora | any supported release | not tested |
+| SUSE Linux Enterprise / openSUSE Leap | **15 SP3 / 15.3** (glibc 2.31) | not tested |
+| Derivatives (Linux Mint, Pop!_OS, ...) | the release built on the bases above (e.g. Mint 20+) | not tested |
+
+What sets the Linux minimum is what applications need from the system:
+**glibc 2.28** (the build is made on Rocky Linux 8; a newer glibc runs it, an
+older one can't), a GCC 6+ C++ runtime (`libstdc++`, `GLIBCXX_3.4.22`), and
+`libxcb-util.so.1` for Qt's X11 plugin.
+
+Not supported: RHEL / CentOS 7 (glibc 2.17), Ubuntu 18.04 (glibc 2.27),
+Debian 10 (its `libxcb-util` appears to be the older `.so.0`; command-line
+programs would run, Qt GUIs not), SLES 12, Amazon Linux 2.
+
+On minimal installs, applications also need the usual desktop libraries (any
+desktop install has them): X11/xcb, OpenGL, fontconfig, dbus, glib,
+`libpulse`, `libXrandr`, `libgomp` (package names in
+[`linux/README.md`](linux/README.md)). Tested with
+`linux/test/run-on-distros.sh`.
 
 ## Contents
 
