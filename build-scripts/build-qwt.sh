@@ -1,6 +1,6 @@
 #!/bin/bash
-# Qwt for 64-bit Windows, built against the build-only Qt 6.11.2 from
-# build-qt.sh ($WINLIBS_QT); runs with any installed Qt 6.11 or newer.
+# Qwt for 64-bit Windows, built against the build-only Qt 6.12.0 from
+# build-qt.sh ($WINLIBS_QT); runs with any installed Qt 6.12 or newer.
 # Upstream qwt is qmake-only; we use the CMakeLists shipped in build-scripts.
 # Source: the official 6.3.0 release (see below). 6.3.0 fixes, among others,
 # filled curves with a curve fitter drawing nothing, and blurry legend icons,

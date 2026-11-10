@@ -1,6 +1,6 @@
 #!/bin/bash
 # Marble (KDE map widget) for 64-bit Windows, built against the build-only
-# Qt 6.11.2 from build-qt.sh ($WINLIBS_QT); runs with any installed Qt 6.11+.
+# Qt 6.12.0 from build-qt.sh ($WINLIBS_QT); runs with any installed Qt 6.12+.
 # Library-only build (no apps/tools/tests/designer plugin), no KDE Frameworks.
 source "$(dirname "$0")/env.sh"
 
