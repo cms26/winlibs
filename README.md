@@ -33,7 +33,7 @@ distributions) are built as a Docker image, see [`linux/`](linux/README.md).
 | `log4cplus/log4cplus-2.2.1` | log4cplus | 2.2.1 | Unicode (`tchar` = `wchar_t`); target `log4cplus::log4cplusU`, adds `UNICODE`/`_UNICODE` to consumers |
 | `log4cplus/log4cplus-2.2.1-nonunicode` | log4cplus | 2.2.1 | narrow (`tchar` = `char`); target `log4cplus::log4cplus`; mingw runtime (libgcc, libstdc++, winpthread) linked statically into the DLL, so no `runtime/` DLLs needed for it |
 | `mariadb-connector-c/mariadb-connector-c-3.4.11` | MariaDB Connector/C | 3.4.11 | MySQL client library for Qt's MySQL driver (`QMYSQL`; build the driver with `windows/build-qt-mysql-driver.ps1`, see below). LGPL 2.1; TLS via Windows Schannel (no OpenSSL DLLs); MySQL 8/9 logins (`caching_sha2_password`) built in; mingw runtime linked statically: `bin/libmariadb.dll` needs only Windows DLLs |
-| `marble/marble-26.08.0` | Marble | 26.08.0 (KDE Gear) | Qt6 build, library only |
+| `marble/marble-26.08.3` | Marble | 26.08.3 (KDE Gear) | Qt6 build, library only |
 | `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only; CMake package (`find_package(nlohmann_json CONFIG)`, target `nlohmann_json::nlohmann_json`) and pkg-config file in `share/` |
 | `openssl/openssl-3.5.9` | OpenSSL | 3.5.9 | 3.5 LTS line |
 | `portaudio/portaudio-19.7.0` | PortAudio | v19.7.0 | WMME/DirectSound/WASAPI/WDM-KS |

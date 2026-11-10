@@ -4,7 +4,7 @@
 # Library-only build (no apps/tools/tests/designer plugin), no KDE Frameworks.
 source "$(dirname "$0")/env.sh"
 
-VER=26.08.0
+VER=26.08.3
 ECM_VER=6.17.0
 PREFIX="$REPO_ROOT/marble/marble-$VER"
 QT="$WINLIBS_QT"
