@@ -1,12 +1,12 @@
 #!/bin/bash
-# log4cplus 2.2.0.1, narrow (tchar = char; target log4cplus::log4cplus),
+# log4cplus 2.2.1, narrow (tchar = char; target log4cplus::log4cplus),
 # matching the Windows log4cplus-<ver>-nonunicode install and its prefix
 # name. (On Linux, UNICODE builds use wchar_t like on Windows; the app uses
 # the narrow build, so only that one is built.)
 source "$(dirname "$0")/env.sh"
 
-VER=2.2.0.1
-TAG=REL_2_2_0_1
+VER=2.2.1
+TAG=REL_2_2_1
 PREFIX="$PREFIX_ROOT/log4cplus/log4cplus-$VER-nonunicode"
 
 if [ ! -d "$SRC/log4cplus-$VER" ]; then

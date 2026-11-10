@@ -30,8 +30,8 @@ distributions) are built as a Docker image, see [`linux/`](linux/README.md).
 | `gpb/36.2` | Protocol Buffers | 36.2 | legacy layout: `bin/` (protoc.exe + plugins), `c++/` (headers at root: google/, absl/, upb/), `c++/lib/` (static libs, bundled Abseil) |
 | `libssh/libssh-0.12.2` | libssh | 0.12.2 | linked against repo OpenSSL + zlib |
 | `liquid-dsp/liquid-dsp-1.8.3` | liquid-dsp | 1.8.3 | **runs on any x86-64 CPU**: SSE/AVX dot-product kernels chosen at run time (portable loop below 16 taps); linked with FFTW (static) for spgram/fftfilt/channelizers/OFDM, planner made thread-safe; small Win32 compat shims; CMake package `liquid` (targets `liquid::liquid-static`, `liquid::liquid` DLL; upstream names) |
-| `log4cplus/log4cplus-2.2.0.1` | log4cplus | 2.2.0.1 | Unicode (`tchar` = `wchar_t`); target `log4cplus::log4cplusU`, adds `UNICODE`/`_UNICODE` to consumers |
-| `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus | 2.2.0.1 | narrow (`tchar` = `char`); target `log4cplus::log4cplus`; mingw runtime (libgcc, libstdc++, winpthread) linked statically into the DLL, so no `runtime/` DLLs needed for it |
+| `log4cplus/log4cplus-2.2.1` | log4cplus | 2.2.1 | Unicode (`tchar` = `wchar_t`); target `log4cplus::log4cplusU`, adds `UNICODE`/`_UNICODE` to consumers |
+| `log4cplus/log4cplus-2.2.1-nonunicode` | log4cplus | 2.2.1 | narrow (`tchar` = `char`); target `log4cplus::log4cplus`; mingw runtime (libgcc, libstdc++, winpthread) linked statically into the DLL, so no `runtime/` DLLs needed for it |
 | `mariadb-connector-c/mariadb-connector-c-3.4.11` | MariaDB Connector/C | 3.4.11 | MySQL client library for Qt's MySQL driver (`QMYSQL`; build the driver with `windows/build-qt-mysql-driver.ps1`, see below). LGPL 2.1; TLS via Windows Schannel (no OpenSSL DLLs); MySQL 8/9 logins (`caching_sha2_password`) built in; mingw runtime linked statically: `bin/libmariadb.dll` needs only Windows DLLs |
 | `marble/marble-26.08.0` | Marble | 26.08.0 (KDE Gear) | Qt6 build, library only |
 | `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only; CMake package (`find_package(nlohmann_json CONFIG)`, target `nlohmann_json::nlohmann_json`) and pkg-config file in `share/` |
