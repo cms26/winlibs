@@ -3,7 +3,7 @@
 # openssl/libssh/qt consumers; shared + static.
 source "$(dirname "$0")/env.sh"
 
-VER=1.3.2
+VER=1.4
 PREFIX="$REPO_ROOT/zlib/zlib-$VER"
 
 if [ ! -d "$SRC/zlib-$VER" ]; then

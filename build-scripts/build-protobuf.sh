@@ -10,7 +10,7 @@ source "$(dirname "$0")/env.sh"
 
 VER=36.0
 PREFIX="$REPO_ROOT/gpb/$VER"
-ZLIB="$REPO_ROOT/zlib/zlib-1.3.2"
+ZLIB="$REPO_ROOT/zlib/zlib-1.4"
 
 if [ ! -d "$SRC/protobuf-$VER" ]; then
     git clone --depth 1 --branch "v$VER" --recurse-submodules --shallow-submodules \

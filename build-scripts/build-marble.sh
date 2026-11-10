@@ -8,7 +8,7 @@ VER=26.08.0
 ECM_VER=6.17.0
 PREFIX="$REPO_ROOT/marble/marble-$VER"
 QT="$WINLIBS_QT"
-ZLIB="$REPO_ROOT/zlib/zlib-1.3.2"
+ZLIB="$REPO_ROOT/zlib/zlib-1.4"
 
 if [ ! -d "$SRC/marble-$VER" ]; then
     git clone --depth 1 --branch "v$VER" https://github.com/KDE/marble.git "$SRC/marble-$VER"
