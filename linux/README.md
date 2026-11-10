@@ -73,7 +73,7 @@ Same folder names as the Windows tree, so CMake paths match:
 | `gpb/36.2` | Protocol Buffers 36.2 | same legacy layout as Windows (`bin/protoc`, headers + `lib/` in `c++/`); static, position independent |
 | `qwt/6.3.0` | Qwt 6.3.0 | `libqwt.so` + `libqwt-static.a`; targets `qwt::qwt`, `qwt::qwt-static` |
 | `openssl/openssl-3.5.9` | OpenSSL 3.5.9 | 3.5 LTS |
-| `ffmpeg/ffmpeg-9.0.1` | FFmpeg 9.0.1 | for Qt Multimedia (the version Qt 6.12 documents); shared, LGPL 2.1+ (no GPL/nonfree parts), no hardware video decoding (no libva dependency); also usable directly (headers + `lib/pkgconfig`) |
+| `ffmpeg/ffmpeg-9.0.2` | FFmpeg 9.0.2 | for Qt Multimedia (bug-fix release of 9.0.1, the version Qt 6.12 documents); shared, LGPL 2.1+ (no GPL/nonfree parts), no hardware video decoding (no libva dependency); also usable directly (headers + `lib/pkgconfig`) |
 | `xcb-util-cursor/0.1.5` | xcb-util-cursor 0.1.5 | needed by Qt's xcb plugin, not in RHEL 8's base repositories; copied into Qt's `lib/` |
 | `eigen/eigen-3.4.1`, `nlohmann/v3.12.0`, `vkfft/vkfft-1.3.4` | header-only | CMake packages as on Windows |
 | `mariadb-connector-c/mariadb-connector-c-3.4.11` | MariaDB Connector/C 3.4.11 | MySQL client library for Qt's MySQL driver (`QMYSQL`, in `qt/6.12.0/plugins/sqldrivers`; `libmariadb` copied into Qt's `lib/`). LGPL 2.1; TLS via the winlibs OpenSSL; MySQL 8/9 logins (`caching_sha2_password`) built in. See "MySQL" below |
