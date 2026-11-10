@@ -14,7 +14,7 @@
 # Requires fftw/ to be built first (build-fftw.sh).
 source "$(dirname "$0")/env.sh"
 
-VER=1.8.2
+VER=1.8.3
 FFTW="$REPO_ROOT/fftw/fftw-3.3.10"
 
 if [ ! -d "$SRC/liquid-dsp-$VER" ]; then

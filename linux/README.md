@@ -68,7 +68,7 @@ Same folder names as the Windows tree, so CMake paths match:
 | `qt/6.12.0` | Qt 6.12.0 | qtbase (xcb, OpenGL, dbus, sqlite), qtshadertools, qtdeclarative, qtsvg, qtimageformats, qtserialport, qt5compat, qtwebsockets, qtgrpc (QtProtobuf/QtGrpc, `qt_add_protobuf`), qtmultimedia (FFmpeg backend, PulseAudio/PipeWire audio), qtpositioning, qtlocation; OpenSSL and FFmpeg copied into `lib/`; ICU, HarfBuzz, PCRE2, libpng, libjpeg bundled |
 | `boost/boost-1.92.0` | Boost 1.92.0 | same version as Windows; shared + static, tagged layout. Boost 1.86.0 (classic Asio API, `io_service`) can be added next to it with `build-boost.sh 1.86.0` |
 | `log4cplus/log4cplus-2.2.0.1-nonunicode` | log4cplus 2.2.0.1 | narrow (`tchar` = `char`), target `log4cplus::log4cplus` |
-| `liquid-dsp/liquid-dsp-1.8.2` | liquid-dsp 1.8.2 | same tuning as Windows: run-time SSE/AVX dispatch, FFTW enabled and statically linked; targets `liquid::liquid`, `liquid::liquid-static` |
+| `liquid-dsp/liquid-dsp-1.8.3` | liquid-dsp 1.8.3 | same tuning as Windows: run-time SSE/AVX dispatch, FFTW enabled and statically linked; targets `liquid::liquid`, `liquid::liquid-static` |
 | `fftw/fftw-3.3.10` | FFTW 3.3.10 | double + single, SSE2/AVX/AVX2 codelets chosen at run time, threads; `FFTW3::fftw3`, `FFTW3::fftw3f` |
 | `gpb/36.2` | Protocol Buffers 36.2 | same legacy layout as Windows (`bin/protoc`, headers + `lib/` in `c++/`); static, position independent |
 | `qwt/6.3.0` | Qwt 6.3.0 | `libqwt.so` + `libqwt-static.a`; targets `qwt::qwt`, `qwt::qwt-static` |
@@ -156,7 +156,7 @@ the Windows ones:
   "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
   "cacheVariables": {
     "CMAKE_BUILD_TYPE": "Release",
-    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.3.0;$env{WINLIBS}/boost/boost-1.92.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.2;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.2/c++;$env{WINLIBS}/nlohmann/v3.12.0;$env{WINLIBS}/eigen/eigen-3.4.1;$env{WINLIBS}/mkl/mkl-2026.2.0"
+    "CMAKE_PREFIX_PATH": "$env{WINLIBS}/qt/6.12.0;$env{WINLIBS}/qwt/6.3.0;$env{WINLIBS}/boost/boost-1.92.0;$env{WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode;$env{WINLIBS}/liquid-dsp/liquid-dsp-1.8.3;$env{WINLIBS}/fftw/fftw-3.3.10;$env{WINLIBS}/gpb/36.2/c++;$env{WINLIBS}/nlohmann/v3.12.0;$env{WINLIBS}/eigen/eigen-3.4.1;$env{WINLIBS}/mkl/mkl-2026.2.0"
   }
 }
 ```

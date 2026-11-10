@@ -16,7 +16,7 @@ list(APPEND CMAKE_PREFIX_PATH
     "${WINLIBS}/qwt/6.3.0"
     "${WINLIBS}/boost/boost-1.92.0"
     "${WINLIBS}/log4cplus/log4cplus-2.2.0.1-nonunicode"
-    "${WINLIBS}/liquid-dsp/liquid-dsp-1.8.2"
+    "${WINLIBS}/liquid-dsp/liquid-dsp-1.8.3"
     "${WINLIBS}/fftw/fftw-3.3.10"
     "${WINLIBS}/gpb/36.2/c++"
     "${WINLIBS}/nlohmann/v3.12.0"

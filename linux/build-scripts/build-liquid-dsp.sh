@@ -10,7 +10,7 @@
 # Requires build-fftw.sh.
 source "$(dirname "$0")/env.sh"
 
-VER=1.8.2
+VER=1.8.3
 PREFIX="$PREFIX_ROOT/liquid-dsp/liquid-dsp-$VER"
 FFTW="$PREFIX_ROOT/fftw/fftw-$FFTW_VER"
 
