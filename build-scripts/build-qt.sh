@@ -12,7 +12,7 @@ source "$(dirname "$0")/env.sh"
 VER=6.11.2
 PREFIX="$WINLIBS_QT"
 HOST_PREFIX="$WORK/qt-host-$VER"
-OPENSSL="$REPO_ROOT/openssl/openssl-3.5.8"
+OPENSSL="$REPO_ROOT/openssl/openssl-3.5.9"
 
 export WINLIBS_FIND_ROOT="$OPENSSL"
 

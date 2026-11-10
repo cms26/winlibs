@@ -35,7 +35,7 @@ distributions) are built as a Docker image, see [`linux/`](linux/README.md).
 | `mariadb-connector-c/mariadb-connector-c-3.4.11` | MariaDB Connector/C | 3.4.11 | MySQL client library for Qt's MySQL driver (`QMYSQL`; build the driver with `windows/build-qt-mysql-driver.ps1`, see below). LGPL 2.1; TLS via Windows Schannel (no OpenSSL DLLs); MySQL 8/9 logins (`caching_sha2_password`) built in; mingw runtime linked statically: `bin/libmariadb.dll` needs only Windows DLLs |
 | `marble/marble-26.08.0` | Marble | 26.08.0 (KDE Gear) | Qt6 build, library only |
 | `nlohmann/v3.12.0` | nlohmann/json | 3.12.0 | header-only; CMake package (`find_package(nlohmann_json CONFIG)`, target `nlohmann_json::nlohmann_json`) and pkg-config file in `share/` |
-| `openssl/openssl-3.5.8` | OpenSSL | 3.5.8 | 3.5 LTS line |
+| `openssl/openssl-3.5.9` | OpenSSL | 3.5.9 | 3.5 LTS line |
 | `portaudio/portaudio-19.7.0` | PortAudio | v19.7.0 | WMME/DirectSound/WASAPI/WDM-KS |
 | `qwt/6.3.0` | Qwt | 6.3.0 | built against Qt 6.11.2 (runs with any installed Qt 6.11+); `lib/` holds `qwt.dll`/`qwtd.dll` + import libs + static libs; headers in `include/qwt`; the official release tarball (from Ubuntu's archive, which carries SourceForge's file unmodified; checksum-pinned). Over 6.2.0 it fixes filled curves with a curve fitter drawing nothing and blurry legend icons, spectrograms and rubber bands on high-DPI screens. CMake package `qwt` (targets `qwt::qwt` DLL, `qwt::qwt-static`; needs your installed Qt on the prefix path). Upgrading from 6.2.0: change `qwt/6.2.0` to `qwt/6.3.0` in your prefix paths; the API is the same except `QwtPlotOpenGLCanvas(int numSamples, QwtPlot*)` replacing the `QSurfaceFormat` constructor, and `QwtPointSeriesData`, `QwtPoint3DSeriesData` and `QwtIntervalSeriesData` being typedefs now (a forward declaration `class QwtPointSeriesData;` must become `#include <qwt_series_data.h>`) |
 | `shapelib/1.6.3` | Shapelib | 1.6.3 | |
@@ -80,7 +80,7 @@ application against release Qt).
   link-compatible with MSVC. C libraries (openssl, fftw, zlib, portaudio,
   liquid-dsp, shapelib, ...) can be used from MSVC via their DLLs/import libs.
 - **CMake**: most libraries install CMake package configs, e.g.
-  `-DCMAKE_PREFIX_PATH=C:/Qt/6.12.0/mingw_64;<repo>/openssl/openssl-3.5.8;...`
+  `-DCMAKE_PREFIX_PATH=C:/Qt/6.12.0/mingw_64;<repo>/openssl/openssl-3.5.9;...`
 - **Command-line tools**: `protoc.exe` and `flatc.exe` are fully static and
   run standalone; `openssl.exe` and `SoapySDRUtil.exe` ship with the mingw
   runtime DLLs beside them.

@@ -4,7 +4,7 @@ source "$(dirname "$0")/env.sh"
 
 VER=2.10.19
 PREFIX="$REPO_ROOT/cpprestsdk/cpprestsdk-$VER"
-OPENSSL="$REPO_ROOT/openssl/openssl-3.5.8"
+OPENSSL="$REPO_ROOT/openssl/openssl-3.5.9"
 ZLIB="$REPO_ROOT/zlib/zlib-1.4"
 
 # cpprestsdk 2.10.x (archived upstream) requires the classic Boost.Asio API

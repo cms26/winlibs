@@ -4,7 +4,7 @@ source "$(dirname "$0")/env.sh"
 
 VER=0.12.2
 PREFIX="$REPO_ROOT/libssh/libssh-$VER"
-OPENSSL="$REPO_ROOT/openssl/openssl-3.5.8"
+OPENSSL="$REPO_ROOT/openssl/openssl-3.5.9"
 ZLIB="$REPO_ROOT/zlib/zlib-1.4"
 
 if [ ! -d "$SRC/libssh-$VER" ]; then

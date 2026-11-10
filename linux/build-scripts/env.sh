@@ -26,7 +26,7 @@ mkdir -p "$SRC" "$BLD" "$PREFIX_ROOT"
 
 # Library versions, shared by the scripts that depend on each other.
 QT_VER=6.12.0
-OPENSSL_VER=3.5.8
+OPENSSL_VER=3.5.9
 FFTW_VER=3.3.10
 PROTOBUF_VER=36.0
 BOOST_VER_DEFAULT=1.92.0

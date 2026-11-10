@@ -72,7 +72,7 @@ Same folder names as the Windows tree, so CMake paths match:
 | `fftw/fftw-3.3.10` | FFTW 3.3.10 | double + single, SSE2/AVX/AVX2 codelets chosen at run time, threads; `FFTW3::fftw3`, `FFTW3::fftw3f` |
 | `gpb/36.0` | Protocol Buffers 36.0 | same legacy layout as Windows (`bin/protoc`, headers + `lib/` in `c++/`); static, position independent |
 | `qwt/6.3.0` | Qwt 6.3.0 | `libqwt.so` + `libqwt-static.a`; targets `qwt::qwt`, `qwt::qwt-static` |
-| `openssl/openssl-3.5.8` | OpenSSL 3.5.8 | 3.5 LTS |
+| `openssl/openssl-3.5.9` | OpenSSL 3.5.9 | 3.5 LTS |
 | `ffmpeg/ffmpeg-9.0.1` | FFmpeg 9.0.1 | for Qt Multimedia (the version Qt 6.12 documents); shared, LGPL 2.1+ (no GPL/nonfree parts), no hardware video decoding (no libva dependency); also usable directly (headers + `lib/pkgconfig`) |
 | `xcb-util-cursor/0.1.5` | xcb-util-cursor 0.1.5 | needed by Qt's xcb plugin, not in RHEL 8's base repositories; copied into Qt's `lib/` |
 | `eigen/eigen-3.4.1`, `nlohmann/v3.12.0`, `vkfft/vkfft-1.3.4` | header-only | CMake packages as on Windows |

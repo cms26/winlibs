@@ -6,7 +6,7 @@ source "$(dirname "$0")/env.sh"
 VER=4.14.2
 PREFIX="$REPO_ROOT/wt/wt-$VER"
 BOOST="$REPO_ROOT/boost/boost-1.92.0"
-OPENSSL="$REPO_ROOT/openssl/openssl-3.5.8"
+OPENSSL="$REPO_ROOT/openssl/openssl-3.5.9"
 ZLIB="$REPO_ROOT/zlib/zlib-1.4"
 
 if [ ! -d "$SRC/wt-$VER" ]; then
