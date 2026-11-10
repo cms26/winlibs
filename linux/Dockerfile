@@ -75,7 +75,7 @@ RUN dnf -y install dnf-plugins-core \
 # Current CMake and Ninja from their official GitHub releases (the RHEL 8
 # packages are older than Qt 6.12 likes); both run on glibc 2.17+.
 ARG CMAKE_VER=3.31.10
-ARG NINJA_VER=1.13.1
+ARG NINJA_VER=1.13.2
 RUN curl -sSfL "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VER}/cmake-${CMAKE_VER}-linux-x86_64.tar.gz" \
         | tar -xz -C /usr/local --strip-components=1 \
  && curl -sSfL -o /tmp/ninja.zip "https://github.com/ninja-build/ninja/releases/download/v${NINJA_VER}/ninja-linux.zip" \
